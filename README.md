@@ -7,6 +7,7 @@ An iOS package for automatic creating and editing avatars.
 ![Avatar3](./Docs/3.png)
 ![Avatar4](./Docs/4.png)
 ![Avatar5](./Docs/5.png)    
+![Avatar6](./Docs/6.png)
 
 ### Avatar editing
 ```swift
@@ -18,7 +19,7 @@ vc.delegate = self
 self.present(vc, animated: true, completion: nil)
 ```
 ### Show avatar
-Put AvatarView into your layout (storyboard or xib) and set avatar id to it:
+Put **AvatarView** into your layout (storyboard or xib) and set avatar id to it:
 ```swift
 @IBOutlet weak var avatarView: AvatarView!
 ...
@@ -26,5 +27,13 @@ avatarView.avatarId = avatarId
 ```
 ![AvatarView](./Docs/AvatarView.png)
 
-### Installation
+### Installation with **swift package manager**
+Tap on your main project, tab **Package dependencies** and add following url:
+```swift
+https://github.com/prcela/Avatar
+```
+
+### Preview in Yamb app
+Checkout this [Yamb](https://apps.apple.com/us/app/yamb/id354188615) app to see this avatars in action, how community builds creates many variations of avatars.
+
 
