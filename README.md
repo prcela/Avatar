@@ -1,6 +1,12 @@
 # Avatar
 
-An iOS package for automatic creating and editing avatars.    
+An iOS package for automatic creating and editing avatars.
+
+![Avatar1](./Docs/1.png)
+![Avatar2](./Docs/2.png)
+![Avatar3](./Docs/3.png)
+![Avatar4](./Docs/4.png)
+![Avatar5](./Docs/5.png)    
 
 ### Avatar editing
 ```swift
@@ -18,6 +24,7 @@ Put AvatarView into your layout (storyboard or xib) and set avatar id to it:
 ...
 avatarView.avatarId = avatarId
 ```
-![AvatarView](./AvatarView.png)
+![AvatarView](./Docs/AvatarView.png)
 
-### Instalation
+### Installation
+
