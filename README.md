@@ -2,13 +2,9 @@
 
 An iOS package for automatic creating and editing avatars.
 
-![Avatar1](./Docs/1.png)
-![Avatar2](./Docs/2.png)
-![Avatar3](./Docs/3.png)
-![Avatar4](./Docs/4.png)
-![Avatar5](./Docs/5.png)    
-![Avatar6](./Docs/6.png)
-![Avatar7](./Docs/7.png)
+![Avatar1](./Docs/1.png) ![Avatar2](./Docs/2.png) ![Avatar3](./Docs/3.png)
+![Avatar4](./Docs/4.png) ![Avatar5](./Docs/5.png) ![Avatar6](./Docs/6.png)
+![Avatar7](./Docs/7.png) ![Avatar8](./Docs/8.png)
 
 ### Avatar editing
 ```swift
