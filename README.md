@@ -37,7 +37,7 @@ avatarView.avatarId = avatarId
 ```
 ![AvatarView](./Docs/AvatarView.png)
 
-### Installation with **swift package manager**
+### Installation
 Tap on your main project, tab **Package dependencies** and add following url:
 ```swift
 https://github.com/prcela/Avatar
