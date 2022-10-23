@@ -43,6 +43,7 @@ https://github.com/prcela/Avatar
 ```
 
 ### Preview in Yamb app
-Checkout this [Yamb](https://apps.apple.com/us/app/yamb/id354188615) app to see this avatars in action, how community builds creates many variations of avatars.
+Checkout this [Yamb](https://apps.apple.com/us/app/yamb/id354188615) app to see this avatars in action, see how community builds many variations of these avatars.
+We also have a similar functionality for Android, written in kotlin, feel free to contact us via *Yamb app*/*More*/*Contact us*.
 
 
