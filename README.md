@@ -18,6 +18,14 @@ vc.avatar = Avatar.decompress(value: avatarId) // provide existing avatar id or 
 vc.delegate = self
 self.present(vc, animated: true, completion: nil)
 ```
+Delegate method that will be called when editing is done:
+``` swift
+public protocol EditAvatarViewControllerDelegate: AnyObject {
+    func doneAvatar(_ avatar: Avatar)
+}
+```
+Received avatar object can be compressed or presented with single 64 bit integer. You can use this as avatarId and store it to your server, sending it to other clients and present it locally.
+
 ### Show avatar
 Put **AvatarView** into your layout (storyboard or xib) and set avatar id to it:
 ```swift
