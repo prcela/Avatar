@@ -18,6 +18,7 @@ vc.avatar = Avatar.decompress(value: avatarId) // provide existing avatar id or 
 vc.delegate = self
 self.present(vc, animated: true, completion: nil)
 ```
+![Editor](./Docs/editor.png)
 Delegate method that will be called when editing is done:
 ``` swift
 public protocol EditAvatarViewControllerDelegate: AnyObject {
