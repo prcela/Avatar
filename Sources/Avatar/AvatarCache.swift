@@ -11,7 +11,7 @@ import UIKit
 
 class AvatarCache {
     fileprivate static var images = [Int64:UIImage?]()
-    fileprivate static let editAvatarView =  UINib(nibName: "EditAvatarView", bundle: .module).instantiate(withOwner: nil).first as! EditAvatarView
+    fileprivate static let editAvatarView = UINib(nibName: "EditAvatarView", bundle: .module).instantiate(withOwner: nil).first as! EditAvatarView
     
     class func fetchImage(avatarId:Int64) -> UIImage? {
         if let img = images[avatarId] {
