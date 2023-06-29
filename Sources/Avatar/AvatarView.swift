@@ -19,8 +19,8 @@ public class AvatarView: UIImageView {
     }
     
     fileprivate func update() {
-        if let id = avatarId {
-            image = AvatarCache.fetchImage(avatarId: id)
+        if let avatarId {
+            image = AvatarCache.fetchImage(avatarId: avatarId)
         }
     }
 }
