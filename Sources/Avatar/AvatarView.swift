@@ -20,7 +20,7 @@ public class AvatarView: UIImageView {
     
     fileprivate func update() {
         if let avatarId {
-            image = AvatarCache.fetchImage(avatarId: avatarId)
+            image = AvatarCache.fetchImage(avatarId: avatarId, small: false)
         }
     }
 }
