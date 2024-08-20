@@ -38,4 +38,9 @@ public class AvatarCache {
             return small ? smallImg : img
         }
     }
+    
+    public class func didReceiveMemoryWarning() {
+        images.removeAll()
+        imagesSmall.removeAll()
+    }
 }
