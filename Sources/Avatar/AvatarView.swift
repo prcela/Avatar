@@ -11,6 +11,7 @@ import UIKit
 
 public class AvatarView: UIImageView {
     public static var hideAll = false
+    public static var enableBots = false
     public var avatarId: Int64? = nil {
         didSet {
             if oldValue != avatarId {

@@ -30,6 +30,7 @@ public class EditAvatarView : UIView {
         if avatar.skinColorIdx >= skinColors.count {
             avatar.skinColorIdx = 0
         }
+        bodyImgView.image = avatar.skin.image()
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         mouthImgView.image = avatar.mouth.image()
         noseImgView.image = avatar.nose.image()

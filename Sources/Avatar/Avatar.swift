@@ -470,9 +470,18 @@ public class Avatar {
     }
     
     enum Skin: Int, CaseIterable, AvatarSymbol {
+        // 1 bit
         case Normal
+        case Bot
         func image() -> UIImage? {
-            return UIImage(named: "Body", in: .module, compatibleWith: .current)
+            let imageName: String
+            switch self {
+            case .Normal:
+                imageName = "Body"
+            case .Bot:
+                imageName = AvatarView.enableBots ? "Bot" : "Body"
+            }
+            return UIImage(named: imageName, in: .module, compatibleWith: .current)
         }
     }
     enum Nose: Int, CaseIterable, AvatarSymbol {
@@ -682,6 +691,7 @@ public class Avatar {
     }
     
     var skinColorIdx = 0
+    var skin: Skin = .Normal
     var eyes: Eyes = .Default
     var mouth: Mouth = .Default
     var eyebrow: Eyebrow = .Default
@@ -749,6 +759,7 @@ public class Avatar {
             result <<= ctBits
             result |= Int64(v)
         }
+        addBits(1, v: skin.rawValue)
         addBits(4, v: skinColorIdx)
         addBits(5, v: eyes.rawValue)
         addBits(5, v: mouth.rawValue)
@@ -770,6 +781,11 @@ public class Avatar {
     public class func decompress(value: Int64) -> Avatar {
         let avatar = Avatar()
         var v = value
+        func read1bit() -> Int {
+            let rv = v & 0b1
+            v >>= 1
+            return Int(rv)
+        }
         func read2bits() -> Int {
             let rv = v & 0b11
             v >>= 2
@@ -809,6 +825,7 @@ public class Avatar {
         avatar.mouth = Mouth(rawValue: read5bits()) ?? .Default
         avatar.eyes = Eyes(rawValue: read5bits()) ?? .Closed
         avatar.skinColorIdx = read4bits()
+        avatar.skin = Skin(rawValue: read1bit()) ?? .Normal
         
         return avatar
     }
