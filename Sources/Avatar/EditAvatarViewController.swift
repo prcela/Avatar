@@ -36,6 +36,12 @@ public class EditAvatarViewController: UIViewController {
         editAvatarView?.avatar = avatar
         editAvatarView?.update()
         
+        if #available(iOS 14.0, *) {
+            navigationItem.backButtonDisplayMode = .minimal
+        } else {
+            // Fallback on earlier versions
+        }
+        
     }
     
     @IBAction func selectPart(_ sender: UIButton) {
@@ -108,6 +114,7 @@ extension EditAvatarViewController: UICollectionViewDelegate {
     }
 }
 
+@MainActor
 public protocol EditAvatarViewControllerDelegate: AnyObject {
     func doneAvatar(_ avatar: Avatar)
 }
