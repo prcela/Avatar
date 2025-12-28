@@ -31,13 +31,13 @@ extension UIView {
     }
     
     func image() -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(bounds.size, isOpaque, 0.0)
-        defer { UIGraphicsEndImageContext() }
-        if let context = UIGraphicsGetCurrentContext() {
-            layer.render(in: context)
-            let image = UIGraphicsGetImageFromCurrentImageContext()
-            return image
+        let format = UIGraphicsImageRendererFormat.default()
+        format.opaque = isOpaque
+        format.scale = UIScreen.main.scale
+        let renderer = UIGraphicsImageRenderer(size: bounds.size, format: format)
+        return renderer.image { _ in
+            layer.render(in: UIGraphicsGetCurrentContext()!)
         }
-        return nil
     }
 }
+

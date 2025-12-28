@@ -29,10 +29,10 @@ public class AvatarCache {
             var smallImg: UIImage?
             if let img {
                 let smallSize = CGSize(width: 30, height: 30)
-                UIGraphicsBeginImageContextWithOptions(smallSize, false, 0)
-                img.draw(in: CGRect(x: 0, y: 0, width: smallSize.width, height: smallSize.height))
-                smallImg = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
+                let renderer = UIGraphicsImageRenderer(size: smallSize)
+                smallImg = renderer.image { _ in
+                    img.draw(in: CGRect(origin: .zero, size: smallSize))
+                }
                 imagesSmall[avatarId] = smallImg
             }
             return small ? smallImg : img
