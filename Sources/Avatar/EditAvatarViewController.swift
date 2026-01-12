@@ -23,6 +23,51 @@ public class EditAvatarViewController: UIViewController {
     var parts = Avatar.Part.allCases
     var selectedPart: Avatar.Part? = nil
     
+    private func selectCurrentItemsIfPossible() {
+        guard let part = selectedPart else { return }
+
+        // Resolve indices from Avatar if available, else fallback to 0
+        let symbolsCount = symbolsCollectionView.numberOfItems(inSection: 0)
+        let colorsCount = colorsCollectionView.numberOfItems(inSection: 0)
+
+        var symbolIndex = 0
+        var colorIndex = 0
+
+        if let idx = avatar.symbolIndex(for: part) {
+            symbolIndex = idx
+        }
+        if let idx = avatar.colorIndex(for: part) {
+            colorIndex = idx
+        }
+
+        if symbolsCount > 0 {
+            let indexPath = IndexPath(item: symbolIndex, section: 0)
+            symbolsCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [.centeredVertically, .centeredHorizontally])
+            if let cell = symbolsCollectionView.cellForItem(at: indexPath) {
+                applySelectionStyle(to: cell)
+            }
+        }
+        if colorsCount > 0 {
+            let indexPath = IndexPath(item: colorIndex, section: 0)
+            colorsCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: [.centeredVertically, .centeredHorizontally])
+            if let cell = colorsCollectionView.cellForItem(at: indexPath) {
+                applySelectionStyle(to: cell)
+            }
+        }
+    }
+    
+    private func applySelectionStyle(to cell: UICollectionViewCell) {
+        cell.contentView.layer.cornerRadius = 8
+        cell.contentView.layer.masksToBounds = true
+        cell.contentView.layer.borderWidth = 2
+        cell.contentView.layer.borderColor = UIColor.cyan.withAlphaComponent(0.8).cgColor
+    }
+
+    private func clearSelectionStyle(from cell: UICollectionViewCell) {
+        cell.contentView.layer.borderWidth = 0
+        cell.contentView.layer.borderColor = nil
+    }
+    
     public class func instantiate() -> Self {
         return UIStoryboard(name: "Avatar", bundle: .module).instantiateInitialViewController() as! Self
     }
@@ -36,25 +81,52 @@ public class EditAvatarViewController: UIViewController {
         editAvatarView?.avatar = avatar
         editAvatarView?.update()
         
+        symbolsCollectionView.allowsMultipleSelection = false
+        colorsCollectionView.allowsMultipleSelection = false
+        
+        symbolsCollectionView.allowsSelection = true
+        colorsCollectionView.allowsSelection = true
+        
         if #available(iOS 14.0, *) {
             navigationItem.backButtonDisplayMode = .minimal
         } else {
             // Fallback on earlier versions
         }
         
+        symbolsCollectionView.reloadData()
+        colorsCollectionView.reloadData()
+        selectCurrentItemsIfPossible()
+        
+        if let selected = symbolsCollectionView.indexPathsForSelectedItems?.first,
+           let cell = symbolsCollectionView.cellForItem(at: selected) {
+            applySelectionStyle(to: cell)
+        }
+        if let selected = colorsCollectionView.indexPathsForSelectedItems?.first,
+           let cell = colorsCollectionView.cellForItem(at: selected) {
+            applySelectionStyle(to: cell)
+        }
     }
     
     @IBAction func selectPart(_ sender: UIButton) {
-        btns.forEach { btn in
-            btn.isSelected = false
-        }
+        btns.forEach { $0.isSelected = false }
         sender.isSelected = true
-        selectedPart = parts[sender.tag]
-        
+
+        let idx = sender.tag
+        guard parts.indices.contains(idx) else { return }
+        selectedPart = parts[idx]
+
         symbolsCollectionView.reloadData()
         colorsCollectionView.reloadData()
+        selectCurrentItemsIfPossible()
         
-        
+        if let selected = symbolsCollectionView.indexPathsForSelectedItems?.first,
+           let cell = symbolsCollectionView.cellForItem(at: selected) {
+            applySelectionStyle(to: cell)
+        }
+        if let selected = colorsCollectionView.indexPathsForSelectedItems?.first,
+           let cell = colorsCollectionView.cellForItem(at: selected) {
+            applySelectionStyle(to: cell)
+        }
     }
     
     @IBAction func cancel(_ sender: Any) {
@@ -71,20 +143,27 @@ public class EditAvatarViewController: UIViewController {
 extension EditAvatarViewController: UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let part = selectedPart else { return UICollectionViewCell() }
         switch collectionView {
         case symbolsCollectionView:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath) as! AvatarSymbolCell
-            let symbol = selectedPart!.symbols()[indexPath.row]
+            let symbol = part.symbols()[indexPath.row]
             let config = UIImage.SymbolConfiguration(scale: .large)
             cell.img.image = symbol.image() ?? UIImage(systemName: "xmark")?.applyingSymbolConfiguration(config)
+            // Selection styling
+            cell.contentView.layer.cornerRadius = 8
+            cell.contentView.layer.masksToBounds = true
+            if cell.isSelected { applySelectionStyle(to: cell) } else { clearSelectionStyle(from: cell) }
             return cell
         default:
             // colors
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath)
-            cell.contentView.backgroundColor = selectedPart!.colors()[indexPath.row]
+            cell.contentView.backgroundColor = part.colors()[indexPath.row]
+            cell.contentView.layer.cornerRadius = 8
+            cell.contentView.layer.masksToBounds = true
+            if cell.isSelected { applySelectionStyle(to: cell) } else { clearSelectionStyle(from: cell) }
             return cell
         }
-        
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -101,16 +180,31 @@ extension EditAvatarViewController: UICollectionViewDataSource {
 
 extension EditAvatarViewController: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let part = selectedPart else { return }
+        // Light haptic feedback for selection
+        if #available(iOS 10.0, *) {
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+        }
         switch collectionView {
         case symbolsCollectionView:
-            let symbol = selectedPart!.symbols()[indexPath.row]
-            avatar.set(part: selectedPart!, symbol: symbol)
+            let symbol = part.symbols()[indexPath.row]
+            avatar.set(part: part, symbol: symbol)
         default:
-            avatar.set(part: selectedPart!, colorIdx: indexPath.row)
+            avatar.set(part: part, colorIdx: indexPath.row)
         }
         editAvatarView?.avatar = avatar
         editAvatarView?.update()
         
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            applySelectionStyle(to: cell)
+        }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            clearSelectionStyle(from: cell)
+        }
     }
 }
 
@@ -118,3 +212,4 @@ extension EditAvatarViewController: UICollectionViewDelegate {
 public protocol EditAvatarViewControllerDelegate: AnyObject {
     func doneAvatar(_ avatar: Avatar)
 }
+

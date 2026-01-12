@@ -830,6 +830,48 @@ public class Avatar {
         return avatar
     }
     
+    func symbolIndex(for part: Part) -> Int? {
+        switch part {
+        case .Eyes:
+            return Eyes.allCases.firstIndex(where: { $0.rawValue == eyes.rawValue })
+        case .Mouth:
+            return Mouth.allCases.firstIndex(where: { $0.rawValue == mouth.rawValue })
+        case .Eyebrow:
+            return Eyebrow.allCases.firstIndex(where: { $0.rawValue == eyebrow.rawValue })
+        case .Glasses:
+            return Glasses.allCases.firstIndex(where: { $0.rawValue == glasses.rawValue })
+        case .Hair:
+            return Hair.allCases.firstIndex(where: { $0.rawValue == hair.rawValue })
+        case .Clothing:
+            return Clothing.allCases.firstIndex(where: { $0.rawValue == clothing.rawValue })
+        case .FacialHair:
+            return FacialHair.allCases.firstIndex(where: { $0.rawValue == facialHair.rawValue })
+        case .Addition:
+            return Addition.allCases.firstIndex(where: { $0.rawValue == addition.rawValue })
+        case .Skin:
+            return Skin.allCases.firstIndex(where: { $0.rawValue == skin.rawValue })
+        case .Nose:
+            return Nose.allCases.firstIndex(where: { $0.rawValue == nose.rawValue })
+        case .ClothLogo:
+            return ClothLogo.allCases.firstIndex(where: { $0.rawValue == clothLogo.rawValue })
+        }
+    }
+
+    func colorIndex(for part: Part) -> Int? {
+        switch part {
+        case .Skin:
+            return skinColorIdx
+        case .Hair:
+            return hairColorIdx
+        case .FacialHair:
+            return facialHairColorIdx
+        case .Clothing:
+            return clothingColorIdx
+        default:
+            return nil
+        }
+    }
+    
 }
 
 
@@ -837,3 +879,4 @@ protocol AvatarSymbol: Any {
     func image() -> UIImage?
     var rawValue: Int { get }
 }
+
