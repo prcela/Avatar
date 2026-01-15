@@ -872,6 +872,12 @@ public class Avatar {
         }
     }
     
+    public func makeAngry() {
+        set(part: .Mouth, symbol: Mouth.Grimace)
+        set(part: .Eyes, symbol: Eyes.Surprised)
+        set(part: .Eyebrow, symbol: Eyebrow.Angry)
+    }
+    
 }
 
 
