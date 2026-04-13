@@ -98,43 +98,43 @@ public class Avatar {
         func image() -> UIImage? {
             switch self {
             case .Concerned:
-                return UIImage(named: "Concerned", in: .module, compatibleWith: .current)
+                return UIImage(resource: .concerned)
             case .Default:
-                return UIImage(named: "Default mouth", in: .module, compatibleWith: .current)
+                return UIImage(resource: .defaultMouth)
             case .Disbelief:
-                return UIImage(named: "Disbelief", in: .module, compatibleWith: .current)
+                return UIImage(resource: .disbelief)
             case .Eating:
-                return UIImage(named: "Eating", in: .module, compatibleWith: .current)
+                return UIImage(resource: .eating)
             case .Grimace:
-                return UIImage(named: "Grimace", in: .module, compatibleWith: .current)
+                return UIImage(resource: .grimace)
             case .Sad:
-                return UIImage(named: "Sad", in: .module, compatibleWith: .current)
+                return UIImage(resource: .sad)
             case .ScreamOpen:
-                return UIImage(named: "Scream Open", in: .module, compatibleWith: .current)
+                return UIImage(resource: .screamOpen)
             case .Serious:
-                return UIImage(named: "Serious", in: .module, compatibleWith: .current)
+                return UIImage(resource: .serious)
             case .Smile:
-                return UIImage(named: "Smile", in: .module, compatibleWith: .current)
+                return UIImage(resource: .smile)
             case .Tongue:
-                return UIImage(named: "Tongue", in: .module, compatibleWith: .current)
+                return UIImage(resource: .tongue)
             case .Twinkle:
-                return UIImage(named: "Twinkle", in: .module, compatibleWith: .current)
+                return UIImage(resource: .twinkle)
             case .Vomit:
-                return UIImage(named: "Vomit", in: .module, compatibleWith: .current)
+                return UIImage(resource: .vomit)
             case .Lipstick:
-                return UIImage(named: "Lipstick", in: .module, compatibleWith: .current)
+                return UIImage(resource: .lipstick)
             case .Lipstick2:
-                return UIImage(named: "Lipstick2", in: .module, compatibleWith: .current)
+                return UIImage(resource: .lipstick2)
             case .Lipstick3:
-                return UIImage(named: "Lipstick3", in: .module, compatibleWith: .current)
+                return UIImage(resource: .lipstick3)
             case .Kiss:
-                return UIImage(named: "Kiss", in: .module, compatibleWith: .current)
+                return UIImage(resource: .kiss)
             case .Meh:
-                return UIImage(named: "Meh", in: .module, compatibleWith: .current)
+                return UIImage(resource: .meh)
             case .Disbelief2:
-                return UIImage(named: "Disbelief2", in: .module, compatibleWith: .current)
+                return UIImage(resource: .disbelief2)
             case .WhiteSmile:
-                return UIImage(named: "WhiteSmile", in: .module, compatibleWith: .current)
+                return UIImage(resource: .whiteSmile)
             }
         }
     }
