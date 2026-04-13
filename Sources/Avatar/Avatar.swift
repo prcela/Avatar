@@ -35,41 +35,41 @@ public class Avatar {
         func image() -> UIImage? {
             switch self {
             case .Closed:
-                return UIImage(named: "Closed", in: .module, compatibleWith: .current)
+                return UIImage(resource: .closed)
             case .Cry:
-                return UIImage(named: "Cry", in: .module, compatibleWith: .current)
+                return UIImage(resource: .cry)
             case .Default:
-                return UIImage(named: "Default Eyes", in: .module, compatibleWith: .current)
+                return UIImage(resource: .defaultEyes)
             case .Roll:
-                return UIImage(named: "Eye Roll", in: .module, compatibleWith: .current)
+                return UIImage(resource: .eyeRoll)
             case .Happy:
-                return UIImage(named: "Happy", in: .module, compatibleWith: .current)
+                return UIImage(resource: .happy)
             case .Side:
-                return UIImage(named: "Side", in: .module, compatibleWith: .current)
+                return UIImage(resource: .side)
             case .Hearts:
-                return UIImage(named: "Hearts", in: .module, compatibleWith: .current)
+                return UIImage(resource: .hearts)
             case .Squint:
-                return UIImage(named: "Squint", in: .module, compatibleWith: .current)
+                return UIImage(resource: .squint)
             case .Surprised:
-                return UIImage(named: "Surprised", in: .module, compatibleWith: .current)
+                return UIImage(resource: .surprised)
             case .Wink:
-                return UIImage(named: "Wink", in: .module, compatibleWith: .current)
+                return UIImage(resource: .wink)
             case .WinkWacky:
-                return UIImage(named: "Wink Wacky", in: .module, compatibleWith: .current)
+                return UIImage(resource: .winkWacky)
             case .Dizzy:
-                return UIImage(named: "X Dizzy", in: .module, compatibleWith: .current)
+                return UIImage(resource: .xDizzy)
             case .White:
-                return UIImage(named: "WhiteEyes", in: .module, compatibleWith: .current)
+                return UIImage(resource: .whiteEyes)
             case .WhiteLine:
-                return UIImage(named: "WhiteLine", in: .module, compatibleWith: .current)
+                return UIImage(resource: .whiteLine)
             case .BlackLine:
-                return UIImage(named: "BlackLine", in: .module, compatibleWith: .current)
+                return UIImage(resource: .blackLine)
             case .Lower:
-                return UIImage(named: "<Eyes", in: .module, compatibleWith: .current)
+                return UIImage(resource: .lEyes)
             case .White2:
-                return UIImage(named: "White2", in: .module, compatibleWith: .current)
+                return UIImage(resource: .white2)
             case .White3:
-                return UIImage(named: "White3", in: .module, compatibleWith: .current)
+                return UIImage(resource: .white3)
             }
         }
     }
