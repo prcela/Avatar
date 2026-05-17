@@ -67,6 +67,24 @@ public class EditAvatarViewController: UIViewController {
         cell.contentView.layer.borderWidth = 0
         cell.contentView.layer.borderColor = nil
     }
+
+    private func configureCollectionViewLayouts() {
+        if let layout = symbolsCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            layout.scrollDirection = .horizontal
+            layout.itemSize = CGSize(width: 100, height: 100)
+            layout.estimatedItemSize = .zero
+            layout.minimumLineSpacing = 10
+            layout.minimumInteritemSpacing = 10
+        }
+
+        if let layout = colorsCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            layout.scrollDirection = .horizontal
+            layout.itemSize = CGSize(width: 44, height: 44)
+            layout.estimatedItemSize = .zero
+            layout.minimumLineSpacing = 10
+            layout.minimumInteritemSpacing = 10
+        }
+    }
     
     public class func instantiate() -> Self {
         return UIStoryboard(name: "Avatar", bundle: .module).instantiateInitialViewController() as! Self
@@ -86,6 +104,7 @@ public class EditAvatarViewController: UIViewController {
         
         symbolsCollectionView.allowsSelection = true
         colorsCollectionView.allowsSelection = true
+        configureCollectionViewLayouts()
         
         if #available(iOS 14.0, *) {
             navigationItem.backButtonDisplayMode = .minimal
@@ -153,7 +172,11 @@ extension EditAvatarViewController: UICollectionViewDataSource {
             // Selection styling
             cell.contentView.layer.cornerRadius = 8
             cell.contentView.layer.masksToBounds = true
-            if cell.isSelected { applySelectionStyle(to: cell) } else { clearSelectionStyle(from: cell) }
+            if collectionView.indexPathsForSelectedItems?.contains(indexPath) == true {
+                applySelectionStyle(to: cell)
+            } else {
+                clearSelectionStyle(from: cell)
+            }
             return cell
         default:
             // colors
@@ -161,7 +184,11 @@ extension EditAvatarViewController: UICollectionViewDataSource {
             cell.contentView.backgroundColor = part.colors()[indexPath.row]
             cell.contentView.layer.cornerRadius = 8
             cell.contentView.layer.masksToBounds = true
-            if cell.isSelected { applySelectionStyle(to: cell) } else { clearSelectionStyle(from: cell) }
+            if collectionView.indexPathsForSelectedItems?.contains(indexPath) == true {
+                applySelectionStyle(to: cell)
+            } else {
+                clearSelectionStyle(from: cell)
+            }
             return cell
         }
     }
