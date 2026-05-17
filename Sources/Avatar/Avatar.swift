@@ -214,6 +214,7 @@ public class Avatar {
         case Bakine
         case Bakine2
         case StarsGlasses
+        case SoftSquare
         
         func image() -> UIImage? {
             switch self {
@@ -247,6 +248,8 @@ public class Avatar {
                 return UIImage(named: "Bakine2Glasses", in: .module, compatibleWith: .current)
             case .StarsGlasses:
                 return UIImage(named: "StarsGlasses", in: .module, compatibleWith: .current)
+            case .SoftSquare:
+                return UIImage(named: "Soft Square", in: .module, compatibleWith: .current)
             }
         }
     }
