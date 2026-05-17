@@ -540,6 +540,9 @@ public class Avatar {
         case Beer
         case Ball
         case Lucky
+        case Coffee
+        case Dice
+        case Trophy
         
         func image() -> UIImage? {
             switch self {
@@ -589,6 +592,12 @@ public class Avatar {
                 return UIImage(named: "BallLogo", in: .module, compatibleWith: .current)
             case .Lucky:
                 return UIImage(named: "LuckyLogo", in: .module, compatibleWith: .current)
+            case .Coffee:
+                return UIImage(named: "CoffeeLogo", in: .module, compatibleWith: .current)
+            case .Dice:
+                return UIImage(named: "DiceLogo", in: .module, compatibleWith: .current)
+            case .Trophy:
+                return UIImage(named: "TrophyLogo", in: .module, compatibleWith: .current)
             }
         }
     }
