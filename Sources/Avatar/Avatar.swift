@@ -280,6 +280,8 @@ public class Avatar {
         case Big
         case ShortRoundFriz
         case StraightLeft
+        case BuzzCut
+        case Bieber
         
         func image() -> UIImage? {
             switch self {
@@ -357,6 +359,10 @@ public class Avatar {
                 return UIImage(named: "Short Round Friz", in: .module, compatibleWith: .current)
             case .StraightLeft:
                 return UIImage(named: "StraightLeft", in: .module, compatibleWith: .current)
+            case .BuzzCut:
+                return UIImage(named: "Buzz Cut", in: .module, compatibleWith: .current)
+            case .Bieber:
+                return UIImage(named: "Bieber", in: .module, compatibleWith: .current)
             }
         }
         
