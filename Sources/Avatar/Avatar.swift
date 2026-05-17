@@ -96,6 +96,7 @@ public class Avatar {
         case WhiteSmile
         case PinkLips
         case PinkSmile
+        case RoseLips
         
         func image() -> UIImage? {
             switch self {
@@ -141,6 +142,8 @@ public class Avatar {
                 return UIImage(named: "Pink Lips", in: .module, compatibleWith: .current)
             case .PinkSmile:
                 return UIImage(named: "Pink Smile", in: .module, compatibleWith: .current)
+            case .RoseLips:
+                return UIImage(named: "Rose Lips", in: .module, compatibleWith: .current)
             }
         }
     }
