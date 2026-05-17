@@ -65,7 +65,7 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, aboveSubview: clothingImgView)
         case .Freckles, .Old, .Makeup:
             insertSubview(additionImgView, aboveSubview: bodyImgView)
-        case .Hairband:
+        case .Hairband, .Crown:
             insertSubview(additionImgView, aboveSubview: hairView)
         case .AddHearts:
             insertSubview(additionImgView, aboveSubview: glassesView)

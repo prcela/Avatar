@@ -454,6 +454,7 @@ public class Avatar {
         case Old
         case Makeup
         case AddHearts
+        case Crown
         
         func image() -> UIImage? {
             switch self {
@@ -471,6 +472,8 @@ public class Avatar {
                 return UIImage(named: "Makeup", in: .module, compatibleWith: .current)
             case .AddHearts:
                 return UIImage(named: "AddHearts", in: .module, compatibleWith: .current)
+            case .Crown:
+                return UIImage(named: "Crown", in: .module, compatibleWith: .current)
             }
         }
     }
