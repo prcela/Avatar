@@ -306,6 +306,7 @@ public class Avatar {
         case GlamWaves
         case SleekBob
         case WavyBob
+        case TexturedCrop
         
         func image() -> UIImage? {
             switch self {
@@ -399,6 +400,8 @@ public class Avatar {
                 return UIImage(named: "Sleek Bob", in: .module, compatibleWith: .current)
             case .WavyBob:
                 return UIImage(named: "Wavy Bob", in: .module, compatibleWith: .current)
+            case .TexturedCrop:
+                return UIImage(named: "Textured Crop", in: .module, compatibleWith: .current)
             }
         }
         
