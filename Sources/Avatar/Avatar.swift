@@ -533,7 +533,7 @@ public class Avatar {
             case .Normal:
                 imageName = "Body"
             case .Bot:
-                imageName = AvatarView.enableBots ? "Bot" : "Body"
+                imageName = UIAvatarView.enableBots ? "Bot" : "Body"
             }
             return UIImage(named: imageName, in: .module, compatibleWith: .current)
         }

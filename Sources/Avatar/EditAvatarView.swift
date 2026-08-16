@@ -1,5 +1,5 @@
 //
-//  AvatarView.swift
+//  EditAvatarView.swift
 //  Yamb
 //
 //  Created by Kresimir Prcela on 25.12.2021..

@@ -1,46 +1,34 @@
 //
 //  AvatarView.swift
-//  Yamb
-//
-//  Created by Kresimir Prcela on 27.12.2021..
-//  Copyright © 2021 Rika Omega Rika. All rights reserved.
+//  Avatar
 //
 
-import Foundation
+import SwiftUI
 import UIKit
 
-public class AvatarView: UIImageView {
-    public static var hideAll = false
-    public static var enableBots = false
-    public var avatarId: Int64? = nil {
-        didSet {
-            if oldValue != avatarId {
-                update()
-            }
-        }
+/// Native SwiftUI avatar renderer.
+///
+/// The UIKit counterpart is `UIAvatarView`.
+public struct AvatarView: View {
+    private let avatarID: Int64
+    private let small: Bool
+
+    public init(avatarID: Int64, small: Bool = false) {
+        self.avatarID = avatarID
+        self.small = small
     }
-    
-    public override func awakeFromNib() {
-        super.awakeFromNib()
-        isHidden = Self.hideAll
-    }
-    
-    override public var isHidden: Bool {
-        get {
-            return super.isHidden
-        }
-        set {
-            if Self.hideAll {
-                super.isHidden = true
+
+    public var body: some View {
+        Group {
+            if !UIAvatarView.hideAll,
+               let image = AvatarCache.fetchImage(avatarId: avatarID, small: small) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
             } else {
-                super.isHidden = newValue
+                Color.clear
             }
         }
-    }
-    
-    fileprivate func update() {
-        if let avatarId, !Self.hideAll {
-            image = AvatarCache.fetchImage(avatarId: avatarId, small: false)
-        }
+        .accessibilityHidden(true)
     }
 }
