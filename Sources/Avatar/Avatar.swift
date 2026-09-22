@@ -583,6 +583,7 @@ public class Avatar {
         case ButtonUpShirt
         case BasketballJersey
         case ElegantDress
+        case OffShoulderBlouse
 
         func image() -> UIImage? {
             switch self {
@@ -634,11 +635,13 @@ public class Avatar {
                 return UIImage(named: "BasketballJersey", in: .module, compatibleWith: .current)
             case .ElegantDress:
                 return UIImage(named: "ElegantDress", in: .module, compatibleWith: .current)
+            case .OffShoulderBlouse:
+                return UIImage(named: "OffShoulderBlouse", in: .module, compatibleWith: .current)
             }
         }
 
         func image(color: UIColor) -> UIImage? {
-            guard let original = (self == .SportsJersey || self == .ButtonUpShirt || self == .BasketballJersey || self == .ElegantDress) ? image()?.avatarTinted(color) : image() else { return nil }
+            guard let original = (self == .SportsJersey || self == .ButtonUpShirt || self == .BasketballJersey || self == .ElegantDress || self == .OffShoulderBlouse) ? image()?.avatarTinted(color) : image() else { return nil }
             guard verticalOffset != 0 else { return original }
             let format = UIGraphicsImageRendererFormat()
             format.scale = original.scale
@@ -657,6 +660,7 @@ public class Avatar {
             case .LeatherJacket: return 17.5
             case .SportsJersey: return 28
             case .BasketballJersey: return -4
+            case .CroatiaJersey, .PortugalJersey, .FranceJersey, .ArgentinaJersey: return 22
             default: return self == .DenimJacket || self == .ButtonUpShirt || isJersey ? 12 : 0
             }
         }
