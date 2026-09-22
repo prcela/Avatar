@@ -22,6 +22,7 @@ public class EditAvatarViewController: UIViewController {
     
     var parts = Avatar.Part.allCases
     var selectedPart: Avatar.Part? = nil
+    private let bodyTypeButton = UIButton(type: .system)
     
     private func selectCurrentItemsIfPossible() {
         guard let part = selectedPart else { return }
@@ -93,6 +94,15 @@ public class EditAvatarViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
+        bodyTypeButton.showsMenuAsPrimaryAction = true
+        bodyTypeButton.accessibilityLabel = NSLocalizedString("Avatar body shape", value: "Body shape", comment: "Avatar editor")
+        updateBodyTypeMenu()
+        if let toolbar = view.subviews.compactMap({ $0 as? UIToolbar }).first,
+           let cancel = toolbar.items?.first, let done = toolbar.items?.last {
+            toolbar.items = [cancel, UIBarButtonItem(systemItem: .flexibleSpace),
+                UIBarButtonItem(customView: bodyTypeButton), UIBarButtonItem(systemItem: .flexibleSpace), done]
+        }
+
         // Do any additional setup after loading the view.
         editAvatarView = Bundle.module.loadNibNamed("EditAvatarView", owner: nil, options: nil)!.first! as? EditAvatarView
         holderView.embedSubview(editAvatarView!)
@@ -146,6 +156,36 @@ public class EditAvatarViewController: UIViewController {
            let cell = colorsCollectionView.cellForItem(at: selected) {
             applySelectionStyle(to: cell)
         }
+    }
+
+    private func bodyTypeTitle(_ type: Avatar.BodyType) -> String {
+        switch type {
+        case .normal: return NSLocalizedString("Avatar body normal", value: "Normal", comment: "Avatar body type")
+        case .slim: return NSLocalizedString("Avatar body slim", value: "Slim", comment: "Avatar body type")
+        case .verySlim: return NSLocalizedString("Avatar body very slim", value: "Very slim", comment: "Avatar body type")
+        case .broad: return NSLocalizedString("Avatar body broad", value: "Broad", comment: "Avatar body type")
+        case .veryBroad: return NSLocalizedString("Avatar body very broad", value: "Very broad", comment: "Avatar body type")
+        }
+    }
+
+    private func updateBodyTypeMenu() {
+        let title = bodyTypeTitle(avatar.bodyType)
+        var configuration = UIButton.Configuration.plain()
+        configuration.title = title
+        configuration.image = UIImage(systemName: "chevron.down")
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 6
+        bodyTypeButton.configuration = configuration
+        bodyTypeButton.accessibilityValue = title
+        bodyTypeButton.sizeToFit()
+        bodyTypeButton.menu = UIMenu(title: bodyTypeButton.accessibilityLabel ?? "", children: Avatar.BodyType.allCases.map { type in
+            UIAction(title: bodyTypeTitle(type), state: type == avatar.bodyType ? .on : .off) { [weak self] _ in
+                guard let self else { return }
+                self.avatar.bodyType = type
+                self.editAvatarView?.update()
+                self.updateBodyTypeMenu()
+            }
+        })
     }
     
     @IBAction func cancel(_ sender: Any) {
@@ -239,4 +279,3 @@ extension EditAvatarViewController: UICollectionViewDelegate {
 public protocol EditAvatarViewControllerDelegate: AnyObject {
     func doneAvatar(_ avatar: Avatar)
 }
-

@@ -10,21 +10,22 @@ import Foundation
 import UIKit
 
 public class AvatarCache {
-    fileprivate static var images = [Int64:UIImage?]()
-    fileprivate static var imagesSmall = [Int64:UIImage?]()
+    fileprivate static var images = [String:UIImage?]()
+    fileprivate static var imagesSmall = [String:UIImage?]()
     fileprivate static let editAvatarView = UINib(nibName: "EditAvatarView", bundle: .module).instantiate(withOwner: nil).first as! EditAvatarView
     
-    public class func fetchImage(avatarId:Int64, small: Bool) -> UIImage? {
-        if small, let smallImg = imagesSmall[avatarId] {
+    public class func fetchImage(avatarId:Int64, avatarHexId: String = "", small: Bool) -> UIImage? {
+        let key = AvatarHexID(avatarHexId)?.hex ?? "legacy:\(avatarId)"
+        if small, let smallImg = imagesSmall[key] {
             return smallImg
-        } else if !small, let img = images[avatarId] {
+        } else if !small, let img = images[key] {
             return img
         } else {
-            let avatar = Avatar.decompress(value: avatarId)
+            let avatar = Avatar.decompress(value: avatarId, hexId: avatarHexId)
             editAvatarView.avatar = avatar
             editAvatarView.update()
             let img = editAvatarView.image()
-            images[avatarId] = img
+            images[key] = img
             
             var smallImg: UIImage?
             if let img {
@@ -33,7 +34,7 @@ public class AvatarCache {
                 smallImg = renderer.image { _ in
                     img.draw(in: CGRect(origin: .zero, size: smallSize))
                 }
-                imagesSmall[avatarId] = smallImg
+            imagesSmall[key] = smallImg
             }
             return small ? smallImg : img
         }

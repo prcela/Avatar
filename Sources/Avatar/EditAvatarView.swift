@@ -26,6 +26,13 @@ public class EditAvatarView : UIView {
     var avatar = Avatar()
     
     func update() {
+        layer.sublayerTransform = CATransform3DIdentity
+        let fixedSizeViews: [UIView] = [eyesImgView, mouthImgView, eyesbrowImgView, noseImgView, clothingLogoImgView]
+        let bodyTransform = CGAffineTransform(scaleX: avatar.bodyType.scaleX, y: 1)
+        // All image views are centered on the avatar's X axis, including the neck shadow.
+        for subview in subviews {
+            subview.transform = fixedSizeViews.contains(where: { $0 === subview }) ? .identity : bodyTransform
+        }
         let skinColors = Avatar.Part.Skin.colors()
         if avatar.skinColorIdx >= skinColors.count {
             avatar.skinColorIdx = 0
@@ -34,8 +41,10 @@ public class EditAvatarView : UIView {
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         mouthImgView.image = avatar.mouth.image()
         noseImgView.image = avatar.nose.image()
-        eyesImgView.image = avatar.eyes.image()
-        eyesbrowImgView.image = avatar.eyebrow.image()
+        eyesImgView.image = positionedPair(avatar.eyes.image())
+        // Keep the connected eyebrow intact instead of opening a gap in its center.
+        eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
+            ? avatar.eyebrow.image() : positionedPair(avatar.eyebrow.image())
         glassesView.image = avatar.glasses.image()
         let hairColors = Avatar.Part.Hair.colors()
         if avatar.hairColorIdx >= hairColors.count {
@@ -73,6 +82,27 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, belowSubview: hairView)
         case .AddHearts, .Headphones:
             insertSubview(additionImgView, aboveSubview: glassesView)
+        }
+    }
+
+    private func positionedPair(_ image: UIImage?) -> UIImage? {
+        guard let image, avatar.bodyType != .normal else { return image }
+        // Move each eye/brow by 3 or 6 points on the 264-point avatar canvas.
+        // Only the spacing changes; each half keeps its original size and height.
+        let offset = (avatar.bodyType.scaleX - 1) * 20 * image.size.width / 112
+        let halfWidth = image.size.width / 2
+        let format = UIGraphicsImageRendererFormat.default()
+        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+        return renderer.image { context in
+            for side in 0...1 {
+                let shift = side == 0 ? -offset : offset
+                let clip = CGRect(x: CGFloat(side) * halfWidth + shift, y: 0,
+                                  width: halfWidth, height: image.size.height)
+                context.cgContext.saveGState()
+                context.cgContext.clip(to: clip)
+                image.draw(at: CGPoint(x: shift, y: 0))
+                context.cgContext.restoreGState()
+            }
         }
     }
     

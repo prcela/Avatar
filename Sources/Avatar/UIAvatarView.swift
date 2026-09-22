@@ -19,6 +19,14 @@ public class UIAvatarView: UIImageView {
             }
         }
     }
+    public var avatarHexId = "" {
+        didSet { if oldValue != avatarHexId { update() } }
+    }
+
+    public func setAvatar(avatarId: Int64? = nil, avatarHexId: String = "") {
+        self.avatarHexId = avatarHexId
+        self.avatarId = avatarId
+    }
     public var small = false
     
     public override func awakeFromNib() {
@@ -40,8 +48,10 @@ public class UIAvatarView: UIImageView {
     }
     
     fileprivate func update() {
-        if let avatarId, !Self.hideAll {
-            image = AvatarCache.fetchImage(avatarId: avatarId, small: small)
+        if let avatarId = avatarId ?? AvatarHexID(avatarHexId)?.legacyID, !Self.hideAll {
+            image = AvatarCache.fetchImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small)
+        } else {
+            image = nil
         }
     }
 }

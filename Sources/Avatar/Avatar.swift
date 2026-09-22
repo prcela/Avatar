@@ -10,6 +10,24 @@ import Foundation
 import UIKit
 
 public class Avatar {
+    public enum BodyType: Int, CaseIterable {
+        case normal = 0, slim = 1, verySlim = 2, broad = 3, veryBroad = 4
+        var scaleX: CGFloat {
+            switch self {
+            case .normal: return 1
+            case .slim: return 0.85
+            case .verySlim: return 0.70
+            case .broad: return 1.15
+            case .veryBroad: return 1.30
+            }
+        }
+    }
+    public var bodyType: BodyType = .normal {
+        didSet { loadedHexID?.bodyType = bodyType.rawValue }
+    }
+    private var loadedHexID: AvatarHexID?
+    private var loadedValues = [Int]()
+
     
     enum Eyes: Int, CaseIterable, AvatarSymbol {
         // 5 bits
@@ -905,6 +923,10 @@ public class Avatar {
     
     
     func set(part: Part, symbol: AvatarSymbol) {
+        let fields: [Part: AvatarHexID.Field] = [.Eyes: .eyes, .Mouth: .mouth, .Eyebrow: .eyebrow,
+            .Glasses: .glasses, .Hair: .hair, .Clothing: .clothing, .FacialHair: .facialHair,
+            .Addition: .addition, .Skin: .skin, .Nose: .nose, .ClothLogo: .logo]
+        if let field = fields[part] { loadedHexID?[field] = symbol.rawValue }
         switch part {
         case .Eyes:
             eyes = Eyes(rawValue: symbol.rawValue)!
@@ -932,6 +954,9 @@ public class Avatar {
     }
     
     func set(part: Part, colorIdx: Int) {
+        let fields: [Part: AvatarHexID.Field] = [.Skin: .skinColor, .Hair: .hairColor,
+            .Clothing: .clothingColor, .FacialHair: .facialHairColor]
+        if let field = fields[part] { loadedHexID?[field] = colorIdx }
         switch part {
         case .Skin:
             skinColorIdx = colorIdx
@@ -971,7 +996,8 @@ public class Avatar {
         return result
     }
     
-    public class func decompress(value: Int64) -> Avatar {
+    public class func decompress(value: Int64, hexId: String = "") -> Avatar {
+        if let hex = AvatarHexID(hexId) { return decompress(hex: hex) }
         let avatar = Avatar()
         var v = value
         func read1bit() -> Int {
@@ -1023,6 +1049,47 @@ public class Avatar {
         return avatar
     }
     
+    private var fieldValues: [Int] {
+        [skin.rawValue, skinColorIdx, eyes.rawValue, mouth.rawValue, eyebrow.rawValue, glasses.rawValue, hair.rawValue, hairColorIdx, clothing.rawValue, clothingColorIdx, facialHair.rawValue, facialHairColorIdx, addition.rawValue, nose.rawValue, clothLogo.rawValue]
+    }
+
+    public func compressHex() -> String {
+        var result = loadedHexID ?? AvatarHexID(legacyID: 0)
+        for (index, field) in AvatarHexID.Field.allCases.enumerated() {
+            if loadedHexID == nil || fieldValues[index] != loadedValues[index] {
+                result[field] = fieldValues[index]
+            }
+        }
+        if loadedHexID == nil { result.bodyType = bodyType.rawValue }
+        return result.hex
+    }
+
+    public var legacyAvatarId: Int64 { AvatarHexID(compressHex())!.legacyID }
+
+    private class func decompress(hex: AvatarHexID) -> Avatar {
+        let avatar = decompress(value: hex.legacyID)
+        avatar.skin = Skin(rawValue: hex[.skin]) ?? .Normal
+        avatar.skinColorIdx = Part.Skin.colors().indices.contains(hex[.skinColor]) ? hex[.skinColor] : 0
+        avatar.eyes = Eyes(rawValue: hex[.eyes]) ?? .Closed
+        avatar.mouth = Mouth(rawValue: hex[.mouth]) ?? .Default
+        avatar.eyebrow = Eyebrow(rawValue: hex[.eyebrow]) ?? .Default
+        avatar.glasses = Glasses(rawValue: hex[.glasses]) ?? .None
+        avatar.hair = Hair(rawValue: hex[.hair]) ?? .None
+        avatar.hairColorIdx = Part.Hair.colors().indices.contains(hex[.hairColor]) ? hex[.hairColor] : 0
+        avatar.clothing = Clothing(rawValue: hex[.clothing]) ?? .Shirt
+        avatar.clothingColorIdx = Part.Clothing.colors().indices.contains(hex[.clothingColor]) ? hex[.clothingColor] : 0
+        avatar.facialHair = FacialHair(rawValue: hex[.facialHair]) ?? .None
+        avatar.facialHairColorIdx = Part.FacialHair.colors().indices.contains(hex[.facialHairColor]) ? hex[.facialHairColor] : 0
+        avatar.addition = Addition(rawValue: hex[.addition]) ?? .None
+        avatar.nose = Nose(rawValue: hex[.nose]) ?? .Normal
+        avatar.clothLogo = ClothLogo(rawValue: hex[.logo]) ?? .None
+        avatar.bodyType = BodyType(rawValue: hex.bodyType) ?? .normal
+        // Keep unknown future values and reserved bits when editing another part.
+        avatar.loadedValues = avatar.fieldValues
+        avatar.loadedHexID = hex
+        return avatar
+    }
+
     func symbolIndex(for part: Part) -> Int? {
         switch part {
         case .Eyes:
@@ -1078,4 +1145,3 @@ protocol AvatarSymbol: Any {
     func image() -> UIImage?
     var rawValue: Int { get }
 }
-
