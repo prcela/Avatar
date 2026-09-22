@@ -52,4 +52,22 @@ public struct AvatarHexID: Equatable, Hashable {
             high = (high & ~(UInt64(7) << 15)) | (UInt64(newValue) << 15)
         }
     }
+
+    /// High-word bits 18...22; palette indices 26...31 are reserved.
+    public var additionColor: Int {
+        get { Int((high >> 18) & 31) }
+        set {
+            precondition((0...31).contains(newValue))
+            high = (high & ~(UInt64(31) << 18)) | (UInt64(newValue) << 18)
+        }
+    }
+
+    /// High-word bits 23...29: 0 = no number, 1...100 = jersey numbers 0...99.
+    public var jerseyNumber: Int {
+        get { Int((high >> 23) & 127) }
+        set {
+            precondition((0...127).contains(newValue))
+            high = (high & ~(UInt64(127) << 23)) | (UInt64(newValue) << 23)
+        }
+    }
 }

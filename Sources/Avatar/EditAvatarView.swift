@@ -37,7 +37,7 @@ public class EditAvatarView : UIView {
         if avatar.skinColorIdx >= skinColors.count {
             avatar.skinColorIdx = 0
         }
-        bodyImgView.image = avatar.skin.image()
+        bodyImgView.image = bodyImageForClothing()
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         mouthImgView.image = avatar.mouth.image()
         noseImgView.image = avatar.nose.image()
@@ -46,26 +46,36 @@ public class EditAvatarView : UIView {
         eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
             ? avatar.eyebrow.image() : positionedPair(avatar.eyebrow.image())
         glassesView.image = avatar.glasses.image()
+        if avatar.glasses == .Monocle {
+            // Enlarge around the lens/eye center (160, 110), retaining the 8-point drop.
+            glassesView.transform = bodyTransform.translatedBy(x: -11.2, y: 11.6).scaledBy(x: 1.4, y: 1.4)
+        }
         let hairColors = Avatar.Part.Hair.colors()
         if avatar.hairColorIdx >= hairColors.count {
             avatar.hairColorIdx = 0
         }
         hairView.image = avatar.hair.image(color: hairColors[avatar.hairColorIdx])
         hairView.tintColor = hairColors[avatar.hairColorIdx]
-        clothingImgView.image = avatar.clothing.image()
+        let hairScale = avatar.hair.appearanceScale
+        let hairOffsetX: CGFloat = avatar.hair == .Beret ? -4 : 0
+        let hairOffsetY = (1 - hairScale) * (avatar.hair.scaleAnchorY - 140)
+        hairView.transform = bodyTransform.translatedBy(x: hairOffsetX, y: hairOffsetY).scaledBy(x: hairScale, y: hairScale)
         let clothingColors = Avatar.Part.Clothing.colors()
         if avatar.clothingColorIdx >= clothingColors.count {
             avatar.clothingColorIdx = 0
         }
+        clothingImgView.image = avatar.clothing.image(color: clothingColors[avatar.clothingColorIdx])
         clothingImgView.tintColor = clothingColors[avatar.clothingColorIdx]
-        additionImgView.image = avatar.addition.avatarImage()
+        let additionColors = Avatar.Part.Addition.colors()
+        let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
+        additionImgView.image = avatar.addition.avatarImage(color: additionColor)
         facialHairImgView.image = avatar.facialHair.image()
         let facialHairColors = Avatar.Part.FacialHair.colors()
         if avatar.facialHairColorIdx >= facialHairColors.count {
             avatar.facialHairColorIdx = 0
         }
         facialHairImgView.tintColor = facialHairColors[avatar.facialHairColorIdx]
-        clothingLogoImgView.image = avatar.clothLogo.image()
+        clothingLogoImgView.image = avatar.shirtMarkImage()
         
         switch avatar.addition {
         case .None:
@@ -74,15 +84,31 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, aboveSubview: clothingImgView)
         case .Freckles, .Old, .Makeup:
             insertSubview(additionImgView, aboveSubview: bodyImgView)
-        case .Hairband, .Crown:
+        case .Hairband, .Crown, .KungFuHeadband:
             insertSubview(additionImgView, aboveSubview: hairView)
         case .Bandana:
             insertSubview(additionImgView, belowSubview: facialHairImgView)
-        case .GoldChain, .GoldEarring, .DiamondEarrings:
+        case .GoldChain, .GoldEarring, .DiamondEarrings, .BowTie, .Tie, .Scarf, .DiceChain, .GoldMedal:
             insertSubview(additionImgView, belowSubview: hairView)
-        case .AddHearts, .Headphones:
+        case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
             insertSubview(additionImgView, aboveSubview: glassesView)
         }
+    }
+
+    private func bodyImageForClothing() -> UIImage? {
+        guard let image = avatar.skin.image() else { return nil }
+        guard avatar.clothing.verticalOffset > 0 else { return image }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+            // Keep the head and neck, hiding the bare shoulder rim above lowered clothing.
+            let scaleX = image.size.width / 200
+            let scaleY = image.size.height / 244
+            let visibleSkin = UIBezierPath(rect: CGRect(x: 0, y: 0, width: image.size.width, height: 160 * scaleY))
+            visibleSkin.append(UIBezierPath(rect: CGRect(x: 68 * scaleX, y: 160 * scaleY, width: 64 * scaleX, height: 84 * scaleY)))
+            visibleSkin.addClip()
+            image.draw(at: .zero)
+        }.withRenderingMode(image.renderingMode)
     }
 
     private func positionedPair(_ image: UIImage?) -> UIImage? {

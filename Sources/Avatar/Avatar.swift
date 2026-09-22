@@ -25,6 +25,12 @@ public class Avatar {
     public var bodyType: BodyType = .normal {
         didSet { loadedHexID?.bodyType = bodyType.rawValue }
     }
+    var additionColorIdx = 0 {
+        didSet { loadedHexID?.additionColor = additionColorIdx }
+    }
+    var jerseyNumber = 0 {
+        didSet { loadedHexID?.jerseyNumber = jerseyNumber }
+    }
     private var loadedHexID: AvatarHexID?
     private var loadedValues = [Int]()
 
@@ -237,6 +243,9 @@ public class Avatar {
         case BoldShades
         case SkiGoggles
         
+        case Monocle
+        case FutureVisor
+
         func image() -> UIImage? {
             switch self {
             case .None:
@@ -277,6 +286,10 @@ public class Avatar {
                 return UIImage(named: "Bold Shades", in: .module, compatibleWith: .current)
             case .SkiGoggles:
                 return UIImage(named: "SkiGoggles", in: .module, compatibleWith: .current)
+            case .Monocle:
+                return UIImage(named: "Monocle", in: .module, compatibleWith: .current)
+            case .FutureVisor:
+                return UIImage(named: "FutureVisor", in: .module, compatibleWith: .current)
             }
         }
     }
@@ -340,6 +353,34 @@ public class Avatar {
         case HighPonytail
         case SpaceBuns
         
+        case BucketHat
+        case Beret
+        case BackwardCap
+        case LowFade
+        case FlatTop
+        case TwinBraids
+
+        var appearanceScale: CGFloat {
+            switch self {
+            case .BucketHat: return 1.08
+            case .Beret, .LowFade: return 1.15
+            case .BackwardCap: return 1.0925
+            case .FlatTop: return 1.10
+            default: return 1
+            }
+        }
+
+        var scaleAnchorY: CGFloat {
+            switch self {
+            case .BucketHat: return 51.5
+            case .Beret: return 45.5
+            case .BackwardCap: return 51
+            case .LowFade: return 75.5
+            case .FlatTop: return 65.5
+            default: return 140
+            }
+        }
+
         func image() -> UIImage? {
             switch self {
             case .None:
@@ -456,10 +497,25 @@ public class Avatar {
                 return UIImage(named: "HighPonytail", in: .module, compatibleWith: .current)
             case .SpaceBuns:
                 return UIImage(named: "SpaceBuns", in: .module, compatibleWith: .current)
+            case .BucketHat:
+                return UIImage(named: "BucketHat", in: .module, compatibleWith: .current)
+            case .Beret:
+                return UIImage(named: "Beret", in: .module, compatibleWith: .current)
+            case .BackwardCap:
+                return UIImage(named: "BackwardCap", in: .module, compatibleWith: .current)
+            case .LowFade:
+                return UIImage(named: "LowFade", in: .module, compatibleWith: .current)
+            case .FlatTop:
+                return UIImage(named: "FlatTop", in: .module, compatibleWith: .current)
+            case .TwinBraids:
+                return UIImage(named: "TwinBraids", in: .module, compatibleWith: .current)
             }
         }
 
         func image(color: UIColor) -> UIImage? {
+            if [.BucketHat, .Beret, .BackwardCap, .LowFade, .FlatTop, .TwinBraids].contains(self) {
+                return image()?.avatarTinted(color)
+            }
             guard self == .CowboyHat || self == .BaseballCap, let image = image() else {
                 return image()
             }
@@ -516,6 +572,18 @@ public class Avatar {
         case UndershirtW
         case LeftSide
         
+        case DenimJacket
+        case LeatherJacket
+        case SportsJersey
+        case CroatiaJersey
+        case SerbiaJersey
+        case ArgentinaJersey
+        case PortugalJersey
+        case FranceJersey
+        case ButtonUpShirt
+        case BasketballJersey
+        case ElegantDress
+
         func image() -> UIImage? {
             switch self {
             case .Shirt:
@@ -544,7 +612,74 @@ public class Avatar {
                 return UIImage(named: "UndershirtW", in: .module, compatibleWith: .current)
             case .LeftSide:
                 return UIImage(named: "ShirtLeftSide", in: .module, compatibleWith: .current)
+            case .DenimJacket:
+                return UIImage(named: "DenimJacket", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .LeatherJacket:
+                return UIImage(named: "LeatherJacket", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .SportsJersey:
+                return UIImage(named: "SportsJersey", in: .module, compatibleWith: .current)
+            case .CroatiaJersey:
+                return UIImage(named: "CroatiaJersey", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .SerbiaJersey:
+                return UIImage(named: "SerbiaJersey", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .ArgentinaJersey:
+                return UIImage(named: "ArgentinaJersey", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .PortugalJersey:
+                return UIImage(named: "PortugalJersey", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .FranceJersey:
+                return UIImage(named: "FranceJersey", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .ButtonUpShirt:
+                return UIImage(named: "ButtonUpShirt", in: .module, compatibleWith: .current)
+            case .BasketballJersey:
+                return UIImage(named: "BasketballJersey", in: .module, compatibleWith: .current)
+            case .ElegantDress:
+                return UIImage(named: "ElegantDress", in: .module, compatibleWith: .current)
             }
+        }
+
+        func image(color: UIColor) -> UIImage? {
+            guard let original = (self == .SportsJersey || self == .ButtonUpShirt || self == .BasketballJersey || self == .ElegantDress) ? image()?.avatarTinted(color) : image() else { return nil }
+            guard verticalOffset != 0 else { return original }
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = original.scale
+            let bottomExtension = max(0, -verticalOffset)
+            let drawable = bottomExtension > 0
+                ? original.resizableImage(withCapInsets: UIEdgeInsets(top: original.size.height - 2, left: 0, bottom: 1, right: 0), resizingMode: .stretch)
+                : original
+            return UIGraphicsImageRenderer(size: original.size, format: format).image { _ in
+                // Extend above the bottom edge when lifting clothing, keeping the chest covered.
+                drawable.draw(in: CGRect(x: 0, y: verticalOffset, width: original.size.width, height: original.size.height + bottomExtension))
+            }.withRenderingMode(.alwaysOriginal)
+        }
+
+        var verticalOffset: CGFloat {
+            switch self {
+            case .LeatherJacket: return 17.5
+            case .SportsJersey: return 28
+            case .BasketballJersey: return -4
+            default: return self == .DenimJacket || self == .ButtonUpShirt || isJersey ? 12 : 0
+            }
+        }
+
+        var isJersey: Bool {
+            switch self {
+            case .SportsJersey, .CroatiaJersey, .SerbiaJersey, .ArgentinaJersey, .PortugalJersey, .FranceJersey, .BasketballJersey:
+                return true
+            default:
+                return false
+            }
+        }
+
+        var defaultJerseyNumber: Int? {
+            switch self {
+            case .ArgentinaJersey, .FranceJersey: return 10
+            case .PortugalJersey: return 7
+            default: return nil
+            }
+        }
+
+        var usesColor: Bool {
+            self != .DenimJacket && self != .LeatherJacket && (!isJersey || self == .SportsJersey || self == .BasketballJersey)
         }
     }
     enum FacialHair: Int, CaseIterable, AvatarSymbol {
@@ -590,7 +725,7 @@ public class Avatar {
         
     }
     enum Addition: Int, CaseIterable, AvatarSymbol {
-        // 4 bits
+        // 4 legacy bits plus one extension bit in the hex ID.
         case None
         case Blazer
         case Freckles
@@ -604,7 +739,17 @@ public class Avatar {
         case GoldChain
         case GoldEarring
         case DiamondEarrings
+        case KungFuHeadband
         
+        case BowTie
+        case Tie
+        case Scarf
+        case CheekBandage
+        case EyebrowScar
+        case EyebrowPiercing
+        case DiceChain
+        case GoldMedal
+
         func image() -> UIImage? {
             switch self {
             case .None:
@@ -633,10 +778,30 @@ public class Avatar {
                 return UIImage(named: "GoldEarring", in: .module, compatibleWith: .current)
             case .DiamondEarrings:
                 return UIImage(named: "DiamondEarrings", in: .module, compatibleWith: .current)
+            case .KungFuHeadband:
+                return UIImage(named: "KungFuHeadband", in: .module, compatibleWith: .current)
+            case .BowTie:
+                return UIImage(named: "BowTie", in: .module, compatibleWith: .current)
+            case .Tie:
+                return UIImage(named: "Tie", in: .module, compatibleWith: .current)
+            case .Scarf:
+                return UIImage(named: "Scarf", in: .module, compatibleWith: .current)
+            case .CheekBandage:
+                return UIImage(named: "CheekBandage", in: .module, compatibleWith: .current)
+            case .EyebrowScar:
+                return UIImage(named: "EyebrowScar", in: .module, compatibleWith: .current)
+            case .EyebrowPiercing:
+                return UIImage(named: "EyebrowPiercing", in: .module, compatibleWith: .current)
+            case .DiceChain:
+                return UIImage(named: "DiceChain", in: .module, compatibleWith: .current)
+            case .GoldMedal:
+                return UIImage(named: "GoldMedal", in: .module, compatibleWith: .current)
             }
         }
 
-        func avatarImage() -> UIImage? {
+        var usesColor: Bool { self == .BowTie || self == .Tie || self == .Scarf }
+
+        func avatarImage(color: UIColor? = nil) -> UIImage? {
             let frames: [CGRect]
             switch self {
             case .Bandana:
@@ -644,7 +809,7 @@ public class Avatar {
             case .Headphones:
                 frames = [CGRect(x: 26.4, y: 8, width: 211.2, height: 146)]
             case .GoldChain:
-                frames = [CGRect(x: 90, y: 196, width: 84, height: 52)]
+                frames = [CGRect(x: 90, y: 208, width: 84, height: 52)]
             case .GoldEarring:
                 frames = [CGRect(x: 63, y: 126, width: 14, height: 22)]
             case .DiamondEarrings:
@@ -652,12 +817,31 @@ public class Avatar {
                     CGRect(x: 67, y: 125, width: 8, height: 8),
                     CGRect(x: 189, y: 125, width: 8, height: 8)
                 ]
+            case .KungFuHeadband:
+                frames = [CGRect(x: 75, y: 61, width: 142, height: 32)]
+            case .BowTie:
+                frames = [CGRect(x: 96.9, y: 185.25, width: 70.2, height: 32.5)]
+            case .Tie:
+                frames = [CGRect(x: 116.4, y: 224, width: 31.2, height: 87.6)]
+            case .Scarf:
+                frames = [CGRect(x: 79.635, y: 181.4, width: 107.73, height: 119.7)]
+            case .CheekBandage:
+                frames = [CGRect(x: 81.5, y: 128.5, width: 36, height: 17)]
+            case .EyebrowScar:
+                frames = [CGRect(x: 98, y: 74, width: 16, height: 28)]
+            case .EyebrowPiercing:
+                frames = [CGRect(x: 103, y: 74.25, width: 12, height: 22.5)]
+            case .DiceChain:
+                frames = [CGRect(x: 94, y: 201, width: 76, height: 72)]
+            case .GoldMedal:
+                frames = [CGRect(x: 100, y: 190, width: 64, height: 81)]
             default:
                 return image()
             }
 
             // Place accessories in the avatar's 264 x 280 artwork coordinates.
-            guard let image = image() else { return nil }
+            guard let original = image() else { return nil }
+            let image = usesColor ? color.map { original.avatarTinted($0) } ?? original : original
             let format = UIGraphicsImageRendererFormat()
             format.scale = image.scale
             return UIGraphicsImageRenderer(size: CGSize(width: 264, height: 280), format: format).image { _ in
@@ -866,6 +1050,8 @@ public class Avatar {
                     UIColor(netHex: 0xff213c85),
                     UIColor(netHex: 0xffcdb29b)
                 ]
+            case .Addition:
+                return Part.Clothing.colors()
             case .Clothing:
                 return [
                     UIColor(netHex: 0xff262E33),
@@ -939,7 +1125,11 @@ public class Avatar {
         case .Hair:
             hair = Hair(rawValue: symbol.rawValue)!
         case .Clothing:
-            clothing = Clothing(rawValue: symbol.rawValue)!
+            let selected = Clothing(rawValue: symbol.rawValue)!
+            if selected != clothing, let number = selected.defaultJerseyNumber {
+                jerseyNumber = number + 1
+            }
+            clothing = selected
         case .FacialHair:
             facialHair = FacialHair(rawValue: symbol.rawValue)!
         case .Addition:
@@ -964,6 +1154,8 @@ public class Avatar {
             hairColorIdx = colorIdx
         case .FacialHair:
             facialHairColorIdx = colorIdx
+        case .Addition:
+            additionColorIdx = colorIdx
         case .Clothing:
             clothingColorIdx = colorIdx
         default:
@@ -975,7 +1167,7 @@ public class Avatar {
         var result = Int64(0)
         func addBits(_ ctBits:Int, v: Int) {
             result <<= ctBits
-            result |= Int64(v)
+            result |= Int64(v) & ((1 << ctBits) - 1)
         }
         addBits(1, v: skin.rawValue)
         addBits(4, v: skinColorIdx)
@@ -1060,11 +1252,28 @@ public class Avatar {
                 result[field] = fieldValues[index]
             }
         }
-        if loadedHexID == nil { result.bodyType = bodyType.rawValue }
+        if loadedHexID == nil {
+            result.bodyType = bodyType.rawValue
+            result.additionColor = additionColorIdx
+            result.jerseyNumber = jerseyNumber
+        }
         return result.hex
     }
 
     public var legacyAvatarId: Int64 { AvatarHexID(compressHex())!.legacyID }
+
+    func shirtMarkImage() -> UIImage? {
+        guard clothing.isJersey, (1...100).contains(jerseyNumber) else { return clothLogo.image() }
+        let text = String(jerseyNumber - 1) as NSString
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 32, weight: .heavy),
+            .foregroundColor: UIColor.white, .strokeColor: UIColor(white: 0.12, alpha: 1), .strokeWidth: -3
+        ]
+        let size = text.size(withAttributes: attributes)
+        return UIGraphicsImageRenderer(size: CGSize(width: 110, height: 44)).image { _ in
+            text.draw(at: CGPoint(x: (110 - size.width) / 2, y: (44 - size.height) / 2), withAttributes: attributes)
+        }.withRenderingMode(.alwaysOriginal)
+    }
 
     private class func decompress(hex: AvatarHexID) -> Avatar {
         let avatar = decompress(value: hex.legacyID)
@@ -1084,6 +1293,8 @@ public class Avatar {
         avatar.nose = Nose(rawValue: hex[.nose]) ?? .Normal
         avatar.clothLogo = ClothLogo(rawValue: hex[.logo]) ?? .None
         avatar.bodyType = BodyType(rawValue: hex.bodyType) ?? .normal
+        avatar.additionColorIdx = Part.Addition.colors().indices.contains(hex.additionColor) ? hex.additionColor : 0
+        avatar.jerseyNumber = (0...100).contains(hex.jerseyNumber) ? hex.jerseyNumber : 0
         // Keep unknown future values and reserved bits when editing another part.
         avatar.loadedValues = avatar.fieldValues
         avatar.loadedHexID = hex
@@ -1125,6 +1336,8 @@ public class Avatar {
             return hairColorIdx
         case .FacialHair:
             return facialHairColorIdx
+        case .Addition:
+            return additionColorIdx
         case .Clothing:
             return clothingColorIdx
         default:
@@ -1144,4 +1357,18 @@ public class Avatar {
 protocol AvatarSymbol: Any {
     func image() -> UIImage?
     var rawValue: Int { get }
+}
+
+private extension UIImage {
+    func avatarTinted(_ color: UIColor) -> UIImage {
+        let bounds = CGRect(origin: .zero, size: size)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = scale
+        return UIGraphicsImageRenderer(size: size, format: format).image { context in
+            color.setFill()
+            context.fill(bounds)
+            draw(in: bounds, blendMode: .multiply, alpha: 1)
+            draw(in: bounds, blendMode: .destinationIn, alpha: 1)
+        }.withRenderingMode(.alwaysOriginal)
+    }
 }

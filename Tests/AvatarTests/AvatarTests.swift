@@ -4,6 +4,89 @@ import XCTest
 final class AvatarTests: XCTestCase {
     private let legacy: Int64 = 903052408064125018
 
+    func testNationalJerseysUseExtendedClothingFieldWithoutChangingNeighbors() throws {
+        let jerseys: [Avatar.Clothing] = [.CroatiaJersey, .SerbiaJersey, .ArgentinaJersey, .PortugalJersey, .FranceJersey]
+        let original = AvatarHexID(legacyID: legacy)
+        for (index, jersey) in jerseys.enumerated() {
+            XCTAssertEqual(jersey.rawValue, 16 + index)
+            XCTAssertTrue(jersey.isJersey)
+            XCTAssertFalse(jersey.usesColor)
+            for number in [0, 1, 8, 11, 100] {
+                let avatar = Avatar.decompress(value: legacy)
+                avatar.set(part: .Clothing, symbol: jersey)
+                avatar.jerseyNumber = number
+                let hex = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+                XCTAssertEqual(hex[.clothing], jersey.rawValue)
+                for field in AvatarHexID.Field.allCases where field != .clothing {
+                    XCTAssertEqual(hex[field], original[field])
+                }
+                let saved = Avatar.decompress(value: 0, hexId: hex.hex)
+                XCTAssertEqual(saved.clothing, jersey)
+                XCTAssertEqual(saved.jerseyNumber, number)
+                XCTAssertEqual(saved.compressHex(), hex.hex)
+                XCTAssertEqual(avatar.compress(), avatar.legacyAvatarId)
+            }
+        }
+    }
+
+    func testNationalJerseyDefaultsOnlyApplyWhenChangingClothing() {
+        let avatar = Avatar.decompress(value: legacy)
+        let defaults: [(Avatar.Clothing, Int)] = [(.ArgentinaJersey, 10), (.PortugalJersey, 7), (.FranceJersey, 10)]
+        for (jersey, number) in defaults {
+            avatar.set(part: .Clothing, symbol: jersey)
+            XCTAssertEqual(avatar.jerseyNumber, number + 1)
+            avatar.jerseyNumber = 24
+            avatar.set(part: .Clothing, symbol: jersey)
+            XCTAssertEqual(avatar.jerseyNumber, 24)
+            let saved = Avatar.decompress(value: 0, hexId: avatar.compressHex())
+            XCTAssertEqual(saved.jerseyNumber, 24)
+        }
+        avatar.set(part: .Clothing, symbol: Avatar.Clothing.CroatiaJersey)
+        XCTAssertEqual(avatar.jerseyNumber, 24)
+        avatar.set(part: .Clothing, symbol: Avatar.Clothing.SerbiaJersey)
+        XCTAssertEqual(avatar.jerseyNumber, 24)
+    }
+
+    func testSharedAccessoryHeaderFixture() {
+        var hex = AvatarHexID(legacyID: legacy)
+        hex.bodyType = 4
+        hex.additionColor = 23
+        hex.jerseyNumber = 100
+        XCTAssertEqual(hex.hex, "00000000325e00000c8849616c39285a")
+    }
+
+    func testExpandedAccessoriesKeepLegacyFieldsAndNewOptions() {
+        let avatar = Avatar.decompress(value: legacy)
+        avatar.addition = .Scarf
+        avatar.additionColorIdx = 23
+        avatar.clothing = .SportsJersey
+        avatar.jerseyNumber = 100
+        let saved = Avatar.decompress(value: 0, hexId: avatar.compressHex())
+        XCTAssertEqual(saved.addition, .Scarf)
+        XCTAssertEqual(saved.additionColorIdx, 23)
+        XCTAssertEqual(saved.jerseyNumber, 100)
+        XCTAssertEqual(saved.clothing, .SportsJersey)
+        XCTAssertEqual(saved.facialHairColorIdx, avatar.facialHairColorIdx)
+        XCTAssertEqual(avatar.compress(), avatar.legacyAvatarId)
+    }
+
+    func testReservedAccessoryOptionsSurviveUnrelatedEdits() throws {
+        var hex = try XCTUnwrap(AvatarHexID("80000000400000000c8849616c39285a"))
+        hex.additionColor = 31
+        hex.jerseyNumber = 127
+        let avatar = Avatar.decompress(value: 0, hexId: hex.hex)
+        XCTAssertEqual(avatar.additionColorIdx, 0)
+        XCTAssertEqual(avatar.jerseyNumber, 0)
+        avatar.bodyType = .slim
+        hex.bodyType = 1
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        avatar.additionColorIdx = 0
+        avatar.jerseyNumber = 0
+        hex.additionColor = 0
+        hex.jerseyNumber = 0
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+    }
+
     func testEmptyAndInvalidHexUseLegacyAppearance() {
         for hex in ["", "bad", String(repeating: "g", count: 32)] {
             let avatar = Avatar.decompress(value: legacy, hexId: hex)

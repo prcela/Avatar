@@ -23,6 +23,7 @@ public class EditAvatarViewController: UIViewController {
     var parts = Avatar.Part.allCases
     var selectedPart: Avatar.Part? = nil
     private let bodyTypeButton = UIButton(type: .system)
+    private let jerseyNumberButton = UIButton(type: .system)
     
     private func selectCurrentItemsIfPossible() {
         guard let part = selectedPart else { return }
@@ -97,11 +98,10 @@ public class EditAvatarViewController: UIViewController {
         bodyTypeButton.showsMenuAsPrimaryAction = true
         bodyTypeButton.accessibilityLabel = NSLocalizedString("Avatar body shape", value: "Body shape", comment: "Avatar editor")
         updateBodyTypeMenu()
-        if let toolbar = view.subviews.compactMap({ $0 as? UIToolbar }).first,
-           let cancel = toolbar.items?.first, let done = toolbar.items?.last {
-            toolbar.items = [cancel, UIBarButtonItem(systemItem: .flexibleSpace),
-                UIBarButtonItem(customView: bodyTypeButton), UIBarButtonItem(systemItem: .flexibleSpace), done]
-        }
+        jerseyNumberButton.showsMenuAsPrimaryAction = true
+        jerseyNumberButton.accessibilityLabel = NSLocalizedString("Avatar jersey number", value: "Jersey number", comment: "Avatar editor")
+        updateJerseyNumberMenu()
+
 
         // Do any additional setup after loading the view.
         editAvatarView = Bundle.module.loadNibNamed("EditAvatarView", owner: nil, options: nil)!.first! as? EditAvatarView
@@ -156,6 +156,40 @@ public class EditAvatarViewController: UIViewController {
            let cell = colorsCollectionView.cellForItem(at: selected) {
             applySelectionStyle(to: cell)
         }
+    }
+
+    private func updateJerseyNumberMenu() {
+        let noNumber = NSLocalizedString("Avatar no number", value: "No number", comment: "Avatar jersey")
+        var actions: [UIMenuElement] = [UIAction(title: noNumber, state: avatar.jerseyNumber == 0 ? .on : .off) { [weak self] _ in
+            self?.setJerseyNumber(0)
+        }]
+        for start in stride(from: 0, through: 90, by: 10) {
+            let numbers = (start..<(start + 10)).map { number in
+                UIAction(title: String(number), state: avatar.jerseyNumber == number + 1 ? .on : .off) { [weak self] _ in
+                    self?.setJerseyNumber(number + 1)
+                }
+            }
+            actions.append(UIMenu(title: "\(start)-\(start + 9)", children: numbers))
+        }
+        jerseyNumberButton.setTitle(avatar.jerseyNumber == 0 ? "#--" : "#\(avatar.jerseyNumber - 1)", for: .normal)
+        jerseyNumberButton.menu = UIMenu(title: jerseyNumberButton.accessibilityLabel ?? "", children: actions)
+        jerseyNumberButton.sizeToFit()
+        if let toolbar = view.subviews.compactMap({ $0 as? UIToolbar }).first,
+           let cancel = toolbar.items?.first, let done = toolbar.items?.last {
+            var items = [cancel, UIBarButtonItem(systemItem: .flexibleSpace), UIBarButtonItem(customView: bodyTypeButton)]
+            if avatar.clothing.isJersey {
+                items.append(UIBarButtonItem(systemItem: .flexibleSpace))
+                items.append(UIBarButtonItem(customView: jerseyNumberButton))
+            }
+            items += [UIBarButtonItem(systemItem: .flexibleSpace), done]
+            toolbar.items = items
+        }
+    }
+
+    private func setJerseyNumber(_ number: Int) {
+        avatar.jerseyNumber = number
+        editAvatarView?.update()
+        updateJerseyNumberMenu()
     }
 
     private func bodyTypeTitle(_ type: Avatar.BodyType) -> String {
@@ -240,6 +274,8 @@ extension EditAvatarViewController: UICollectionViewDataSource {
         case symbolsCollectionView:
             return part.symbols().count
         default:
+            if part == .Addition && !avatar.addition.usesColor { return 0 }
+            if part == .Clothing && !avatar.clothing.usesColor { return 0 }
             return part.colors().count
         }
     }
@@ -257,6 +293,9 @@ extension EditAvatarViewController: UICollectionViewDelegate {
         case symbolsCollectionView:
             let symbol = part.symbols()[indexPath.row]
             avatar.set(part: part, symbol: symbol)
+            colorsCollectionView.reloadData()
+            selectCurrentItemsIfPossible()
+            updateJerseyNumberMenu()
         default:
             avatar.set(part: part, colorIdx: indexPath.row)
         }
