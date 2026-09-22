@@ -813,7 +813,7 @@ public class Avatar {
             case .Headphones:
                 frames = [CGRect(x: 26.4, y: 8, width: 211.2, height: 146)]
             case .GoldChain:
-                frames = [CGRect(x: 90, y: 208, width: 84, height: 52)]
+                frames = [CGRect(x: 90, y: 199, width: 84, height: 52)]
             case .GoldEarring:
                 frames = [CGRect(x: 63, y: 126, width: 14, height: 22)]
             case .DiamondEarrings:
