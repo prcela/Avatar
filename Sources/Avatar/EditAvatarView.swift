@@ -37,11 +37,11 @@ public class EditAvatarView : UIView {
         eyesImgView.image = avatar.eyes.image()
         eyesbrowImgView.image = avatar.eyebrow.image()
         glassesView.image = avatar.glasses.image()
-        hairView.image = avatar.hair.image()
         let hairColors = Avatar.Part.Hair.colors()
         if avatar.hairColorIdx >= hairColors.count {
             avatar.hairColorIdx = 0
         }
+        hairView.image = avatar.hair.image(color: hairColors[avatar.hairColorIdx])
         hairView.tintColor = hairColors[avatar.hairColorIdx]
         clothingImgView.image = avatar.clothing.image()
         let clothingColors = Avatar.Part.Clothing.colors()
@@ -49,7 +49,7 @@ public class EditAvatarView : UIView {
             avatar.clothingColorIdx = 0
         }
         clothingImgView.tintColor = clothingColors[avatar.clothingColorIdx]
-        additionImgView.image = avatar.addition.image()
+        additionImgView.image = avatar.addition.avatarImage()
         facialHairImgView.image = avatar.facialHair.image()
         let facialHairColors = Avatar.Part.FacialHair.colors()
         if avatar.facialHairColorIdx >= facialHairColors.count {
@@ -67,7 +67,11 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, aboveSubview: bodyImgView)
         case .Hairband, .Crown:
             insertSubview(additionImgView, aboveSubview: hairView)
-        case .AddHearts:
+        case .Bandana:
+            insertSubview(additionImgView, belowSubview: facialHairImgView)
+        case .GoldChain, .GoldEarring, .DiamondEarrings:
+            insertSubview(additionImgView, belowSubview: hairView)
+        case .AddHearts, .Headphones:
             insertSubview(additionImgView, aboveSubview: glassesView)
         }
     }

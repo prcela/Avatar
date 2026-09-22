@@ -217,6 +217,7 @@ public class Avatar {
         case SoftSquare
         case ThinSquare
         case BoldShades
+        case SkiGoggles
         
         func image() -> UIImage? {
             switch self {
@@ -256,6 +257,8 @@ public class Avatar {
                 return UIImage(named: "Thin Square", in: .module, compatibleWith: .current)
             case .BoldShades:
                 return UIImage(named: "Bold Shades", in: .module, compatibleWith: .current)
+            case .SkiGoggles:
+                return UIImage(named: "SkiGoggles", in: .module, compatibleWith: .current)
             }
         }
     }
@@ -309,6 +312,15 @@ public class Avatar {
         case TexturedCrop
         case SideSweep
         case Spiky
+        case CowboyHat
+        case BaseballCap
+        case ChefHat
+        case VikingHelmet
+        case Mohawk
+        case Pompadour
+        case CurtainPart
+        case HighPonytail
+        case SpaceBuns
         
         func image() -> UIImage? {
             switch self {
@@ -408,7 +420,66 @@ public class Avatar {
                 return UIImage(named: "Side Sweep", in: .module, compatibleWith: .current)
             case .Spiky:
                 return UIImage(named: "Spiky", in: .module, compatibleWith: .current)
+            case .CowboyHat:
+                return UIImage(named: "CowboyHat", in: .module, compatibleWith: .current)
+            case .BaseballCap:
+                return UIImage(named: "BaseballCap", in: .module, compatibleWith: .current)
+            case .ChefHat:
+                return UIImage(named: "ChefHat", in: .module, compatibleWith: .current)
+            case .VikingHelmet:
+                return UIImage(named: "VikingHelmet", in: .module, compatibleWith: .current)
+            case .Mohawk:
+                return UIImage(named: "Mohawk", in: .module, compatibleWith: .current)
+            case .Pompadour:
+                return UIImage(named: "Pompadour", in: .module, compatibleWith: .current)
+            case .CurtainPart:
+                return UIImage(named: "CurtainPart", in: .module, compatibleWith: .current)
+            case .HighPonytail:
+                return UIImage(named: "HighPonytail", in: .module, compatibleWith: .current)
+            case .SpaceBuns:
+                return UIImage(named: "SpaceBuns", in: .module, compatibleWith: .current)
             }
+        }
+
+        func image(color: UIColor) -> UIImage? {
+            guard self == .CowboyHat || self == .BaseballCap, let image = image() else {
+                return image()
+            }
+
+            let bounds = CGRect(origin: .zero, size: image.size)
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = image.scale
+            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+            let shading = renderer.image { context in
+                UIColor.white.setFill()
+                context.cgContext.fill(bounds)
+                image.draw(in: bounds, blendMode: .luminosity, alpha: 1)
+                context.cgContext.setBlendMode(.plusLighter)
+                UIColor(white: 0.55, alpha: 1).setFill()
+                context.cgContext.fill(bounds)
+            }
+
+            return renderer.image { context in
+                color.setFill()
+                context.cgContext.fill(bounds)
+                shading.draw(in: bounds, blendMode: .multiply, alpha: 1)
+                image.draw(in: bounds, blendMode: .destinationIn, alpha: 1)
+
+                if self == .CowboyHat {
+                    // Preserve the original band in the 264 x 280 artwork coordinates.
+                    let band = UIBezierPath()
+                    band.move(to: CGPoint(x: 70.7, y: 58.5))
+                    band.addQuadCurve(to: CGPoint(x: 193, y: 58.8), controlPoint: CGPoint(x: 132, y: 41.5))
+                    band.addLine(to: CGPoint(x: 195.5, y: 68.3))
+                    band.addQuadCurve(to: CGPoint(x: 68.5, y: 68.3), controlPoint: CGPoint(x: 132, y: 52.2))
+                    band.close()
+                    band.apply(CGAffineTransform(scaleX: bounds.width / 264, y: bounds.height / 280))
+                    context.cgContext.saveGState()
+                    band.addClip()
+                    image.draw(in: bounds, blendMode: .normal, alpha: 1)
+                    context.cgContext.restoreGState()
+                }
+            }.withRenderingMode(.alwaysOriginal)
         }
         
     }
@@ -467,6 +538,10 @@ public class Avatar {
         case MoustacheMagnum
         case Bradica
         case Metal
+        case MoustachePencil
+        case MoustacheHorseshoe
+        case BeardStubble
+        // Raw value 11 is retired; start future additions at 12.
         
         func image() -> UIImage? {
             switch self {
@@ -486,6 +561,12 @@ public class Avatar {
                 return UIImage(named: "Bradica", in: .module, compatibleWith: .current)
             case .Metal:
                 return UIImage(named: "BeardMetal", in: .module, compatibleWith: .current)
+            case .MoustachePencil:
+                return UIImage(named: "MoustachePencil", in: .module, compatibleWith: .current)
+            case .MoustacheHorseshoe:
+                return UIImage(named: "MoustacheHorseshoe", in: .module, compatibleWith: .current)
+            case .BeardStubble:
+                return UIImage(named: "BeardStubble", in: .module, compatibleWith: .current)
             }
         }
         
@@ -500,6 +581,11 @@ public class Avatar {
         case Makeup
         case AddHearts
         case Crown
+        case Bandana
+        case Headphones
+        case GoldChain
+        case GoldEarring
+        case DiamondEarrings
         
         func image() -> UIImage? {
             switch self {
@@ -519,7 +605,48 @@ public class Avatar {
                 return UIImage(named: "AddHearts", in: .module, compatibleWith: .current)
             case .Crown:
                 return UIImage(named: "Crown", in: .module, compatibleWith: .current)
+            case .Bandana:
+                return UIImage(named: "Bandana", in: .module, compatibleWith: .current)
+            case .Headphones:
+                return UIImage(named: "Headphones", in: .module, compatibleWith: .current)
+            case .GoldChain:
+                return UIImage(named: "GoldChain", in: .module, compatibleWith: .current)
+            case .GoldEarring:
+                return UIImage(named: "GoldEarring", in: .module, compatibleWith: .current)
+            case .DiamondEarrings:
+                return UIImage(named: "DiamondEarrings", in: .module, compatibleWith: .current)
             }
+        }
+
+        func avatarImage() -> UIImage? {
+            let frames: [CGRect]
+            switch self {
+            case .Bandana:
+                frames = [CGRect(x: 0, y: 6.2, width: 264, height: 280)]
+            case .Headphones:
+                frames = [CGRect(x: 26.4, y: 8, width: 211.2, height: 146)]
+            case .GoldChain:
+                frames = [CGRect(x: 90, y: 196, width: 84, height: 52)]
+            case .GoldEarring:
+                frames = [CGRect(x: 63, y: 126, width: 14, height: 22)]
+            case .DiamondEarrings:
+                frames = [
+                    CGRect(x: 67, y: 125, width: 8, height: 8),
+                    CGRect(x: 189, y: 125, width: 8, height: 8)
+                ]
+            default:
+                return image()
+            }
+
+            // Place accessories in the avatar's 264 x 280 artwork coordinates.
+            guard let image = image() else { return nil }
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = image.scale
+            return UIGraphicsImageRenderer(size: CGSize(width: 264, height: 280), format: format).image { _ in
+                for frame in frames {
+                    image.draw(in: frame)
+                }
+            }.withRenderingMode(.alwaysOriginal)
         }
     }
     
@@ -588,6 +715,7 @@ public class Avatar {
         case Coffee
         case Dice
         case Trophy
+        case MiddleFinger
         
         func image() -> UIImage? {
             switch self {
@@ -643,6 +771,8 @@ public class Avatar {
                 return UIImage(named: "DiceLogo", in: .module, compatibleWith: .current)
             case .Trophy:
                 return UIImage(named: "TrophyLogo", in: .module, compatibleWith: .current)
+            case .MiddleFinger:
+                return UIImage(named: "MiddleFingerLogo", in: .module, compatibleWith: .current)
             }
         }
     }
