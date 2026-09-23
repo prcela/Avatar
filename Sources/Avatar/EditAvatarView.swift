@@ -38,9 +38,11 @@ public class EditAvatarView : UIView {
         if avatar.skinColorIdx >= skinColors.count {
             avatar.skinColorIdx = 0
         }
-        let bodyImages = avatar.skin == .Bot && UIAvatarView.enableBots
-            ? nil : AvatarBodyShape.images(for: avatar.bodyType)
-        bodyImgView.image = bodyImageForClothing(bodyImages?.body ?? avatar.skin.image())
+        let isBot = avatar.skin == .Bot && UIAvatarView.enableBots
+        let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
+        let bodyImage = isBot ? avatar.skin.image()
+            : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
+        bodyImgView.image = bodyImageForClothing(bodyImage)
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()

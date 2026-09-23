@@ -102,6 +102,31 @@ extension AvatarBodyShape {
     }
 
     private static let imageCache = NSCache<NSNumber, Images>()
+    private static let shadedImageCache = NSCache<NSString, UIImage>()
+
+    static func shadedBody(for bodyType: Avatar.BodyType, skinColorIndex: Int) -> UIImage? {
+        let key = "\(bodyType.rawValue)-\(skinColorIndex)" as NSString
+        if let image = shadedImageCache.object(forKey: key) { return image }
+        guard let mask = images(for: bodyType)?.body
+            ?? UIImage(named: "Body", in: .module, compatibleWith: nil) else { return nil }
+        let color = Avatar.Part.Skin.colors()[skinColorIndex]
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = mask.scale
+        let size = CGSize(width: 200, height: 244)
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { renderer in
+            let context = renderer.cgContext
+            let bounds = CGRect(origin: .zero, size: size)
+            mask.withRenderingMode(.alwaysOriginal).draw(in: bounds)
+            context.setBlendMode(.sourceIn)
+            context.setFillColor(color.cgColor)
+            context.fill(bounds)
+            AvatarBodyShading.draw(in: context)
+        }.withRenderingMode(.alwaysOriginal)
+        // Reuse lighting when changing clothing/accessories or showing the same avatar in a list.
+        let cost = Int(size.width * size.height * format.scale * format.scale) * 4
+        shadedImageCache.setObject(image, forKey: key, cost: cost)
+        return image
+    }
 
     static func images(for bodyType: Avatar.BodyType) -> Images? {
         guard let shape = AvatarBodyShape(bodyType: bodyType) else { return nil }
