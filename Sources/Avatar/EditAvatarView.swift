@@ -23,7 +23,11 @@ public class EditAvatarView : UIView {
     @IBOutlet weak var noseImgView: UIImageView!
     @IBOutlet weak var hairView: UIImageView!
     @IBOutlet weak var glassesView: UIImageView!
-    
+
+    private let hairBackingView = UIImageView()
+    private let hairBackingMask = CAShapeLayer()
+    private let hairFaceMask = CAShapeLayer()
+
     var avatar = Avatar()
     
     func update() {
@@ -65,11 +69,67 @@ public class EditAvatarView : UIView {
             avatar.hairColorIdx = 0
         }
         hairView.image = avatar.hair.image(color: hairColors[avatar.hairColorIdx])
+        if !isBot && avatar.hair.followsCheekShape {
+            hairView.image = AvatarBodyShape.fittedHair(avatar.hair, bodyType: avatar.bodyType)
+        }
         hairView.tintColor = hairColors[avatar.hairColorIdx]
         let hairScale = avatar.hair.appearanceScale
-        let hairOffsetX: CGFloat = avatar.hair == .Beret ? -4 : 0
-        let hairOffsetY = (1 - hairScale) * (avatar.hair.scaleAnchorY - 140)
-        hairView.transform = bodyTransform.translatedBy(x: hairOffsetX, y: hairOffsetY).scaledBy(x: hairScale, y: hairScale)
+        let hairScaleY = avatar.hair.appearanceScaleY
+        let hairWidthScale = isBot ? 1 : avatar.hair.widthScale(for: avatar.bodyType)
+        let hairStyle = avatar.hair.style
+        let hairOffsetX: CGFloat = hairStyle?.offsetX ?? (avatar.hair == .Beret ? -4 : 0)
+        let hairOffsetY = (1 - hairScaleY) * (avatar.hair.scaleAnchorY - 140) + (hairStyle?.offsetY ?? 0)
+        // Raise the ponytail by 5% of the 280-point avatar canvas.
+        let hairLift: CGFloat = avatar.hair == .HighPonytail ? 14 : 0
+        let hairTransform = bodyTransform.translatedBy(x: hairOffsetX, y: hairOffsetY - hairLift)
+            .scaledBy(x: hairScale, y: hairScaleY)
+        hairView.transform = hairTransform.scaledBy(x: hairWidthScale, y: 1)
+        if !isBot, let hairStyle {
+            hairFaceMask.frame = hairView.bounds
+            hairFaceMask.fillRule = .evenOdd
+            hairFaceMask.path = hairStyle.frontMask(for: avatar.bodyType, bounds: hairView.bounds)
+            hairView.layer.mask = hairFaceMask
+        } else {
+            hairView.layer.mask = nil
+        }
+        let needsHairBacking = hairStyle != nil || avatar.hair == .HighPonytail
+            || (avatar.hair == .LongWavy && (avatar.bodyType == .broad || avatar.bodyType == .veryBroad))
+        if !isBot && needsHairBacking {
+            // Fill openings behind the skin when widening the front hair.
+            if hairBackingView.superview == nil {
+                insertSubview(hairBackingView, belowSubview: bodyImgView)
+            }
+            hairBackingView.bounds = hairView.bounds
+            hairBackingView.center = hairView.center
+            hairBackingView.contentMode = hairView.contentMode
+            hairBackingView.transform = hairTransform
+            hairBackingView.image = hairStyle != nil ? hairView.image
+                : avatar.hair.image(color: hairColors[avatar.hairColorIdx])
+            if avatar.hair == .ShavedSides {
+                // Continuous strands behind the ears and cheeks, preserving the front cutouts.
+                hairBackingView.image = avatar.hair.image(color: hairColors[avatar.hairColorIdx], backing: true)
+            }
+            hairBackingView.tintColor = hairView.tintColor
+            hairBackingView.layer.mask = nil
+            if hairStyle != nil {
+                // A narrower rear layer closes transparent gaps around the jaw and neck.
+                // ShavedSides needs its full width to connect the strands behind the ears.
+                let backingWidth: CGFloat = avatar.hair == .ShavedSides ? 1 : 0.9
+                hairBackingView.transform = hairTransform.scaledBy(x: backingWidth, y: 1)
+            }
+            if avatar.hair == .HighPonytail {
+                // Keep only the original scalp behind the temples, excluding the ponytail.
+                hairBackingView.transform = hairTransform.scaledBy(x: (hairScale - 0.1) / hairScale, y: 1)
+                hairBackingMask.frame = hairBackingView.bounds
+                hairBackingMask.path = UIBezierPath(rect: CGRect(x: 0, y: 0,
+                    width: hairBackingView.bounds.width * 196 / 266,
+                    height: hairBackingView.bounds.height / 2)).cgPath
+                hairBackingView.layer.mask = hairBackingMask
+            }
+        } else {
+            hairBackingView.image = nil
+            hairBackingView.layer.mask = nil
+        }
         let clothingColors = Avatar.Part.Clothing.colors()
         if avatar.clothingColorIdx >= clothingColors.count {
             avatar.clothingColorIdx = 0

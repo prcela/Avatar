@@ -24,9 +24,15 @@ public class EditAvatarViewController: UIViewController {
     var selectedPart: Avatar.Part? = nil
     private let bodyTypes: [Avatar.BodyType] = [.verySlim, .slim, .normal, .broad, .veryBroad]
     private let jerseyNumberButton = UIButton(type: .system)
+    #if DEBUG
+    private let selectedPartDebugLabel = UILabel()
+    #endif
     
     private func selectCurrentItemsIfPossible() {
         guard let part = selectedPart else { return }
+        #if DEBUG
+        updateSelectedPartDebugLabel()
+        #endif
 
         // Resolve indices from Avatar if available, else fallback to 0
         let symbolsCount = symbolsCollectionView.numberOfItems(inSection: 0)
@@ -115,6 +121,23 @@ public class EditAvatarViewController: UIViewController {
         holderView.embedSubview(editAvatarView!)
         editAvatarView?.avatar = avatar
         editAvatarView?.update()
+
+        #if DEBUG
+        selectedPartDebugLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+        selectedPartDebugLabel.textColor = .secondaryLabel
+        selectedPartDebugLabel.textAlignment = .center
+        selectedPartDebugLabel.adjustsFontSizeToFitWidth = true
+        selectedPartDebugLabel.minimumScaleFactor = 0.7
+        selectedPartDebugLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(selectedPartDebugLabel)
+        // Use the existing gap below the preview, outside the rendered avatar.
+        NSLayoutConstraint.activate([
+            selectedPartDebugLabel.topAnchor.constraint(equalTo: holderView.bottomAnchor, constant: 1),
+            selectedPartDebugLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            selectedPartDebugLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            selectedPartDebugLabel.heightAnchor.constraint(equalToConstant: 14)
+        ])
+        #endif
         
         symbolsCollectionView.allowsMultipleSelection = false
         colorsCollectionView.allowsMultipleSelection = false
@@ -164,6 +187,22 @@ public class EditAvatarViewController: UIViewController {
             applySelectionStyle(to: cell)
         }
     }
+
+    #if DEBUG
+    private func updateSelectedPartDebugLabel() {
+        guard let part = selectedPart else {
+            selectedPartDebugLabel.text = nil
+            return
+        }
+        if part == .Skin {
+            selectedPartDebugLabel.text = "Body.\(avatar.bodyType)"
+        } else if let index = avatar.symbolIndex(for: part), part.symbols().indices.contains(index) {
+            selectedPartDebugLabel.text = "\(part).\(part.symbols()[index])"
+        } else {
+            selectedPartDebugLabel.text = nil
+        }
+    }
+    #endif
 
     private func updateJerseyNumberMenu() {
         let noNumber = NSLocalizedString("Avatar no number", value: "No number", comment: "Avatar jersey")

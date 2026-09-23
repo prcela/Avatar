@@ -1,7 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "Bob.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -11,7 +10,8 @@
     },
     {
       "idiom" : "universal",
-      "scale" : "3x"
+      "scale" : "3x",
+      "filename" : "Bob.png"
     }
   ],
   "info" : {
@@ -19,6 +19,6 @@
     "version" : 1
   },
   "properties" : {
-    "template-rendering-intent" : "template"
+    "template-rendering-intent" : "original"
   }
 }

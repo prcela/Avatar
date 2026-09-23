@@ -1,7 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "Curly.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -11,11 +10,15 @@
     },
     {
       "idiom" : "universal",
-      "scale" : "3x"
+      "scale" : "3x",
+      "filename" : "Curly.png"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "original"
   }
 }

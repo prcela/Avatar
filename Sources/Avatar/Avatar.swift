@@ -360,8 +360,14 @@ public class Avatar {
         case FlatTop
         case TwinBraids
 
+        var style: AvatarHairStyle? { AvatarHairStyle.placement(for: self) }
+
         var appearanceScale: CGFloat {
+            if let style { return style.scaleX }
             switch self {
+            // Move the hairline about 5 points outward at each temple.
+            case .HighPonytail: return 1.134
+            case .SpaceBuns: return 0.861
             case .BucketHat: return 1.08
             case .Beret, .LowFade: return 1.15
             case .BackwardCap: return 1.0925
@@ -370,8 +376,51 @@ public class Avatar {
             }
         }
 
-        var scaleAnchorY: CGFloat {
+        var appearanceScaleY: CGFloat {
+            if let style { return style.scaleY }
             switch self {
+            case .SideFringe: return 0.82
+            case .HighPonytail: return 0.935
+            case .SpaceBuns: return 0.72
+            default: return appearanceScale
+            }
+        }
+
+        func widthScale(for bodyType: BodyType) -> CGFloat {
+            if style != nil { return 1 }
+            switch self {
+            case .BuzzCut:
+                switch bodyType {
+                case .broad: return 1.05
+                case .veryBroad: return 1.10
+                default: return 1
+                }
+            case .SleekBob:
+                switch bodyType {
+                case .broad: return 1.04
+                case .veryBroad: return 1.08
+                default: return 1
+                }
+            default: return 1
+            }
+        }
+
+        var followsCheekShape: Bool {
+            if style != nil { return false }
+            switch self {
+            case .Dreads2, .ShaggyMullet, .Curvy, .Dreads, .Frida, .ShavedSides, .Straight,
+                 .StraightStrand, .LStraight, .MiaWallace, .LongButNotTooLong,
+                 .Fro, .Curly, .Bob, .Big, .LongWavy, .WavyBob:
+                return true
+            default: return false
+            }
+        }
+
+        var scaleAnchorY: CGFloat {
+            if style != nil { return 0 }
+            switch self {
+            case .HighPonytail, .SpaceBuns: return 0
+            case .SideFringe: return 24
             case .BucketHat: return 51.5
             case .Beret: return 45.5
             case .BackwardCap: return 51
@@ -512,8 +561,14 @@ public class Avatar {
             }
         }
 
-        func image(color: UIColor) -> UIImage? {
-            if [.BucketHat, .Beret, .BackwardCap, .LowFade, .FlatTop, .TwinBraids].contains(self) {
+        func image(color: UIColor, backing: Bool = false) -> UIImage? {
+            if backing && self == .ShavedSides {
+                return UIImage(named: "ShavedSidesBacking", in: .module, compatibleWith: .current)?.avatarTinted(color)
+            }
+            if style != nil && self != .Frida {
+                return image()?.avatarTinted(color)
+            }
+            if [.SideFringe, .HighPonytail, .SpaceBuns, .BucketHat, .Beret, .BackwardCap, .LowFade, .FlatTop, .TwinBraids].contains(self) {
                 return image()?.avatarTinted(color)
             }
             guard self == .CowboyHat || self == .BaseballCap, let image = image() else {

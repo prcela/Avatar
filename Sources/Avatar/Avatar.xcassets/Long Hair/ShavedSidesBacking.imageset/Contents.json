@@ -9,9 +9,9 @@
       "scale" : "2x"
     },
     {
+      "filename" : "ShavedSidesBacking.png",
       "idiom" : "universal",
-      "scale" : "3x",
-      "filename" : "Big.png"
+      "scale" : "3x"
     }
   ],
   "info" : {

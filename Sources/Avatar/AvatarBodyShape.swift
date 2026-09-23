@@ -70,6 +70,87 @@ struct AvatarBodyShape {
         path.addPath(lowerFacePath, transform: CGAffineTransform(translationX: 0, y: shadowDepth))
         return path
     }
+
+    /// Extra face width relative to the original round head, in avatar coordinates.
+    func hairCheekOffset(at y: CGFloat) -> CGFloat {
+        let localY = y - 36
+        guard localY > 100, y < 220 else { return 0 }
+        func cubic(_ a: CGFloat, _ b: CGFloat, _ c: CGFloat, _ d: CGFloat, _ t: CGFloat) -> CGFloat {
+            let u = 1 - t
+            return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d
+        }
+        var faceWidth: CGFloat = 0
+        if localY < chinY {
+            let upper = localY < chinY - 8
+            let ys: [CGFloat] = upper ? [94, 112, 132, chinY - 8] : [chinY - 8, chinY, chinY, chinY]
+            let xs: [CGFloat] = upper ? [56, 56, cheekControlX - 100, jawHalfWidth]
+                : [jawHalfWidth, jawHalfWidth * 0.6, jawHalfWidth * 0.3, 0]
+            var low: CGFloat = 0
+            var high: CGFloat = 1
+            for _ in 0..<16 {
+                let t = (low + high) / 2
+                if cubic(ys[0], ys[1], ys[2], ys[3], t) < localY { low = t } else { high = t }
+            }
+            faceWidth = cubic(xs[0], xs[1], xs[2], xs[3], (low + high) / 2)
+        }
+        let originalWidth = max(24, sqrt(max(0, 56 * 56 - (localY - 94) * (localY - 94))))
+        let fade = max(0, min(1, (y - 196) / 24))
+        return max(0, max(neckHalfWidth, faceWidth) - originalWidth) * (1 - fade * fade * (3 - 2 * fade))
+    }
+
+    func fittedHairImage(_ image: CGImage, clearFace: Bool = false) -> CGImage? {
+        let scale = 3
+        let width = 266 * scale, height = 280 * scale
+        let info = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+        let space = CGColorSpaceCreateDeviceRGB()
+        guard let source = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                                     bytesPerRow: width * 4, space: space, bitmapInfo: info),
+              let output = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                                     bytesPerRow: width * 4, space: space, bitmapInfo: info),
+              let sourceData = source.data, let outputData = output.data else { return nil }
+        source.interpolationQuality = .high
+        source.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        if clearFace {
+            // ShavedSides has no front locks over the cheeks: keep its straight sides intact.
+            source.translateBy(x: 0, y: CGFloat(height))
+            source.scaleBy(x: CGFloat(scale), y: -CGFloat(scale))
+            source.translateBy(x: 33, y: 36)
+            source.setBlendMode(.clear)
+            source.addPath(lowerFacePath)
+            source.fillPath()
+            return source.makeImage()
+        }
+        outputData.copyMemory(from: sourceData, byteCount: width * height * 4)
+        let src = sourceData.assumingMemoryBound(to: UInt8.self)
+        let dst = outputData.assumingMemoryBound(to: UInt8.self)
+        let center = CGFloat(width) / 2
+        let inner = CGFloat(24 * scale), edge = CGFloat(48 * scale), outer = CGFloat(72 * scale)
+        // Resample only the cheek/neck area. The scalp, outer silhouette and lower hair stay intact.
+        for y in (136 * scale)..<(220 * scale) {
+            let offset = hairCheekOffset(at: (CGFloat(y) + 0.5) / CGFloat(scale)) * CGFloat(scale)
+            if offset == 0 { continue }
+            for x in (61 * scale)..<(205 * scale) {
+                let dx = CGFloat(x) + 0.5 - center
+                let distance = abs(dx)
+                let sample: CGFloat
+                if distance < inner + offset {
+                    sample = distance * inner / (inner + offset)
+                } else if distance < edge + offset {
+                    sample = distance - offset
+                } else {
+                    sample = edge + (distance - edge - offset) / (1 - offset / (outer - edge))
+                }
+                let sourceX = (dx < 0 ? -sample : sample) + center - 0.5
+                let x0 = Int(floor(sourceX)), fraction = sourceX - CGFloat(x0)
+                for channel in 0..<4 {
+                    let a = CGFloat(src[(y * width + x0) * 4 + channel])
+                    let b = CGFloat(src[(y * width + x0 + 1) * 4 + channel])
+                    dst[(y * width + x) * 4 + channel] = UInt8((a * (1 - fraction) + b * fraction).rounded())
+                }
+            }
+        }
+        return output.makeImage()
+    }
 }
 
 extension AvatarBodyShape {
@@ -103,6 +184,23 @@ extension AvatarBodyShape {
 
     private static let imageCache = NSCache<NSNumber, Images>()
     private static let shadedImageCache = NSCache<NSString, UIImage>()
+    private static let fittedHairCache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.totalCostLimit = 16 * 1024 * 1024
+        return cache
+    }()
+
+    static func fittedHair(_ hair: Avatar.Hair, bodyType: Avatar.BodyType) -> UIImage? {
+        guard hair.followsCheekShape, bodyType == .broad || bodyType == .veryBroad,
+              let shape = AvatarBodyShape(bodyType: bodyType) else { return hair.image() }
+        let key = "\(hair.rawValue)-\(bodyType.rawValue)" as NSString
+        if let image = fittedHairCache.object(forKey: key) { return image }
+        guard let original = hair.image(), let cgImage = original.cgImage,
+              let fitted = shape.fittedHairImage(cgImage, clearFace: hair == .ShavedSides) else { return hair.image() }
+        let image = UIImage(cgImage: fitted, scale: 3, orientation: .up).withRenderingMode(original.renderingMode)
+        fittedHairCache.setObject(image, forKey: key, cost: fitted.bytesPerRow * fitted.height)
+        return image
+    }
 
     static func shadedBody(for bodyType: Avatar.BodyType, skinColorIndex: Int) -> UIImage? {
         let key = "\(bodyType.rawValue)-\(skinColorIndex)" as NSString
