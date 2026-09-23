@@ -1,23 +1,25 @@
 import UIKit
 
-/// Skin-independent highlights and shadows on the original 56 x 36 nose canvas.
+/// Skin fill, highlights and shadows on the original 56 x 36 nose canvas.
 /// Keep geometry and opacity in sync with AvatarNoseStyle.kt.
 enum AvatarNoseStyle {
     private static let cache = NSCache<NSNumber, UIImage>()
 
-    static func image(for nose: Avatar.Nose) -> UIImage {
-        let key = NSNumber(value: nose.rawValue)
+    static func image(for nose: Avatar.Nose, skinColorIndex: Int? = nil) -> UIImage {
+        let colors = Avatar.Part.Skin.colors()
+        let index = skinColorIndex.flatMap { colors.indices.contains($0) ? $0 : nil }
+        let key = NSNumber(value: nose.rawValue * (colors.count + 1) + (index.map { $0 + 1 } ?? 0))
         if let image = cache.object(forKey: key) { return image }
         let format = UIGraphicsImageRendererFormat()
         format.scale = 3
         let image = UIGraphicsImageRenderer(size: CGSize(width: 56, height: 36), format: format).image {
-            draw(nose, in: $0.cgContext)
+            draw(nose, in: $0.cgContext, skinColor: index.map { colors[$0].cgColor })
         }.withRenderingMode(.alwaysOriginal)
         cache.setObject(image, forKey: key)
         return image
     }
 
-    static func draw(_ nose: Avatar.Nose, in context: CGContext) {
+    static func draw(_ nose: Avatar.Nose, in context: CGContext, skinColor: CGColor? = nil) {
         context.saveGState()
         let path = CGMutablePath()
         switch nose {
@@ -29,6 +31,7 @@ enum AvatarNoseStyle {
             path.addCurve(to: CGPoint(x: 16, y: 20),
                           control1: CGPoint(x: 22, y: 28), control2: CGPoint(x: 17, y: 25))
             path.closeSubpath()
+            fill(path, in: context, skinColor: skinColor)
             context.addPath(path)
             context.clip()
             shade(in: context, from: 20, to: 28, top: 0.025, bottom: 0.19)
@@ -39,6 +42,7 @@ enum AvatarNoseStyle {
                           control1: CGPoint(x: 16, y: 25.5), control2: CGPoint(x: 21, y: 28))
             path.addCurve(to: CGPoint(x: 41, y: 20),
                           control1: CGPoint(x: 35, y: 28), control2: CGPoint(x: 40, y: 25.5))
+            fill(path, in: context, skinColor: skinColor)
             light(in: context, x: 28, y: 27.5, rx: 12, ry: 2.5, white: false, alpha: 0.075)
             light(in: context, x: 26.5, y: 23, rx: 10, ry: 5, white: true, alpha: 0.14)
             outline(path, in: context, width: 1.5, from: 19, to: 29)
@@ -52,6 +56,7 @@ enum AvatarNoseStyle {
                           control1: CGPoint(x: 36, y: 32), control2: CGPoint(x: 40, y: 30.5))
             path.addCurve(to: CGPoint(x: 38, y: 10),
                           control1: CGPoint(x: 41, y: 21), control2: CGPoint(x: 39, y: 15))
+            fill(path, in: context, skinColor: skinColor)
             light(in: context, x: 28, y: 31, rx: 12, ry: 3, white: false, alpha: 0.09)
             light(in: context, x: 25, y: 23, rx: 10, ry: 10, white: true, alpha: 0.15)
             outline(path, in: context, width: 1.65, from: 9, to: 33)
@@ -63,6 +68,7 @@ enum AvatarNoseStyle {
                           control1: CGPoint(x: 17, y: 24), control2: CGPoint(x: 13, y: 26))
             path.addCurve(to: CGPoint(x: 28, y: 32),
                           control1: CGPoint(x: 15, y: 31), control2: CGPoint(x: 22, y: 32))
+            fill(path, in: context, skinColor: skinColor)
             light(in: context, x: 22, y: 30.5, rx: 8, ry: 3, white: false, alpha: 0.07)
             light(in: context, x: 22, y: 25, rx: 6.5, ry: 6, white: true, alpha: 0.15)
             outline(path, in: context, width: 1.65, from: 4, to: 33)
@@ -76,10 +82,21 @@ enum AvatarNoseStyle {
                           control1: CGPoint(x: 36, y: 29), control2: CGPoint(x: 41, y: 26.5))
             path.addCurve(to: CGPoint(x: 34, y: 14),
                           control1: CGPoint(x: 41, y: 16.5), control2: CGPoint(x: 38, y: 14))
+            fill(path, in: context, skinColor: skinColor)
             light(in: context, x: 28, y: 27, rx: 12, ry: 3.5, white: false, alpha: 0.07)
             light(in: context, x: 25.5, y: 19.5, rx: 10, ry: 6.5, white: true, alpha: 0.17)
             outline(path, in: context, width: 1.5, from: 13, to: 30)
         }
+        context.restoreGState()
+    }
+
+    private static func fill(_ path: CGPath, in context: CGContext, skinColor: CGColor?) {
+        guard let skinColor else { return }
+        context.saveGState()
+        context.setFillColor(skinColor)
+        context.addPath(path)
+        // Filling closes the open contour without adding a line to its outline.
+        context.fillPath()
         context.restoreGState()
     }
 

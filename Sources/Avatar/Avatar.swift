@@ -798,6 +798,19 @@ public class Avatar {
         case MoustacheHorseshoe
         case BeardStubble
         // Raw value 11 is retired; start future additions at 12.
+
+        var hasShading: Bool {
+            switch self {
+            case .BeardLight, .BeardMagestic, .BeardMedium, .Bradica, .Metal, .BeardStubble:
+                return true
+            default:
+                return false
+            }
+        }
+
+        func image(color: UIColor) -> UIImage? {
+            hasShading ? image()?.avatarTinted(color) : image()
+        }
         
         func image() -> UIImage? {
             switch self {

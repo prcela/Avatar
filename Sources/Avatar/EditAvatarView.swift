@@ -50,7 +50,7 @@ public class EditAvatarView : UIView {
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
-        noseImgView.image = avatar.nose.image()
+        noseImgView.image = AvatarNoseStyle.image(for: avatar.nose, skinColorIndex: avatar.skinColorIdx)
         eyesImgView.image = positionedPair(avatar.eyes.image())
         // Keep the connected eyebrow intact instead of opening a gap in its center.
         eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
@@ -148,11 +148,11 @@ public class EditAvatarView : UIView {
         let additionColors = Avatar.Part.Addition.colors()
         let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
         additionImgView.image = avatar.addition.avatarImage(color: additionColor)
-        facialHairImgView.image = avatar.facialHair.image()
         let facialHairColors = Avatar.Part.FacialHair.colors()
         if avatar.facialHairColorIdx >= facialHairColors.count {
             avatar.facialHairColorIdx = 0
         }
+        facialHairImgView.image = avatar.facialHair.image(color: facialHairColors[avatar.facialHairColorIdx])
         facialHairImgView.tintColor = facialHairColors[avatar.facialHairColorIdx]
         clothingLogoImgView.image = avatar.shirtMarkImage()
         
