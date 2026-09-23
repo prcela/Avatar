@@ -668,7 +668,7 @@ public class Avatar {
         }
 
         func image(color: UIColor) -> UIImage? {
-            guard let original = (self == .SportsJersey || self == .ButtonUpShirt || self == .BasketballJersey || self == .ElegantDress || self == .OffShoulderBlouse || self == .Pajamas || self == .FlannelShirt || self == .Tracksuit || self == .CableKnitSweater || self == .Bathrobe) ? image()?.avatarTinted(color) : image() else { return nil }
+            guard let original = usesColor ? image()?.avatarTinted(color) : image() else { return nil }
             guard verticalOffset != 0 else { return original }
             let format = UIGraphicsImageRendererFormat()
             format.scale = original.scale
@@ -688,8 +688,18 @@ public class Avatar {
             case .LeatherJacket: return 17.5
             case .SportsJersey: return 28
             case .BasketballJersey: return -4
+            case .Dress, .Overall, .ShirtScoopNeck, .Undershirt, .UndershirtW: return -2
             case .CroatiaJersey, .PortugalJersey, .FranceJersey, .ArgentinaJersey: return 22
             default: return self == .DenimJacket || self == .ButtonUpShirt || self == .HawaiianShirt || self == .Pajamas || isJersey ? 12 : 0
+            }
+        }
+
+        /// Keep exposed neckline skin without showing the body outside fabric shoulders.
+        var visibleTorsoWidth: CGFloat? {
+            switch self {
+            case .Shirt, .Sweater, .CollarSweater, .Hoodie, .ShirtCrewNeck, .ShirtVNeck, .Dolce: return 64
+            case .ShirtScoopNeck: return 112
+            default: return verticalOffset > 0 ? 64 : nil
             }
         }
 

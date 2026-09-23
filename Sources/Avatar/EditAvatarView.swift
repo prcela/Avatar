@@ -105,15 +105,15 @@ public class EditAvatarView : UIView {
 
     private func bodyImageForClothing(_ image: UIImage?) -> UIImage? {
         guard let image else { return nil }
-        guard avatar.clothing.verticalOffset > 0 else { return image }
+        guard let torsoWidth = avatar.clothing.visibleTorsoWidth else { return image }
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
         return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
-            // Keep the head and neck, hiding the bare shoulder rim above lowered clothing.
+            // Keep the head and neckline, hiding skin outside the garment's shoulders.
             let scaleX = image.size.width / 200
             let scaleY = image.size.height / 244
             let visibleSkin = UIBezierPath(rect: CGRect(x: 0, y: 0, width: image.size.width, height: 160 * scaleY))
-            visibleSkin.append(UIBezierPath(rect: CGRect(x: 68 * scaleX, y: 160 * scaleY, width: 64 * scaleX, height: 84 * scaleY)))
+            visibleSkin.append(UIBezierPath(rect: CGRect(x: (200 - torsoWidth) / 2 * scaleX, y: 160 * scaleY, width: torsoWidth * scaleX, height: 84 * scaleY)))
             visibleSkin.addClip()
             image.draw(at: .zero)
         }.withRenderingMode(image.renderingMode)

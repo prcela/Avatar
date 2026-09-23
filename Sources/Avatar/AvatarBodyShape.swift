@@ -21,7 +21,8 @@ struct AvatarBodyShape {
         case .broad:
             (neckHalfWidth, jawHalfWidth, cheekControlX, chinY, shoulderControlY, shadowDepth) = (27, 32, 152, 151, 165, 9)
         case .veryBroad:
-            (neckHalfWidth, jawHalfWidth, cheekControlX, chinY, shoulderControlY, shadowDepth) = (30, 35, 158, 153, 163, 10)
+            // Overall body scaling already widens the neck; keep it inside clothing collars.
+            (neckHalfWidth, jawHalfWidth, cheekControlX, chinY, shoulderControlY, shadowDepth) = (24, 35, 158, 153, 163, 10)
         }
     }
 
