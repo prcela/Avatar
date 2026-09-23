@@ -60,7 +60,7 @@ struct AvatarHairStyle {
         .FlatTop: .init(scaleX: 0.88, scaleY: 0.901, offsetX: -0.147, offsetY: -2.292),
         .TwinBraids: .init(scaleX: 0.934, scaleY: 0.821, offsetX: 0.0, offsetY: -3.393),
         .LongStraightBangs: .init(scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0, foreheadInset: 6),
-        .Einstein: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: 2)
+        .Einstein: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: -24.1)
     ]
 
     /// Protect the face after placement, leaving side lengths in front of clothing.
