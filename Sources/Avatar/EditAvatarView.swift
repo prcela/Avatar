@@ -152,8 +152,23 @@ public class EditAvatarView : UIView {
         if avatar.facialHairColorIdx >= facialHairColors.count {
             avatar.facialHairColorIdx = 0
         }
-        facialHairImgView.image = avatar.facialHair.image(color: facialHairColors[avatar.facialHairColorIdx])
+        facialHairImgView.image = avatar.facialHair.image(color: facialHairColors[avatar.facialHairColorIdx],
+            bodyType: isBot ? .normal : avatar.bodyType)
         facialHairImgView.tintColor = facialHairColors[avatar.facialHairColorIdx]
+        let facialHairHeight = avatar.facialHair.canvasHeight
+        let usesTallBeardCanvas = facialHairHeight != 152
+        facialHairImgView.contentMode = usesTallBeardCanvas ? .scaleToFill : .scaleAspectFit
+        if usesTallBeardCanvas {
+            // Align the mouth opening while extending the taller artwork over the chest.
+            facialHairImgView.transform = bodyTransform.translatedBy(x: 0,
+                y: (facialHairHeight - 152) / 2 + avatar.facialHair.verticalOffset)
+                .scaledBy(x: 1, y: facialHairHeight / 152)
+        } else if avatar.facialHair == .BeardLight || avatar.facialHair == .BeardStubble {
+            // Extend over the jaw, scaling around the nose at avatar y = 132.
+            // The facial-hair view is centered at y = 146, so compensate by 1.4 points.
+            facialHairImgView.transform = bodyTransform.translatedBy(x: 0, y: 1.4)
+                .scaledBy(x: 1.04, y: 1.1)
+        }
         clothingLogoImgView.image = avatar.shirtMarkImage()
         
         switch avatar.addition {
@@ -167,7 +182,7 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, aboveSubview: hairView)
         case .Bandana:
             insertSubview(additionImgView, belowSubview: facialHairImgView)
-        case .GoldChain, .GoldEarring, .DiamondEarrings, .BowTie, .Tie, .Scarf, .DiceChain, .GoldMedal:
+        case .GoldChain, .GoldEarring, .DiamondEarrings, .BowTie, .Tie, .Scarf, .DiceChain, .GoldMedal, .SilverBlackNecklace:
             insertSubview(additionImgView, belowSubview: hairView)
         case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
             insertSubview(additionImgView, aboveSubview: glassesView)

@@ -797,19 +797,30 @@ public class Avatar {
         case MoustachePencil
         case MoustacheHorseshoe
         case BeardStubble
-        // Raw value 11 is retired; start future additions at 12.
+        // Raw value 11 belongs to the retired braided beard.
+        case BeardSanta = 12
+        case BeardZZTop = 13
+
+        var canvasHeight: CGFloat {
+            self == .BeardSanta || self == .BeardZZTop ? 210 : 152
+        }
+
+        var verticalOffset: CGFloat {
+            self == .BeardSanta || self == .BeardZZTop ? 8 : 0
+        }
 
         var hasShading: Bool {
             switch self {
-            case .BeardLight, .BeardMagestic, .BeardMedium, .Bradica, .Metal, .BeardStubble:
+            case .BeardLight, .BeardMagestic, .BeardMedium, .Bradica, .Metal, .BeardStubble, .BeardSanta, .BeardZZTop:
                 return true
             default:
                 return false
             }
         }
 
-        func image(color: UIColor) -> UIImage? {
-            hasShading ? image()?.avatarTinted(color) : image()
+        func image(color: UIColor, bodyType: BodyType = .normal) -> UIImage? {
+            let image = self == .BeardStubble ? AvatarBodyShape.fittedStubble(bodyType: bodyType) : image()
+            return hasShading ? image?.avatarTinted(color) : image
         }
         
         func image() -> UIImage? {
@@ -836,6 +847,10 @@ public class Avatar {
                 return UIImage(named: "MoustacheHorseshoe", in: .module, compatibleWith: .current)
             case .BeardStubble:
                 return UIImage(named: "BeardStubble", in: .module, compatibleWith: .current)
+            case .BeardSanta:
+                return UIImage(named: "BeardSanta", in: .module, compatibleWith: .current)
+            case .BeardZZTop:
+                return UIImage(named: "BeardZZTop", in: .module, compatibleWith: .current)
             }
         }
         
@@ -865,6 +880,7 @@ public class Avatar {
         case EyebrowPiercing
         case DiceChain
         case GoldMedal
+        case SilverBlackNecklace
 
         func image() -> UIImage? {
             switch self {
@@ -912,6 +928,8 @@ public class Avatar {
                 return UIImage(named: "DiceChain", in: .module, compatibleWith: .current)
             case .GoldMedal:
                 return UIImage(named: "GoldMedal", in: .module, compatibleWith: .current)
+            case .SilverBlackNecklace:
+                return UIImage(named: "SilverBlackNecklace", in: .module, compatibleWith: .current)
             }
         }
 
@@ -951,6 +969,8 @@ public class Avatar {
                 frames = [CGRect(x: 94, y: 201, width: 76, height: 72)]
             case .GoldMedal:
                 frames = [CGRect(x: 100, y: 190, width: 64, height: 81)]
+            case .SilverBlackNecklace:
+                frames = [CGRect(x: 90, y: 198, width: 84, height: 52)]
             default:
                 return image()
             }

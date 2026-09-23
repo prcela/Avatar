@@ -98,6 +98,61 @@ struct AvatarBodyShape {
         return max(0, max(neckHalfWidth, faceWidth) - originalWidth) * (1 - fade * fade * (3 - 2 * fade))
     }
 
+    /// Fit short stubble to the cheek/jaw contour after its existing 1.04 x 1.1 placement.
+    func fittedStubbleImage(_ image: CGImage) -> CGImage? {
+        let scale = 3, width = 504, height = 456
+        let info = CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+        let space = CGColorSpaceCreateDeviceRGB()
+        guard let source = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                                     bytesPerRow: width * 4, space: space, bitmapInfo: info),
+              let output = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                                     bytesPerRow: width * 4, space: space, bitmapInfo: info),
+              let sourceData = source.data, let outputData = output.data else { return nil }
+        source.interpolationQuality = .high
+        source.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        let src = sourceData.assumingMemoryBound(to: UInt8.self)
+        let dst = outputData.assumingMemoryBound(to: UInt8.self)
+        let center = CGFloat(width) / 2
+        let inner = CGFloat(20 * scale), edge = CGFloat(48 * scale)
+        for y in 0..<height {
+            let placedY = 63.8 + (CGFloat(y) + 0.5) / CGFloat(scale) * 1.1
+            let offset = hairCheekOffset(at: placedY) / 1.04 * CGFloat(scale)
+            for x in 0..<width {
+                let dx = CGFloat(x) + 0.5 - center
+                let distance = abs(dx)
+                // Keep the mouth opening fixed; spread only the cheek and jaw texture.
+                let sample: CGFloat
+                if distance <= inner {
+                    sample = distance
+                } else if distance < edge + offset {
+                    sample = inner + (distance - inner) * (edge - inner) / (edge + offset - inner)
+                } else {
+                    sample = distance - offset
+                }
+                let sourceX = min(CGFloat(width - 1), max(0, center + (dx < 0 ? -sample : sample) - 0.5))
+                let x0 = Int(floor(sourceX)), x1 = min(width - 1, x0 + 1)
+                let fraction = sourceX - CGFloat(x0)
+                for channel in 0..<4 {
+                    let a = CGFloat(src[(y * width + x0) * 4 + channel])
+                    let b = CGFloat(src[(y * width + x1) * 4 + channel])
+                    dst[(y * width + x) * 4 + channel] = UInt8((a * (1 - fraction) + b * fraction).rounded())
+                }
+            }
+        }
+        // Stubble stays on the skin, including the flatter bottom of a broad jaw.
+        output.translateBy(x: 0, y: CGFloat(height))
+        output.scaleBy(x: CGFloat(scale), y: -CGFloat(scale))
+        let outside = CGMutablePath()
+        outside.addRect(CGRect(x: 0, y: 0, width: 168, height: 152))
+        outside.addRect(CGRect(x: 0, y: 0, width: 168, height: (130 - 63.8) / 1.1))
+        outside.addPath(lowerFacePath, transform: CGAffineTransform(a: 1 / 1.04, b: 0, c: 0, d: 1 / 1.1,
+            tx: 84 - 100 / 1.04, ty: (36 - 63.8) / 1.1))
+        output.setBlendMode(.clear)
+        output.addPath(outside)
+        output.drawPath(using: .eoFill)
+        return output.makeImage()
+    }
+
     func fittedHairImage(_ image: CGImage, clearFace: Bool = false) -> CGImage? {
         let scale = 3
         let width = 266 * scale, height = 280 * scale
@@ -184,11 +239,24 @@ extension AvatarBodyShape {
 
     private static let imageCache = NSCache<NSNumber, Images>()
     private static let shadedImageCache = NSCache<NSString, UIImage>()
+    private static let fittedStubbleCache = NSCache<NSNumber, UIImage>()
     private static let fittedHairCache: NSCache<NSString, UIImage> = {
         let cache = NSCache<NSString, UIImage>()
         cache.totalCostLimit = 16 * 1024 * 1024
         return cache
     }()
+
+    static func fittedStubble(bodyType: Avatar.BodyType) -> UIImage? {
+        guard bodyType == .broad || bodyType == .veryBroad,
+              let shape = AvatarBodyShape(bodyType: bodyType) else { return Avatar.FacialHair.BeardStubble.image() }
+        let key = NSNumber(value: bodyType.rawValue)
+        if let image = fittedStubbleCache.object(forKey: key) { return image }
+        guard let original = Avatar.FacialHair.BeardStubble.image(), let cgImage = original.cgImage,
+              let fitted = shape.fittedStubbleImage(cgImage) else { return Avatar.FacialHair.BeardStubble.image() }
+        let image = UIImage(cgImage: fitted, scale: 3, orientation: .up).withRenderingMode(.alwaysOriginal)
+        fittedStubbleCache.setObject(image, forKey: key)
+        return image
+    }
 
     static func fittedHair(_ hair: Avatar.Hair, bodyType: Avatar.BodyType) -> UIImage? {
         guard hair.followsCheekShape, bodyType == .broad || bodyType == .veryBroad,

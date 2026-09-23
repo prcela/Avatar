@@ -168,6 +168,23 @@ final class AvatarTests: XCTestCase {
         }
     }
 
+    func testSantaBeardRoundTripsWithoutReusingRetiredIdentifier() throws {
+        let avatar = Avatar.decompress(value: legacy)
+        avatar.set(part: .FacialHair, symbol: Avatar.FacialHair.BeardSanta)
+        let expectedLegacy = (legacy & ~(Int64(15) << 16)) | (Int64(12) << 16)
+        XCTAssertEqual(avatar.compress(), expectedLegacy)
+        XCTAssertEqual(Avatar.decompress(value: expectedLegacy).facialHair, .BeardSanta)
+        let hex = avatar.compressHex()
+        XCTAssertEqual(hex, "00000000000000000c8849616c3c285a")
+        XCTAssertEqual(Avatar.decompress(value: 0, hexId: hex).facialHair, .BeardSanta)
+        XCTAssertNil(Avatar.FacialHair(rawValue: 11))
+        let encoded = try XCTUnwrap(AvatarHexID(hex))
+        let original = AvatarHexID(legacyID: legacy)
+        for field in AvatarHexID.Field.allCases where field != .facialHair {
+            XCTAssertEqual(encoded[field], original[field])
+        }
+    }
+
     func testEmptyAndInvalidHexUseLegacyAppearance() {
         for hex in ["", "bad", String(repeating: "g", count: 32)] {
             let avatar = Avatar.decompress(value: legacy, hexId: hex)
