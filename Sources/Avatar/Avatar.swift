@@ -359,6 +359,8 @@ public class Avatar {
         case LowFade
         case FlatTop
         case TwinBraids
+        case LongStraightBangs
+        case Einstein
 
         var style: AvatarHairStyle? { AvatarHairStyle.placement(for: self) }
 
@@ -558,6 +560,10 @@ public class Avatar {
                 return UIImage(named: "FlatTop", in: .module, compatibleWith: .current)
             case .TwinBraids:
                 return UIImage(named: "TwinBraids", in: .module, compatibleWith: .current)
+            case .LongStraightBangs:
+                return UIImage(named: "LongStraightBangs", in: .module, compatibleWith: .current)
+            case .Einstein:
+                return UIImage(named: "Einstein", in: .module, compatibleWith: .current)
             }
         }
 

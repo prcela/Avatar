@@ -56,7 +56,9 @@ struct AvatarHairStyle {
         .CurtainPart: .init(scaleX: 0.887, scaleY: 0.835, offsetX: -0.591, offsetY: 1.46),
         .LowFade: .init(scaleX: 0.813, scaleY: 0.903, offsetX: -0.573, offsetY: 7.551),
         .FlatTop: .init(scaleX: 0.88, scaleY: 0.901, offsetX: -0.147, offsetY: -2.292),
-        .TwinBraids: .init(scaleX: 0.934, scaleY: 0.821, offsetX: 0.0, offsetY: -3.393)
+        .TwinBraids: .init(scaleX: 0.934, scaleY: 0.821, offsetX: 0.0, offsetY: -3.393),
+        .LongStraightBangs: .init(scaleX: 1, scaleY: 1, offsetX: 0, offsetY: -4),
+        .Einstein: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: 2)
     ]
 
     /// Protect the face after placement, leaving side lengths in front of clothing.

@@ -113,8 +113,17 @@ public class EditAvatarView : UIView {
             hairBackingView.layer.mask = nil
             if hairStyle != nil {
                 // A narrower rear layer closes transparent gaps around the jaw and neck.
-                // ShavedSides needs its full width to connect the strands behind the ears.
-                let backingWidth: CGFloat = avatar.hair == .ShavedSides ? 1 : 0.9
+                let backingWidth: CGFloat
+                switch avatar.hair {
+                case .ShavedSides:
+                    // Keep the strands connected behind the ears.
+                    backingWidth = 1
+                case .Bob:
+                    // Bring the inner ends against the lower cheeks and jaw.
+                    backingWidth = 0.65
+                default:
+                    backingWidth = 0.9
+                }
                 hairBackingView.transform = hairTransform.scaledBy(x: backingWidth, y: 1)
             }
             if avatar.hair == .HighPonytail {
