@@ -145,7 +145,7 @@
                                                 <rect key="frame" x="164" y="0.0" width="74" height="28"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="tinted" title="Skin" buttonSize="small"/>
+                                                <buttonConfiguration key="configuration" style="tinted" title="Body" buttonSize="small"/>
                                                 <connections>
                                                     <action selector="selectPart:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="rRr-HV-Lkc"/>
                                                 </connections>
@@ -233,6 +233,7 @@
                                                 </collectionViewCellContentView>
                                                 <connections>
                                                     <outlet property="img" destination="YGg-AD-Ql0" id="pDs-Jv-ZvY"/>
+                                                    <outlet property="imageBottomConstraint" destination="QI6-J8-yah" id="cap-bt-img"/>
                                                 </connections>
                                             </collectionViewCell>
                                         </cells>

@@ -13,6 +13,9 @@ public struct AvatarHexID: Equatable, Hashable {
     private var high: UInt64
     private var low: UInt64
 
+    /// High-word bit 30 is clothing bit 5; the existing clothing extension stays at bit 8.
+    private static let clothingExtensionOffset = 30
+
     public init(legacyID: Int64) {
         high = 0
         low = UInt64(bitPattern: legacyID)
@@ -33,14 +36,20 @@ public struct AvatarHexID: Equatable, Hashable {
     public subscript(field: Field) -> Int {
         get {
             let mask = (UInt64(1) << field.width) - 1
-            return Int((low >> field.offset) & mask) | (Int((high >> field.rawValue) & 1) << field.width)
+            let value = Int((low >> field.offset) & mask) | (Int((high >> field.rawValue) & 1) << field.width)
+            return field == .clothing ? value | (Int((high >> Self.clothingExtensionOffset) & 1) << 5) : value
         }
         set {
-            precondition(newValue >= 0 && newValue < (1 << (field.width + 1)))
+            let extraWidth = field == .clothing ? 2 : 1
+            precondition(newValue >= 0 && newValue < (1 << (field.width + extraWidth)))
             let mask = (UInt64(1) << field.width) - 1
             low = (low & ~(mask << field.offset)) | ((UInt64(newValue) & mask) << field.offset)
             let extensionMask = UInt64(1) << field.rawValue
-            high = (high & ~extensionMask) | (UInt64(newValue >> field.width) << field.rawValue)
+            high = (high & ~extensionMask) | (UInt64((newValue >> field.width) & 1) << field.rawValue)
+            if field == .clothing {
+                let clothingMask = UInt64(1) << Self.clothingExtensionOffset
+                high = (high & ~clothingMask) | (UInt64((newValue >> 5) & 1) << Self.clothingExtensionOffset)
+            }
         }
     }
 

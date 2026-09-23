@@ -584,6 +584,15 @@ public class Avatar {
         case BasketballJersey
         case ElegantDress
         case OffShoulderBlouse
+        case HawaiianShirt
+        case Pajamas
+        case FlannelShirt
+        case SailorShirt
+        case Tracksuit
+        case CableKnitSweater
+        case Bathrobe
+        case SafetyVest
+        case KnightArmor
 
         func image() -> UIImage? {
             switch self {
@@ -637,11 +646,29 @@ public class Avatar {
                 return UIImage(named: "ElegantDress", in: .module, compatibleWith: .current)
             case .OffShoulderBlouse:
                 return UIImage(named: "OffShoulderBlouse", in: .module, compatibleWith: .current)
+            case .HawaiianShirt:
+                return UIImage(named: "HawaiianShirt", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .Pajamas:
+                return UIImage(named: "Pajamas", in: .module, compatibleWith: .current)
+            case .FlannelShirt:
+                return UIImage(named: "FlannelShirt", in: .module, compatibleWith: .current)
+            case .SailorShirt:
+                return UIImage(named: "SailorShirt", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .Tracksuit:
+                return UIImage(named: "Tracksuit", in: .module, compatibleWith: .current)
+            case .CableKnitSweater:
+                return UIImage(named: "CableKnitSweater", in: .module, compatibleWith: .current)
+            case .Bathrobe:
+                return UIImage(named: "Bathrobe", in: .module, compatibleWith: .current)
+            case .SafetyVest:
+                return UIImage(named: "SafetyVest", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .KnightArmor:
+                return UIImage(named: "KnightArmor", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
             }
         }
 
         func image(color: UIColor) -> UIImage? {
-            guard let original = (self == .SportsJersey || self == .ButtonUpShirt || self == .BasketballJersey || self == .ElegantDress || self == .OffShoulderBlouse) ? image()?.avatarTinted(color) : image() else { return nil }
+            guard let original = (self == .SportsJersey || self == .ButtonUpShirt || self == .BasketballJersey || self == .ElegantDress || self == .OffShoulderBlouse || self == .Pajamas || self == .FlannelShirt || self == .Tracksuit || self == .CableKnitSweater || self == .Bathrobe) ? image()?.avatarTinted(color) : image() else { return nil }
             guard verticalOffset != 0 else { return original }
             let format = UIGraphicsImageRendererFormat()
             format.scale = original.scale
@@ -657,11 +684,12 @@ public class Avatar {
 
         var verticalOffset: CGFloat {
             switch self {
+            case .FlannelShirt, .SailorShirt, .Tracksuit, .CableKnitSweater, .Bathrobe, .SafetyVest, .KnightArmor: return 12
             case .LeatherJacket: return 17.5
             case .SportsJersey: return 28
             case .BasketballJersey: return -4
             case .CroatiaJersey, .PortugalJersey, .FranceJersey, .ArgentinaJersey: return 22
-            default: return self == .DenimJacket || self == .ButtonUpShirt || isJersey ? 12 : 0
+            default: return self == .DenimJacket || self == .ButtonUpShirt || self == .HawaiianShirt || self == .Pajamas || isJersey ? 12 : 0
             }
         }
 
@@ -683,7 +711,7 @@ public class Avatar {
         }
 
         var usesColor: Bool {
-            self != .DenimJacket && self != .LeatherJacket && (!isJersey || self == .SportsJersey || self == .BasketballJersey)
+            self != .DenimJacket && self != .LeatherJacket && self != .HawaiianShirt && self != .SailorShirt && self != .SafetyVest && self != .KnightArmor && (!isJersey || self == .SportsJersey || self == .BasketballJersey)
         }
     }
     enum FacialHair: Int, CaseIterable, AvatarSymbol {

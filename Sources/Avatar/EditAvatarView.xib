@@ -126,6 +126,7 @@
             <connections>
                 <outlet property="additionImgView" destination="Wi2-ul-WGW" id="CJC-ev-yPD"/>
                 <outlet property="bodyImgView" destination="FEh-ry-Fyd" id="79i-Nf-4L0"/>
+                <outlet property="neckShadowImgView" destination="vdU-oQ-JvA" id="bdS-nk-Sha"/>
                 <outlet property="clothingImgView" destination="qYt-kw-F8f" id="vGM-qz-Peg"/>
                 <outlet property="clothingLogoImgView" destination="ijC-FX-GWE" id="ale-X6-B3M"/>
                 <outlet property="eyesImgView" destination="5eb-37-Noi" id="WB0-2L-iWX"/>

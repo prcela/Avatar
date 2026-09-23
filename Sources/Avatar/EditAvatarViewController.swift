@@ -22,7 +22,7 @@ public class EditAvatarViewController: UIViewController {
     
     var parts = Avatar.Part.allCases
     var selectedPart: Avatar.Part? = nil
-    private let bodyTypeButton = UIButton(type: .system)
+    private let bodyTypes: [Avatar.BodyType] = [.verySlim, .slim, .normal, .broad, .veryBroad]
     private let jerseyNumberButton = UIButton(type: .system)
     
     private func selectCurrentItemsIfPossible() {
@@ -35,7 +35,9 @@ public class EditAvatarViewController: UIViewController {
         var symbolIndex = 0
         var colorIndex = 0
 
-        if let idx = avatar.symbolIndex(for: part) {
+        if part == .Skin {
+            symbolIndex = bodyTypes.firstIndex(of: avatar.bodyType) ?? 2
+        } else if let idx = avatar.symbolIndex(for: part) {
             symbolIndex = idx
         }
         if let idx = avatar.colorIndex(for: part) {
@@ -59,6 +61,7 @@ public class EditAvatarViewController: UIViewController {
     }
     
     private func applySelectionStyle(to cell: UICollectionViewCell) {
+        cell.accessibilityTraits.insert(.selected)
         cell.contentView.layer.cornerRadius = 8
         cell.contentView.layer.masksToBounds = true
         cell.contentView.layer.borderWidth = 2
@@ -66,6 +69,7 @@ public class EditAvatarViewController: UIViewController {
     }
 
     private func clearSelectionStyle(from cell: UICollectionViewCell) {
+        cell.accessibilityTraits.remove(.selected)
         cell.contentView.layer.borderWidth = 0
         cell.contentView.layer.borderColor = nil
     }
@@ -95,9 +99,12 @@ public class EditAvatarViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        bodyTypeButton.showsMenuAsPrimaryAction = true
-        bodyTypeButton.accessibilityLabel = NSLocalizedString("Avatar body shape", value: "Body shape", comment: "Avatar editor")
-        updateBodyTypeMenu()
+        for button in btns {
+            guard parts.indices.contains(button.tag), var configuration = button.configuration else { continue }
+            configuration.title = partTitle(parts[button.tag])
+            button.configuration = configuration
+        }
+
         jerseyNumberButton.showsMenuAsPrimaryAction = true
         jerseyNumberButton.accessibilityLabel = NSLocalizedString("Avatar jersey number", value: "Jersey number", comment: "Avatar editor")
         updateJerseyNumberMenu()
@@ -176,7 +183,7 @@ public class EditAvatarViewController: UIViewController {
         jerseyNumberButton.sizeToFit()
         if let toolbar = view.subviews.compactMap({ $0 as? UIToolbar }).first,
            let cancel = toolbar.items?.first, let done = toolbar.items?.last {
-            var items = [cancel, UIBarButtonItem(systemItem: .flexibleSpace), UIBarButtonItem(customView: bodyTypeButton)]
+            var items = [cancel]
             if avatar.clothing.isJersey {
                 items.append(UIBarButtonItem(systemItem: .flexibleSpace))
                 items.append(UIBarButtonItem(customView: jerseyNumberButton))
@@ -192,6 +199,22 @@ public class EditAvatarViewController: UIViewController {
         updateJerseyNumberMenu()
     }
 
+    private func partTitle(_ part: Avatar.Part) -> String {
+        switch part {
+        case .Eyes: return NSLocalizedString("Avatar eyes", value: "Eyes", comment: "Avatar editor category")
+        case .Mouth: return NSLocalizedString("Avatar mouth", value: "Mouth", comment: "Avatar editor category")
+        case .Eyebrow: return NSLocalizedString("Avatar eyebrows", value: "Eyebrow", comment: "Avatar editor category")
+        case .Glasses: return NSLocalizedString("Avatar glasses", value: "Glasses", comment: "Avatar editor category")
+        case .Hair: return NSLocalizedString("Avatar hair", value: "Hair", comment: "Avatar editor category")
+        case .Clothing: return NSLocalizedString("Avatar clothing", value: "Clothing", comment: "Avatar editor category")
+        case .FacialHair: return NSLocalizedString("Avatar facial hair", value: "Facial hair", comment: "Avatar editor category")
+        case .Addition: return NSLocalizedString("Avatar accessories", value: "Addon", comment: "Avatar editor category")
+        case .Skin: return NSLocalizedString("Avatar body", value: "Body", comment: "Avatar editor category")
+        case .Nose: return NSLocalizedString("Avatar nose", value: "Nose", comment: "Avatar editor category")
+        case .ClothLogo: return NSLocalizedString("Avatar logo", value: "Logo", comment: "Avatar editor category")
+        }
+    }
+
     private func bodyTypeTitle(_ type: Avatar.BodyType) -> String {
         switch type {
         case .normal: return NSLocalizedString("Avatar body normal", value: "Normal", comment: "Avatar body type")
@@ -202,24 +225,11 @@ public class EditAvatarViewController: UIViewController {
         }
     }
 
-    private func updateBodyTypeMenu() {
-        let title = bodyTypeTitle(avatar.bodyType)
-        var configuration = UIButton.Configuration.plain()
-        configuration.title = title
-        configuration.image = UIImage(systemName: "chevron.down")
-        configuration.imagePlacement = .trailing
-        configuration.imagePadding = 6
-        bodyTypeButton.configuration = configuration
-        bodyTypeButton.accessibilityValue = title
-        bodyTypeButton.sizeToFit()
-        bodyTypeButton.menu = UIMenu(title: bodyTypeButton.accessibilityLabel ?? "", children: Avatar.BodyType.allCases.map { type in
-            UIAction(title: bodyTypeTitle(type), state: type == avatar.bodyType ? .on : .off) { [weak self] _ in
-                guard let self else { return }
-                self.avatar.bodyType = type
-                self.editAvatarView?.update()
-                self.updateBodyTypeMenu()
-            }
-        })
+    private func bodyTypePreview(_ type: Avatar.BodyType) -> UIImage? {
+        // Preview a copy so browsing the options never changes the selected avatar.
+        let preview = Avatar.decompress(value: avatar.compress(), hexId: avatar.compressHex())
+        preview.bodyType = type
+        return AvatarCache.fetchImage(avatarId: preview.compress(), avatarHexId: preview.compressHex(), small: false)
     }
     
     @IBAction func cancel(_ sender: Any) {
@@ -240,9 +250,16 @@ extension EditAvatarViewController: UICollectionViewDataSource {
         switch collectionView {
         case symbolsCollectionView:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath) as! AvatarSymbolCell
-            let symbol = part.symbols()[indexPath.row]
-            let config = UIImage.SymbolConfiguration(scale: .large)
-            cell.img.image = symbol.image() ?? UIImage(systemName: "xmark")?.applyingSymbolConfiguration(config)
+            if part == .Skin {
+                let type = bodyTypes[indexPath.row]
+                cell.img.image = bodyTypePreview(type)
+                cell.setCaption(bodyTypeTitle(type))
+            } else {
+                let symbol = part.symbols()[indexPath.row]
+                let config = UIImage.SymbolConfiguration(scale: .large)
+                cell.img.image = symbol.image() ?? UIImage(systemName: "xmark")?.applyingSymbolConfiguration(config)
+                cell.setCaption(nil)
+            }
             // Selection styling
             cell.contentView.layer.cornerRadius = 8
             cell.contentView.layer.masksToBounds = true
@@ -272,7 +289,7 @@ extension EditAvatarViewController: UICollectionViewDataSource {
         
         switch collectionView {
         case symbolsCollectionView:
-            return part.symbols().count
+            return part == .Skin ? bodyTypes.count : part.symbols().count
         default:
             if part == .Addition && !avatar.addition.usesColor { return 0 }
             if part == .Clothing && !avatar.clothing.usesColor { return 0 }
@@ -291,13 +308,21 @@ extension EditAvatarViewController: UICollectionViewDelegate {
         }
         switch collectionView {
         case symbolsCollectionView:
-            let symbol = part.symbols()[indexPath.row]
-            avatar.set(part: part, symbol: symbol)
+            if part == .Skin {
+                avatar.bodyType = bodyTypes[indexPath.row]
+            } else {
+                let symbol = part.symbols()[indexPath.row]
+                avatar.set(part: part, symbol: symbol)
+            }
             colorsCollectionView.reloadData()
             selectCurrentItemsIfPossible()
             updateJerseyNumberMenu()
         default:
             avatar.set(part: part, colorIdx: indexPath.row)
+            if part == .Skin {
+                symbolsCollectionView.reloadData()
+                selectCurrentItemsIfPossible()
+            }
         }
         editAvatarView?.avatar = avatar
         editAvatarView?.update()

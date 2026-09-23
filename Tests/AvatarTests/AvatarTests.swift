@@ -4,6 +4,67 @@ import XCTest
 final class AvatarTests: XCTestCase {
     private let legacy: Int64 = 903052408064125018
 
+    func testSixBitClothingPreservesOtherFieldsAndOldEncoding() throws {
+        let original = try XCTUnwrap(AvatarHexID("80000000b25e00000c8849616c39285a"))
+        var hex = original
+        for value in 0...63 {
+            hex[.clothing] = value
+            XCTAssertEqual(AvatarHexID(hex.hex)?[.clothing], value)
+            for field in AvatarHexID.Field.allCases where field != .clothing {
+                XCTAssertEqual(hex[field], original[field])
+            }
+            XCTAssertEqual(hex.bodyType, original.bodyType)
+            XCTAssertEqual(hex.additionColor, original.additionColor)
+            XCTAssertEqual(hex.jerseyNumber, original.jerseyNumber)
+            let expectedHigh = UInt64(0x80000000b25e0000) | (UInt64((value >> 4) & 1) << 8) | (UInt64((value >> 5) & 1) << 30)
+            let expectedLow = (UInt64(legacy) & ~(UInt64(15) << 25)) | (UInt64(value & 15) << 25)
+            XCTAssertEqual(hex.hex, String(format: "%016llx%016llx", expectedHigh, expectedLow))
+            hex[.clothing] = original[.clothing]
+            XCTAssertEqual(hex, original)
+        }
+    }
+
+    func testNewWardrobeRoundTripsAcrossEveryBodyType() throws {
+        let clothes: [Avatar.Clothing] = [.FlannelShirt, .SailorShirt, .Tracksuit, .CableKnitSweater, .Bathrobe, .SafetyVest, .KnightArmor]
+        for (index, clothing) in clothes.enumerated() {
+            XCTAssertEqual(clothing.rawValue, 27 + index)
+            XCTAssertEqual(clothing.usesColor, [0, 2, 3, 4].contains(index))
+            for bodyType in Avatar.BodyType.allCases {
+                let avatar = Avatar.decompress(value: legacy)
+                avatar.set(part: .Clothing, symbol: clothing)
+                avatar.bodyType = bodyType
+                avatar.clothingColorIdx = 13
+                avatar.additionColorIdx = 23
+                avatar.jerseyNumber = 100
+                let hex = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+                let saved = Avatar.decompress(value: 0, hexId: hex.hex)
+                XCTAssertEqual(saved.clothing, clothing)
+                XCTAssertEqual(saved.bodyType, bodyType)
+                XCTAssertEqual(saved.clothingColorIdx, 13)
+                XCTAssertEqual(saved.additionColorIdx, 23)
+                XCTAssertEqual(saved.jerseyNumber, 100)
+                XCTAssertEqual(saved.compressHex(), hex.hex)
+                XCTAssertEqual(hex.legacyID, avatar.compress())
+            }
+        }
+        let vest = Avatar.decompress(value: 0, hexId: "00000000725e00000c8849616039285a")
+        XCTAssertEqual(vest.clothing, .SafetyVest)
+        vest.set(part: .Clothing, symbol: Avatar.Clothing.KnightArmor)
+        XCTAssertEqual(vest.compressHex(), "00000000725e00000c8849616239285a")
+    }
+
+    func testUnknownSixBitClothingSurvivesUntilExplicitlyReplaced() throws {
+        var hex = try XCTUnwrap(AvatarHexID("80000000725e01000c8849617e39285a"))
+        let avatar = Avatar.decompress(value: 0, hexId: hex.hex)
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        avatar.bodyType = .slim
+        hex.bodyType = 1
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        avatar.set(part: .Clothing, symbol: Avatar.Clothing.Shirt)
+        hex[.clothing] = 0
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+    }
+
     func testNationalJerseysUseExtendedClothingFieldWithoutChangingNeighbors() throws {
         let jerseys: [Avatar.Clothing] = [.CroatiaJersey, .SerbiaJersey, .ArgentinaJersey, .PortugalJersey, .FranceJersey]
         let original = AvatarHexID(legacyID: legacy)

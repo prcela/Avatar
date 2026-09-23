@@ -12,6 +12,7 @@ import UIKit
 public class EditAvatarView : UIView {
     
     @IBOutlet weak var bodyImgView: UIImageView!
+    @IBOutlet weak var neckShadowImgView: UIImageView!
     @IBOutlet weak var clothingImgView: UIImageView!
     @IBOutlet weak var clothingLogoImgView: UIImageView!
     @IBOutlet public weak var additionImgView: UIImageView!
@@ -37,8 +38,11 @@ public class EditAvatarView : UIView {
         if avatar.skinColorIdx >= skinColors.count {
             avatar.skinColorIdx = 0
         }
-        bodyImgView.image = bodyImageForClothing()
+        let bodyImages = avatar.skin == .Bot && UIAvatarView.enableBots
+            ? nil : AvatarBodyShape.images(for: avatar.bodyType)
+        bodyImgView.image = bodyImageForClothing(bodyImages?.body ?? avatar.skin.image())
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
+        neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
         noseImgView.image = avatar.nose.image()
         eyesImgView.image = positionedPair(avatar.eyes.image())
@@ -46,9 +50,13 @@ public class EditAvatarView : UIView {
         eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
             ? avatar.eyebrow.image() : positionedPair(avatar.eyebrow.image())
         glassesView.image = avatar.glasses.image()
+        // Follow 60% of the body width change to keep lenses closer to the eyes.
+        let glassesScaleX = 1 + (avatar.bodyType.scaleX - 1) * 0.6
+        let glassesTransform = CGAffineTransform(scaleX: glassesScaleX, y: 1)
+        glassesView.transform = glassesTransform
         if avatar.glasses == .Monocle {
             // Enlarge around the lens/eye center (160, 110), retaining the 8-point drop.
-            glassesView.transform = bodyTransform.translatedBy(x: -11.2, y: 11.6).scaledBy(x: 1.4, y: 1.4)
+            glassesView.transform = glassesTransform.translatedBy(x: -11.2, y: 11.6).scaledBy(x: 1.4, y: 1.4)
         }
         let hairColors = Avatar.Part.Hair.colors()
         if avatar.hairColorIdx >= hairColors.count {
@@ -95,8 +103,8 @@ public class EditAvatarView : UIView {
         }
     }
 
-    private func bodyImageForClothing() -> UIImage? {
-        guard let image = avatar.skin.image() else { return nil }
+    private func bodyImageForClothing(_ image: UIImage?) -> UIImage? {
+        guard let image else { return nil }
         guard avatar.clothing.verticalOffset > 0 else { return image }
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
