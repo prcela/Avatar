@@ -978,18 +978,7 @@ public class Avatar {
         case Round
         
         func image() -> UIImage? {
-            switch self {
-            case .Normal:
-                return UIImage(named: "Default Nose", in: .module, compatibleWith: .current)
-            case .Mini:
-                return UIImage(named: "Mini Nose", in: .module, compatibleWith: .current)
-            case .Big:
-                return UIImage(named: "Big Nose", in: .module, compatibleWith: .current)
-            case .Left:
-                return UIImage(named: "Left Nose", in: .module, compatibleWith: .current)
-            case .Round:
-                return UIImage(named: "Round Nose", in: .module, compatibleWith: .current)
-            }
+            AvatarNoseStyle.image(for: self)
         }
     }
     enum ClothLogo: Int, CaseIterable, AvatarSymbol {

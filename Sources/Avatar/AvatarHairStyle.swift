@@ -7,6 +7,8 @@ struct AvatarHairStyle {
     let scaleY: CGFloat
     let offsetX: CGFloat
     let offsetY: CGFloat
+    // Extra room for longer bangs above the protected eyes and cheeks.
+    var foreheadInset: CGFloat = 0
 
     static func placement(for hair: Avatar.Hair) -> AvatarHairStyle? {
         placements[hair]
@@ -57,7 +59,7 @@ struct AvatarHairStyle {
         .LowFade: .init(scaleX: 0.813, scaleY: 0.903, offsetX: -0.573, offsetY: 7.551),
         .FlatTop: .init(scaleX: 0.88, scaleY: 0.901, offsetX: -0.147, offsetY: -2.292),
         .TwinBraids: .init(scaleX: 0.934, scaleY: 0.821, offsetX: 0.0, offsetY: -3.393),
-        .LongStraightBangs: .init(scaleX: 1, scaleY: 1, offsetX: 0, offsetY: -4),
+        .LongStraightBangs: .init(scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0, foreheadInset: 6),
         .Einstein: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: 2)
     ]
 
@@ -70,18 +72,18 @@ struct AvatarHairStyle {
         let inverse = CGAffineTransform(a: 1 / scaleX, b: 0, c: 0, d: 1 / scaleY,
             tx: (33 - 133 * (1 - scaleX) - offsetX) / scaleX,
             ty: (36 - offsetY) / scaleY)
-        path.addPath(Self.protectedFace(bodyType), transform: inverse)
+        path.addPath(Self.protectedFace(bodyType, foreheadInset: foreheadInset), transform: inverse)
         var sizeTransform = CGAffineTransform(scaleX: bounds.width / 266, y: bounds.height / 280)
         return path.copy(using: &sizeTransform) ?? path
     }
 
-    private static func protectedFace(_ bodyType: Avatar.BodyType) -> CGPath {
+    private static func protectedFace(_ bodyType: Avatar.BodyType, foreheadInset: CGFloat) -> CGPath {
         let path = CGMutablePath()
         path.move(to: CGPoint(x: 44, y: 94))
         path.addLine(to: CGPoint(x: 44, y: 80))
-        path.addQuadCurve(to: CGPoint(x: 60, y: 64), control: CGPoint(x: 44, y: 64))
-        path.addLine(to: CGPoint(x: 140, y: 64))
-        path.addQuadCurve(to: CGPoint(x: 156, y: 80), control: CGPoint(x: 156, y: 64))
+        path.addQuadCurve(to: CGPoint(x: 60, y: 64 + foreheadInset), control: CGPoint(x: 44, y: 64 + foreheadInset))
+        path.addLine(to: CGPoint(x: 140, y: 64 + foreheadInset))
+        path.addQuadCurve(to: CGPoint(x: 156, y: 80), control: CGPoint(x: 156, y: 64 + foreheadInset))
         path.addLine(to: CGPoint(x: 156, y: 94))
         if let shape = AvatarBodyShape(bodyType: bodyType) {
             let jaw = shape.jawHalfWidth, chin = shape.chinY, cheek = shape.cheekControlX

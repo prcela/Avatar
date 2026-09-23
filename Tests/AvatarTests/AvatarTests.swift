@@ -148,6 +148,26 @@ final class AvatarTests: XCTestCase {
         XCTAssertEqual(avatar.compressHex(), hex.hex)
     }
 
+    func testFirstExtendedHairRoundTripsWithoutChangingLegacyNeighbors() throws {
+        let avatar = Avatar.decompress(value: legacy)
+        avatar.set(part: .Hair, symbol: Avatar.Hair.Einstein)
+        let hex = avatar.compressHex()
+        XCTAssertEqual(hex, "00000000000000400c8849016c39285a")
+        let saved = Avatar.decompress(value: 0, hexId: hex)
+        XCTAssertEqual(saved.hair, .Einstein)
+        XCTAssertEqual(saved.compressHex(), hex)
+
+        let expectedLegacy = legacy & ~(Int64(63) << 33)
+        XCTAssertEqual(avatar.compress(), expectedLegacy)
+        XCTAssertEqual(saved.legacyAvatarId, expectedLegacy)
+        XCTAssertEqual(Avatar.decompress(value: expectedLegacy).hair, .None)
+        let encoded = try XCTUnwrap(AvatarHexID(hex))
+        let original = AvatarHexID(legacyID: legacy)
+        for field in AvatarHexID.Field.allCases where field != .hair {
+            XCTAssertEqual(encoded[field], original[field])
+        }
+    }
+
     func testEmptyAndInvalidHexUseLegacyAppearance() {
         for hex in ["", "bad", String(repeating: "g", count: 32)] {
             let avatar = Avatar.decompress(value: legacy, hexId: hex)
