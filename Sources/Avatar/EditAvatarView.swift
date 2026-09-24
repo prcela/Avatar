@@ -27,6 +27,10 @@ public class EditAvatarView : UIView {
     private let hairBackingView = UIImageView()
     private let hairBackingMask = CAShapeLayer()
     private let hairFaceMask = CAShapeLayer()
+    private let eyePairView = AvatarEyePairView()
+    private let browPairView = AvatarEyePairView()
+    private static let emptyEyes = UIGraphicsImageRenderer(size: CGSize(width: 112, height: 44)).image { _ in }
+    private static let emptyBrows = UIGraphicsImageRenderer(size: CGSize(width: 112, height: 24)).image { _ in }
 
     var avatar = Avatar()
     
@@ -50,11 +54,46 @@ public class EditAvatarView : UIView {
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
+        mouthImgView.transform = CGAffineTransform(scaleX: avatar.mouthWidth.scale, y: 1)
         noseImgView.image = AvatarNoseStyle.image(for: avatar.nose, skinColorIndex: avatar.skinColorIdx)
-        eyesImgView.image = positionedPair(avatar.eyes.image())
+        // Scale around the visible nose center, six points below its canvas center.
+        let noseScale = avatar.noseSize.scale
+        noseImgView.transform = CGAffineTransform(translationX: 0, y: 6 * (1 - noseScale))
+            .scaledBy(x: noseScale, y: noseScale)
+        if avatar.eyeSpacing == .normal && avatar.eyeSize == .normal {
+            eyePairView.isHidden = true
+            eyesImgView.image = positionedPair(avatar.eyes.image())
+        } else {
+            if eyePairView.superview == nil {
+                eyesImgView.addSubview(eyePairView)
+                eyePairView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                eyesImgView.clipsToBounds = false
+            }
+            // Retain the XIB's original intrinsic size while drawing each eye independently.
+            eyesImgView.image = Self.emptyEyes
+            eyePairView.frame = eyesImgView.bounds
+            eyePairView.isHidden = false
+            eyePairView.update(image: avatar.eyes.image(),
+                offset: (avatar.bodyType.scaleX - 1) * 20 + avatar.eyeSpacing.offset,
+                scale: avatar.eyeSize.eyeScale)
+        }
         // Keep the connected eyebrow intact instead of opening a gap in its center.
-        eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
-            ? avatar.eyebrow.image() : positionedPair(avatar.eyebrow.image())
+        if avatar.eyebrow == .UnibrowNatural || avatar.eyeSpacing == .normal {
+            browPairView.isHidden = true
+            eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
+                ? avatar.eyebrow.image() : positionedPair(avatar.eyebrow.image())
+        } else {
+            if browPairView.superview == nil {
+                eyesbrowImgView.addSubview(browPairView)
+                browPairView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                eyesbrowImgView.clipsToBounds = false
+            }
+            eyesbrowImgView.image = Self.emptyBrows
+            browPairView.frame = eyesbrowImgView.bounds
+            browPairView.isHidden = false
+            browPairView.update(image: avatar.eyebrow.image(),
+                offset: (avatar.bodyType.scaleX - 1) * 20 + avatar.eyeSpacing.offset, scale: 1)
+        }
         glassesView.image = avatar.glasses.image()
         // Follow 60% of the body width change to keep lenses closer to the eyes.
         let glassesScaleX = 1 + (avatar.bodyType.scaleX - 1) * 0.6
@@ -226,4 +265,52 @@ public class EditAvatarView : UIView {
         }
     }
     
+}
+
+/// Clip the source pair before transforming each half. Large eyes, including tears
+/// and hearts, can extend beyond the original canvas without being cut off.
+final class AvatarEyePairView: UIView {
+    private let halves = [UIView(), UIView()]
+    private let images = [UIImageView(), UIImageView()]
+    private var eyeOffset: CGFloat = 0
+    private var eyeScale: CGFloat = 1
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isUserInteractionEnabled = false
+        for index in 0...1 {
+            halves[index].clipsToBounds = true
+            images[index].contentMode = .scaleToFill
+            halves[index].addSubview(images[index])
+            addSubview(halves[index])
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("AvatarEyePairView is created programmatically")
+    }
+
+    func update(image: UIImage?, offset: CGFloat, scale: CGFloat) {
+        images.forEach { $0.image = image }
+        eyeOffset = offset
+        eyeScale = scale
+        setNeedsLayout()
+        layoutIfNeeded()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let halfWidth = bounds.width / 2
+        let offset = eyeOffset * bounds.width / 112
+        for index in 0...1 {
+            let half = halves[index]
+            half.transform = .identity
+            half.frame = CGRect(x: CGFloat(index) * halfWidth, y: 0,
+                                width: halfWidth, height: bounds.height)
+            images[index].frame = CGRect(x: -CGFloat(index) * halfWidth, y: 0,
+                                        width: bounds.width, height: bounds.height)
+            half.transform = CGAffineTransform(translationX: index == 0 ? -offset : offset, y: 0)
+                .scaledBy(x: eyeScale, y: eyeScale)
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 @testable import Avatar
 
 final class AvatarTests: XCTestCase {
@@ -298,6 +299,151 @@ final class AvatarTests: XCTestCase {
             XCTAssertEqual(avatar.compressHex(), hex.hex)
             avatar.bodyType = .normal
             XCTAssertEqual(avatar.compressHex(), "80000000000440000c8849616c39285a")
+        }
+    }
+}
+
+extension AvatarTests {
+    func testAllFaceProportionsRoundTripWithoutChangingOtherFields() throws {
+        for source in ["00000000000000000c8849616c39285a", "80000000725e01000c8849617e39285a"] {
+            let original = try XCTUnwrap(AvatarHexID(source))
+            for spacing in Avatar.EyeSpacing.allCases {
+                for eyeSize in Avatar.FeatureSize.allCases {
+                    for mouthWidth in Avatar.FeatureSize.allCases {
+                        for noseSize in Avatar.FeatureSize.allCases {
+                            let avatar = Avatar.decompress(value: legacy, hexId: source)
+                            avatar.eyeSpacing = spacing
+                            avatar.eyeSize = eyeSize
+                            avatar.mouthWidth = mouthWidth
+                            avatar.noseSize = noseSize
+                            let encoded = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+                            XCTAssertEqual(encoded.legacyID, original.legacyID)
+                            for field in AvatarHexID.Field.allCases {
+                                XCTAssertEqual(encoded[field], original[field])
+                            }
+                            XCTAssertEqual(encoded.bodyType, original.bodyType)
+                            XCTAssertEqual(encoded.additionColor, original.additionColor)
+                            XCTAssertEqual(encoded.jerseyNumber, original.jerseyNumber)
+                            let restored = Avatar.decompress(value: 0, hexId: encoded.hex)
+                            XCTAssertEqual(restored.eyeSpacing, spacing)
+                            XCTAssertEqual(restored.eyeSize, eyeSize)
+                            XCTAssertEqual(restored.mouthWidth, mouthWidth)
+                            XCTAssertEqual(restored.noseSize, noseSize)
+                            XCTAssertEqual(restored.compressHex(), encoded.hex)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    func testLegacyFaceProportionsAndResetPreserveIdentity() {
+        let avatar = Avatar.decompress(value: legacy)
+        let original = avatar.compressHex()
+        XCTAssertEqual(avatar.eyeSpacing, .normal)
+        XCTAssertEqual(avatar.eyeSize, .normal)
+        XCTAssertEqual(avatar.mouthWidth, .normal)
+        XCTAssertEqual(avatar.noseSize, .normal)
+        avatar.eyeSpacing = .wide
+        avatar.eyeSize = .large
+        avatar.mouthWidth = .small
+        avatar.noseSize = .large
+        XCTAssertNotEqual(avatar.compressHex(), original)
+        XCTAssertEqual(avatar.legacyAvatarId, legacy)
+        avatar.eyeSpacing = .normal
+        avatar.eyeSize = .normal
+        avatar.mouthWidth = .normal
+        avatar.noseSize = .normal
+        XCTAssertEqual(avatar.compressHex(), original)
+    }
+
+    func testSharedFaceProportionFixtureAndClothingBit() throws {
+        var hex = AvatarHexID(legacyID: legacy)
+        hex[.clothing] = 38
+        hex.eyeSpacing = 1
+        hex.eyeSize = 2
+        hex.mouthWidth = 1
+        hex.noseSize = 2
+        XCTAssertEqual(hex.hex, "0000004cc00000000c8849616c39285a")
+        let avatar = Avatar.decompress(value: 0, hexId: hex.hex)
+        XCTAssertEqual(avatar.eyeSpacing, .narrow)
+        XCTAssertEqual(avatar.eyeSize, .large)
+        XCTAssertEqual(avatar.mouthWidth, .small)
+        XCTAssertEqual(avatar.noseSize, .large)
+        // An unsupported clothing style must also survive an unrelated face edit.
+        avatar.eyeSpacing = .wide
+        hex.eyeSpacing = 2
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        XCTAssertEqual(AvatarHexID(avatar.compressHex())?[.clothing], 38)
+    }
+
+    func testReservedFaceProportionsSurviveUntilExplicitlyReplaced() throws {
+        var hex = try XCTUnwrap(AvatarHexID("80000000725e01000c8849617e39285a"))
+        hex.eyeSpacing = 3
+        hex.eyeSize = 3
+        hex.mouthWidth = 3
+        hex.noseSize = 3
+        let avatar = Avatar.decompress(value: 0, hexId: hex.hex)
+        XCTAssertEqual(avatar.eyeSpacing, .normal)
+        XCTAssertEqual(avatar.eyeSize, .normal)
+        XCTAssertEqual(avatar.mouthWidth, .normal)
+        XCTAssertEqual(avatar.noseSize, .normal)
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        avatar.set(part: .Hair, colorIdx: 2)
+        hex[.hairColor] = 2
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        avatar.eyeSize = .normal
+        hex.eyeSize = 0
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+        avatar.eyeSpacing = .normal
+        hex.eyeSpacing = 0
+        avatar.mouthWidth = .normal
+        hex.mouthWidth = 0
+        avatar.noseSize = .normal
+        hex.noseSize = 0
+        XCTAssertEqual(avatar.compressHex(), hex.hex)
+    }
+
+    @MainActor
+    func testResetFaceProportionsRestoresRenderedAvatar() throws {
+        let view = try XCTUnwrap(Bundle.module.loadNibNamed("EditAvatarView", owner: nil)?.first as? EditAvatarView)
+        let avatar = Avatar.decompress(value: legacy)
+        view.avatar = avatar
+        view.layoutIfNeeded()
+        view.update()
+        let original = try XCTUnwrap(view.image()?.pngData())
+        avatar.eyeSpacing = .wide
+        avatar.eyeSize = .large
+        avatar.mouthWidth = .small
+        avatar.noseSize = .large
+        view.update()
+        XCTAssertNotEqual(view.image()?.pngData(), original)
+        avatar.eyeSpacing = .normal
+        avatar.eyeSize = .normal
+        avatar.mouthWidth = .normal
+        avatar.noseSize = .normal
+        view.update()
+        XCTAssertEqual(view.image()?.pngData(), original)
+    }
+
+    @MainActor
+    func testEyeSizeKeepsEachEyeCenterAndDoesNotClipOuterEdges() {
+        let pair = AvatarEyePairView(frame: CGRect(x: 0, y: 0, width: 112, height: 44))
+        for body in Avatar.BodyType.allCases {
+            for spacing in Avatar.EyeSpacing.allCases {
+                let offset = (body.scaleX - 1) * 20 + spacing.offset
+                for size in Avatar.FeatureSize.allCases {
+                    pair.update(image: nil, offset: offset, scale: size.eyeScale)
+                    XCTAssertFalse(pair.clipsToBounds)
+                    for (index, half) in pair.subviews.enumerated() {
+                        let center = half.convert(CGPoint(x: half.bounds.midX, y: half.bounds.midY), to: pair)
+                        XCTAssertEqual(center.x, index == 0 ? 28 - offset : 84 + offset, accuracy: 0.001)
+                        XCTAssertEqual(center.y, 22, accuracy: 0.001)
+                        XCTAssertEqual(half.frame.height, 44 * size.eyeScale, accuracy: 0.001)
+                        XCTAssertTrue(half.clipsToBounds)
+                    }
+                }
+            }
         }
     }
 }

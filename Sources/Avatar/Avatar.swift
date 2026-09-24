@@ -10,6 +10,53 @@ import Foundation
 import UIKit
 
 public class Avatar {
+    public enum FeatureSize: Int, CaseIterable {
+        // Zero preserves the appearance of every existing avatar.
+        case normal = 0, small = 1, large = 2
+
+        var scale: CGFloat {
+            switch self {
+            case .normal: return 1
+            case .small: return 0.85
+            case .large: return 1.15
+            }
+        }
+
+        var eyeScale: CGFloat {
+            switch self {
+            case .normal: return 1
+            case .small: return 0.8
+            case .large: return 1.2
+            }
+        }
+    }
+
+    public enum EyeSpacing: Int, CaseIterable {
+        case normal = 0, narrow = 1, wide = 2
+
+        // Additional movement of each eye on the original 264-point canvas.
+        var offset: CGFloat {
+            switch self {
+            case .normal: return 0
+            case .narrow: return -5
+            case .wide: return 5
+            }
+        }
+    }
+
+    public var eyeSpacing: EyeSpacing = .normal {
+        didSet { loadedHexID?.eyeSpacing = eyeSpacing.rawValue }
+    }
+    public var eyeSize: FeatureSize = .normal {
+        didSet { loadedHexID?.eyeSize = eyeSize.rawValue }
+    }
+    public var mouthWidth: FeatureSize = .normal {
+        didSet { loadedHexID?.mouthWidth = mouthWidth.rawValue }
+    }
+    public var noseSize: FeatureSize = .normal {
+        didSet { loadedHexID?.noseSize = noseSize.rawValue }
+    }
+
     public enum BodyType: Int, CaseIterable {
         case normal = 0, slim = 1, verySlim = 2, broad = 3, veryBroad = 4
         var scaleX: CGFloat {
@@ -1408,6 +1455,10 @@ public class Avatar {
             result.bodyType = bodyType.rawValue
             result.additionColor = additionColorIdx
             result.jerseyNumber = jerseyNumber
+            result.eyeSpacing = eyeSpacing.rawValue
+            result.eyeSize = eyeSize.rawValue
+            result.mouthWidth = mouthWidth.rawValue
+            result.noseSize = noseSize.rawValue
         }
         return result.hex
     }
@@ -1447,6 +1498,10 @@ public class Avatar {
         avatar.bodyType = BodyType(rawValue: hex.bodyType) ?? .normal
         avatar.additionColorIdx = Part.Addition.colors().indices.contains(hex.additionColor) ? hex.additionColor : 0
         avatar.jerseyNumber = (0...100).contains(hex.jerseyNumber) ? hex.jerseyNumber : 0
+        avatar.eyeSpacing = EyeSpacing(rawValue: hex.eyeSpacing) ?? .normal
+        avatar.eyeSize = FeatureSize(rawValue: hex.eyeSize) ?? .normal
+        avatar.mouthWidth = FeatureSize(rawValue: hex.mouthWidth) ?? .normal
+        avatar.noseSize = FeatureSize(rawValue: hex.noseSize) ?? .normal
         // Keep unknown future values and reserved bits when editing another part.
         avatar.loadedValues = avatar.fieldValues
         avatar.loadedHexID = hex

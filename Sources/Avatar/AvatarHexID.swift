@@ -79,4 +79,35 @@ public struct AvatarHexID: Equatable, Hashable {
             high = (high & ~(UInt64(127) << 23)) | (UInt64(newValue) << 23)
         }
     }
+
+    // Two bits per proportion: 0 = unchanged, 1 = small/narrow, 2 = large/wide.
+    // Value 3 is reserved and must survive edits to other fields.
+    public var eyeSpacing: Int {
+        get { proportion(at: 31) }
+        set { setProportion(newValue, at: 31) }
+    }
+
+    public var eyeSize: Int {
+        get { proportion(at: 33) }
+        set { setProportion(newValue, at: 33) }
+    }
+
+    public var mouthWidth: Int {
+        get { proportion(at: 35) }
+        set { setProportion(newValue, at: 35) }
+    }
+
+    public var noseSize: Int {
+        get { proportion(at: 37) }
+        set { setProportion(newValue, at: 37) }
+    }
+
+    private func proportion(at offset: Int) -> Int {
+        Int((high >> offset) & 3)
+    }
+
+    private mutating func setProportion(_ value: Int, at offset: Int) {
+        precondition((0...3).contains(value))
+        high = (high & ~(UInt64(3) << offset)) | (UInt64(value) << offset)
+    }
 }
