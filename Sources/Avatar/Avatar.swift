@@ -121,6 +121,10 @@ public class Avatar {
         case PinkLips
         case PinkSmile
         case RoseLips
+        case Smirk
+        case GapSmile
+        case Whistle
+        case Vampire
         
         func image() -> UIImage? {
             switch self {
@@ -168,6 +172,14 @@ public class Avatar {
                 return UIImage(named: "Pink Smile", in: .module, compatibleWith: .current)
             case .RoseLips:
                 return UIImage(named: "Rose Lips", in: .module, compatibleWith: .current)
+            case .Smirk:
+                return UIImage(named: "MouthSmirk", in: .module, compatibleWith: .current)
+            case .GapSmile:
+                return UIImage(named: "MouthGapSmile", in: .module, compatibleWith: .current)
+            case .Whistle:
+                return UIImage(named: "MouthWhistle", in: .module, compatibleWith: .current)
+            case .Vampire:
+                return UIImage(named: "MouthVampire", in: .module, compatibleWith: .current)
             }
         }
     }
@@ -1173,7 +1185,22 @@ public class Avatar {
                     UIColor(netHex: 0xff9d497b),
                     UIColor(netHex: 0xff377a81),
                     UIColor(netHex: 0xff213c85),
-                    UIColor(netHex: 0xffcdb29b)
+                    UIColor(netHex: 0xffcdb29b),
+                    // Append only: these indices are stored in avatar IDs.
+                    UIColor(netHex: 0xff181A20), // Soft black
+                    UIColor(netHex: 0xff454951), // Graphite
+                    UIColor(netHex: 0xff737985), // Ash gray
+                    UIColor(netHex: 0xffB5BAC4), // Silver
+                    UIColor(netHex: 0xffFFFFFF), // White
+                    UIColor(netHex: 0xffB7A483), // Ash blonde
+                    UIColor(netHex: 0xffF2CB77), // Golden blonde
+                    UIColor(netHex: 0xffDD8044), // Copper
+                    UIColor(netHex: 0xff751F43), // Burgundy
+                    UIColor(netHex: 0xff6E42A6), // Violet
+                    UIColor(netHex: 0xffB19AE3), // Lavender
+                    UIColor(netHex: 0xff497DEC), // Royal blue
+                    UIColor(netHex: 0xff2B936B), // Emerald
+                    UIColor(netHex: 0xff96DCC2)  // Mint
                 ]
             case .Addition:
                 return Part.Clothing.colors()

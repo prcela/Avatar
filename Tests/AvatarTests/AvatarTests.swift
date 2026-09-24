@@ -4,6 +4,36 @@ import XCTest
 final class AvatarTests: XCTestCase {
     private let legacy: Int64 = 903052408064125018
 
+    func testExpandedHairColorsSurviveSavingAndIndependentEdits() throws {
+        let colors = Avatar.Part.Hair.colors()
+        XCTAssertEqual(colors, Avatar.Part.FacialHair.colors())
+        for sourceHex in ["", "80000000000080000c8849616c39285a"] {
+            for hairIndex in 14..<colors.count {
+                let beardIndex = colors.count + 13 - hairIndex
+                let avatar = Avatar.decompress(value: legacy, hexId: sourceHex)
+                var expected = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+                avatar.set(part: .Hair, colorIdx: hairIndex)
+                avatar.set(part: .FacialHair, colorIdx: beardIndex)
+                expected[.hairColor] = hairIndex
+                expected[.facialHairColor] = beardIndex
+                XCTAssertEqual(avatar.compressHex(), expected.hex)
+
+                let saved = Avatar.decompress(value: avatar.compress(), hexId: avatar.compressHex())
+                XCTAssertEqual(saved.colorIndex(for: .Hair), hairIndex)
+                XCTAssertEqual(saved.colorIndex(for: .FacialHair), beardIndex)
+                XCTAssertEqual(saved.compressHex(), expected.hex)
+
+                // Clearing one extension bit must preserve the other color and unrelated fields.
+                saved.set(part: .Hair, colorIdx: 0)
+                expected[.hairColor] = 0
+                XCTAssertEqual(saved.compressHex(), expected.hex)
+                saved.set(part: .FacialHair, colorIdx: 1)
+                expected[.facialHairColor] = 1
+                XCTAssertEqual(saved.compressHex(), expected.hex)
+            }
+        }
+    }
+
     func testSixBitClothingPreservesOtherFieldsAndOldEncoding() throws {
         let original = try XCTUnwrap(AvatarHexID("80000000b25e00000c8849616c39285a"))
         var hex = original
