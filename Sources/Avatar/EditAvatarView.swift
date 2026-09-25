@@ -187,6 +187,10 @@ public class EditAvatarView : UIView {
         let additionColors = Avatar.Part.Addition.colors()
         let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
         additionImgView.image = avatar.addition.avatarImage(color: additionColor)
+        if avatar.addition == .Crown && avatar.hair != .None && avatar.hair != .Eyepatch {
+            // Leave bald heads at the base position; make room for hair or headwear.
+            additionImgView.transform = bodyTransform.translatedBy(x: 0, y: -8)
+        }
         let facialHairColors = Avatar.Part.FacialHair.colors()
         if avatar.facialHairColorIdx >= facialHairColors.count {
             avatar.facialHairColorIdx = 0

@@ -1,0 +1,286 @@
+{
+  "columns": 8,
+  "rows": 5,
+  "avatars": [
+    {
+      "row": 1,
+      "column": 1,
+      "hexId": "00000000400800c00c4810004230e700",
+      "hair": "Einstein",
+      "clothing": "KnightArmor"
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "hexId": "00000000802489800894406eb0a03c2d",
+      "hair": "HighPonytail",
+      "clothing": "OffShoulderBlouse"
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "hexId": "000000010041888011367268fd118940",
+      "hair": "Mohawk",
+      "clothing": "LeatherJacket"
+    },
+    {
+      "row": 1,
+      "column": 4,
+      "hexId": "00000002325c010018aaa07c21801260",
+      "hair": "TwinBraids",
+      "clothing": "CroatiaJersey"
+    },
+    {
+      "row": 1,
+      "column": 5,
+      "hexId": "00000002801201000517d36096526f80",
+      "hair": "CowboyHat",
+      "clothing": "FlannelShirt"
+    },
+    {
+      "row": 1,
+      "column": 6,
+      "hexId": "0000000b002c018014cf30716ec0b60f",
+      "hair": "SpaceBuns",
+      "clothing": "ElegantDress"
+    },
+    {
+      "row": 1,
+      "column": 7,
+      "hexId": "0000000c0048990008e769ebcb330020",
+      "hair": "Pompadour",
+      "clothing": "ButtonUpShirt"
+    },
+    {
+      "row": 1,
+      "column": 8,
+      "hexId": "0000002c806599000e13907478005640",
+      "hair": "Beret",
+      "clothing": "SailorShirt"
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "hexId": "0000002d059908801e32c0ca1e74ad76",
+      "hair": "BuzzCut",
+      "clothing": "SportsJersey"
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "hexId": "00000028003600002015205306e03580",
+      "hair": "LongWavy",
+      "clothing": "Dress"
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "hexId": "00000030805011000d505a781b558500",
+      "hair": "LowFade",
+      "clothing": "Tracksuit"
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "hexId": "000000310004808009c9807f2e20db2d",
+      "hair": "LongStraightBangs",
+      "clothing": "ShirtScoopNeck"
+    },
+    {
+      "row": 2,
+      "column": 5,
+      "hexId": "00000032402198801078b47a20962140",
+      "hair": "FlatTop",
+      "clothing": "SafetyVest"
+    },
+    {
+      "row": 2,
+      "column": 6,
+      "hexId": "00000032803c090019ec1054d3007a60",
+      "hair": "GlamWaves",
+      "clothing": "HawaiianShirt"
+    },
+    {
+      "row": 2,
+      "column": 7,
+      "hexId": "00000053005a0000058147652b770e80",
+      "hair": "ChefHat",
+      "clothing": "Overall"
+    },
+    {
+      "row": 2,
+      "column": 8,
+      "hexId": "00000044000c018014597056dc40500f",
+      "hair": "SleekBob",
+      "clothing": "CableKnitSweater"
+    },
+    {
+      "row": 3,
+      "column": 1,
+      "hexId": "0000004485a891000883a8ec44b8a220",
+      "hair": "CurtainPart",
+      "clothing": "ArgentinaJersey"
+    },
+    {
+      "row": 3,
+      "column": 2,
+      "hexId": "00000045004581000db1d0595520f340",
+      "hair": "WavyBob",
+      "clothing": "Pajamas"
+    },
+    {
+      "row": 3,
+      "column": 3,
+      "hexId": "00000040006018000d683967f3994376",
+      "hair": "VikingHelmet",
+      "clothing": "Dolce"
+    },
+    {
+      "row": 3,
+      "column": 4,
+      "hexId": "00000008040001000e125079c660e000",
+      "hair": "LowFade",
+      "clothing": "PortugalJersey"
+    },
+    {
+      "row": 3,
+      "column": 5,
+      "hexId": "0000004905b001800c4890764cda2000",
+      "hair": "BackwardCap",
+      "clothing": "BasketballJersey"
+    },
+    {
+      "row": 3,
+      "column": 6,
+      "hexId": "0000000a004c81800894c042bf407c2d",
+      "hair": "Bob",
+      "clothing": "Bathrobe"
+    },
+    {
+      "row": 3,
+      "column": 7,
+      "hexId": "0000000a800180801136220cfa1cc940",
+      "hair": "ShortCurly",
+      "clothing": "DenimJacket"
+    },
+    {
+      "row": 3,
+      "column": 8,
+      "hexId": "0000000b001c080018aa502030801260",
+      "hair": "Frida",
+      "clothing": "ShirtVNeck"
+    },
+    {
+      "row": 4,
+      "column": 1,
+      "hexId": "0000000c003a08000517837288fd6f80",
+      "hair": "BucketHat",
+      "clothing": "Hoodie"
+    },
+    {
+      "row": 4,
+      "column": 2,
+      "hexId": "000000148054088014cfb0416d60b60f",
+      "hair": "Curly",
+      "clothing": "ShirtCrewNeck"
+    },
+    {
+      "row": 4,
+      "column": 3,
+      "hexId": "000000150008900008e719dfd4304020",
+      "hair": "Spiky",
+      "clothing": "Undershirt"
+    },
+    {
+      "row": 4,
+      "column": 4,
+      "hexId": "00000010002590000e13402478a09640",
+      "hair": "Straight",
+      "clothing": "LeftSide"
+    },
+    {
+      "row": 4,
+      "column": 5,
+      "hexId": "0000003085c001800a3270e20911ed76",
+      "hair": "BaseballCap",
+      "clothing": "FranceJersey"
+    },
+    {
+      "row": 4,
+      "column": 6,
+      "hexId": "00000031005e08001415a01b05803580",
+      "hair": "Bun",
+      "clothing": "CollarSweater"
+    },
+    {
+      "row": 4,
+      "column": 7,
+      "hexId": "000000220c1019000d50d00202528500",
+      "hair": "Dreads1",
+      "clothing": "SerbiaJersey"
+    },
+    {
+      "row": 4,
+      "column": 8,
+      "hexId": "00000022802c808009c9303b36c01b2d",
+      "hair": "MiaWallace",
+      "clothing": "UndershirtW"
+    },
+    {
+      "row": 5,
+      "column": 1,
+      "hexId": "00000023004990801078640a23336140",
+      "hair": "Shaggy",
+      "clothing": "Sweater"
+    },
+    {
+      "row": 5,
+      "column": 2,
+      "hexId": "000000240064000019ec902cc000ba60",
+      "hair": "Hijab",
+      "clothing": "Shirt"
+    },
+    {
+      "row": 5,
+      "column": 3,
+      "hexId": "00000024801a09000581c71936740e80",
+      "hair": "Ceasar",
+      "clothing": "FlannelShirt"
+    },
+    {
+      "row": 5,
+      "column": 4,
+      "hexId": "0000004d003409801459203ecee0500f",
+      "hair": "Fro",
+      "clothing": "ElegantDress"
+    },
+    {
+      "row": 5,
+      "column": 5,
+      "hexId": "0000004800509900088358b05d55a220",
+      "hair": "WinterHat2",
+      "clothing": "CableKnitSweater"
+    },
+    {
+      "row": 5,
+      "column": 6,
+      "hexId": "00000048800581000db1804f4a203340",
+      "hair": "MessyFringe",
+      "clothing": "ButtonUpShirt"
+    },
+    {
+      "row": 5,
+      "column": 7,
+      "hexId": "00000049002011001968b02bfa968376",
+      "hair": "Turban",
+      "clothing": "Tracksuit"
+    },
+    {
+      "row": 5,
+      "column": 8,
+      "hexId": "0000004a003e11800ca010229100d480",
+      "hair": "ShavedSides",
+      "clothing": "OffShoulderBlouse"
+    }
+  ]
+}

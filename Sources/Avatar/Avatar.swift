@@ -997,6 +997,9 @@ public class Avatar {
         func avatarImage(color: UIColor? = nil) -> UIImage? {
             let frames: [CGRect]
             switch self {
+            case .Crown:
+                // Lift the compact crown without changing its size.
+                frames = [CGRect(x: 0, y: -18, width: 264, height: 280)]
             case .Bandana:
                 frames = [CGRect(x: 0, y: 6.2, width: 264, height: 280)]
             case .Headphones:
