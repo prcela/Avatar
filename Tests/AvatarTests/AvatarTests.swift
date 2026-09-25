@@ -5,6 +5,38 @@ import UIKit
 final class AvatarTests: XCTestCase {
     private let legacy: Int64 = 903052408064125018
 
+    func testRandomAvatarsUseValidOptionsAndRoundTrip() throws {
+        for _ in 0..<128 {
+            let avatar = Avatar.random()
+            let hex = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+            let saved = Avatar.decompress(value: 0, hexId: hex.hex)
+
+            XCTAssertEqual(avatar.skin, .Normal)
+            XCTAssertNotEqual(hex[.facialHair], 11) // Retired braided beard.
+            for part in Avatar.Part.allCases {
+                XCTAssertNotNil(avatar.symbolIndex(for: part))
+                XCTAssertEqual(saved.symbolIndex(for: part), avatar.symbolIndex(for: part))
+                XCTAssertEqual(saved.colorIndex(for: part), avatar.colorIndex(for: part))
+                if let colorIdx = avatar.colorIndex(for: part) {
+                    XCTAssertTrue(part.colors().indices.contains(colorIdx))
+                }
+            }
+            XCTAssertEqual(saved.bodyType, avatar.bodyType)
+            XCTAssertEqual(saved.eyeSpacing, avatar.eyeSpacing)
+            XCTAssertEqual(saved.eyeSize, avatar.eyeSize)
+            XCTAssertEqual(saved.mouthWidth, avatar.mouthWidth)
+            XCTAssertEqual(saved.noseSize, avatar.noseSize)
+            XCTAssertEqual(saved.jerseyNumber, avatar.jerseyNumber)
+            if avatar.clothing.isJersey {
+                XCTAssertTrue((0...100).contains(avatar.jerseyNumber))
+            } else {
+                XCTAssertEqual(avatar.jerseyNumber, 0)
+            }
+            XCTAssertEqual(saved.compressHex(), hex.hex)
+            XCTAssertEqual(hex.legacyID, avatar.legacyAvatarId)
+        }
+    }
+
     func testExpandedHairColorsSurviveSavingAndIndependentEdits() throws {
         let colors = Avatar.Part.Hair.colors()
         XCTAssertEqual(colors, Avatar.Part.FacialHair.colors())

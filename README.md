@@ -75,11 +75,19 @@ The current `AvatarEditorViewController` is built in UIKit. It keeps the preview
 
 ```swift
 // Inside your view controller:
+let savedHexId = UserDefaults.standard.string(forKey: "avatarHexId")
 let editor = AvatarEditorViewController.instantiate()
-editor.avatar = Avatar.decompress(value: 0, hexId: savedHexId)
+if let savedHexId, AvatarHexID(savedHexId) != nil {
+    editor.avatar = Avatar.decompress(value: 0, hexId: savedHexId)
+} else {
+    // Start from a random avatar if there is no valid saved ID.
+    editor.avatar = Avatar.random()
+}
 editor.delegate = self
 present(editor, animated: true)
 ```
+
+`Avatar.random()` creates a new human avatar from the available parts, colors, body widths, and face proportions. It includes extended hex-ID options and selects only supported values. Jersey numbers are randomized only for jerseys (no number, or 0...99). Save the result with `compressHex()` just like an edited avatar.
 
 The editor works on a draft. **Cancel** leaves the original avatar untouched; **Done** returns the edited avatar through the existing delegate protocol:
 

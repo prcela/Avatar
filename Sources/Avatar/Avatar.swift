@@ -1365,6 +1365,29 @@ public class Avatar {
         }
     }
     
+    /// Creates a human avatar using the currently supported parts, colors and proportions.
+    public class func random() -> Avatar {
+        let avatar = Avatar()
+        for part in Part.allCases {
+            if part != .Skin, let symbol = part.symbols().randomElement() {
+                avatar.set(part: part, symbol: symbol)
+            }
+            if let colorIdx = part.colors().indices.randomElement() {
+                avatar.set(part: part, colorIdx: colorIdx)
+            }
+        }
+        avatar.bodyType = BodyType.allCases.randomElement()!
+        avatar.eyeSpacing = EyeSpacing.allCases.randomElement()!
+        avatar.eyeSize = FeatureSize.allCases.randomElement()!
+        avatar.mouthWidth = FeatureSize.allCases.randomElement()!
+        avatar.noseSize = FeatureSize.allCases.randomElement()!
+        if avatar.clothing.isJersey {
+            // Zero means no number; 1...100 display jersey numbers 0...99.
+            avatar.jerseyNumber = Int.random(in: 0...100)
+        }
+        return avatar
+    }
+
     public func compress() -> Int64 {
         var result = Int64(0)
         func addBits(_ ctBits:Int, v: Int) {
