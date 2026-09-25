@@ -152,98 +152,98 @@
     {
       "row": 3,
       "column": 6,
-      "hexId": "0000000a004c81800894c042bf407c2d",
+      "hexId": "0000000a004c81800894c042bf40702d",
       "hair": "Bob",
       "clothing": "Bathrobe"
     },
     {
       "row": 3,
       "column": 7,
-      "hexId": "0000000a800180801136220cfa1cc940",
+      "hexId": "0000000a800180801136200cfa1cc040",
       "hair": "ShortCurly",
       "clothing": "DenimJacket"
     },
     {
       "row": 3,
       "column": 8,
-      "hexId": "0000000b001c080018aa502030801260",
+      "hexId": "0000000b001c080018aa502030801060",
       "hair": "Frida",
       "clothing": "ShirtVNeck"
     },
     {
       "row": 4,
       "column": 1,
-      "hexId": "0000000c003a08000517837288fd6f80",
+      "hexId": "0000000c003a08000517807288fd1080",
       "hair": "BucketHat",
       "clothing": "Hoodie"
     },
     {
       "row": 4,
       "column": 2,
-      "hexId": "000000148054088014cfb0416d60b60f",
+      "hexId": "0000001480540880144fb0416d60b00f",
       "hair": "Curly",
       "clothing": "ShirtCrewNeck"
     },
     {
       "row": 4,
       "column": 3,
-      "hexId": "000000150008900008e719dfd4304020",
+      "hexId": "000000150008800008e7105fd4304020",
       "hair": "Spiky",
       "clothing": "Undershirt"
     },
     {
       "row": 4,
       "column": 4,
-      "hexId": "00000010002590000e13402478a09640",
+      "hexId": "00000010002580000e13402478a09040",
       "hair": "Straight",
       "clothing": "LeftSide"
     },
     {
       "row": 4,
       "column": 5,
-      "hexId": "0000003085c001800a3270e20911ed76",
+      "hexId": "0000003085c001800a3270620911e076",
       "hair": "BaseballCap",
       "clothing": "FranceJersey"
     },
     {
       "row": 4,
       "column": 6,
-      "hexId": "00000031005e08001415a01b05803580",
+      "hexId": "00000031005e08001415a01b05803080",
       "hair": "Bun",
       "clothing": "CollarSweater"
     },
     {
       "row": 4,
       "column": 7,
-      "hexId": "000000220c1019000d50d00202528500",
+      "hexId": "000000220c1009000d50d00202528000",
       "hair": "Dreads1",
       "clothing": "SerbiaJersey"
     },
     {
       "row": 4,
       "column": 8,
-      "hexId": "00000022802c808009c9303b36c01b2d",
+      "hexId": "00000022802c808009c9303b36c0102d",
       "hair": "MiaWallace",
       "clothing": "UndershirtW"
     },
     {
       "row": 5,
       "column": 1,
-      "hexId": "00000023004990801078640a23336140",
+      "hexId": "00000023004980801078600a23336040",
       "hair": "Shaggy",
       "clothing": "Sweater"
     },
     {
       "row": 5,
       "column": 2,
-      "hexId": "000000240064000019ec902cc000ba60",
+      "hexId": "000000240064000019ec902cc000b060",
       "hair": "Hijab",
       "clothing": "Shirt"
     },
     {
       "row": 5,
       "column": 3,
-      "hexId": "00000024801a09000581c71936740e80",
+      "hexId": "00000024801a09000981c01936740080",
       "hair": "Ceasar",
       "clothing": "FlannelShirt"
     },
@@ -257,21 +257,21 @@
     {
       "row": 5,
       "column": 5,
-      "hexId": "0000004800509900088358b05d55a220",
+      "hexId": "0000004800508900088350305d55a020",
       "hair": "WinterHat2",
       "clothing": "CableKnitSweater"
     },
     {
       "row": 5,
       "column": 6,
-      "hexId": "00000048800581000db1804f4a203340",
+      "hexId": "00000048800581000db1804f4a203040",
       "hair": "MessyFringe",
       "clothing": "ButtonUpShirt"
     },
     {
       "row": 5,
       "column": 7,
-      "hexId": "00000049002011001968b02bfa968376",
+      "hexId": "00000049002001001968b02bfa968076",
       "hair": "Turban",
       "clothing": "Tracksuit"
     },
