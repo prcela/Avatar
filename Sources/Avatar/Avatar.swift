@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: MPL-2.0
+
 //
 //  Avatar.swift
 //  Yamb
 //
 //  Created by Kresimir Prcela on 26.12.2021..
-//  Copyright © 2021 Rika Omega Rika. All rights reserved.
+//  Copyright © 2021 Rika Omega Rika.
 //
 
 import Foundation

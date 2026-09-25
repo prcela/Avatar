@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import UIKit
 
 /// Skin fill, highlights and shadows on the original 56 x 36 nose canvas.

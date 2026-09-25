@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import Foundation
 
 /// 128-bit avatar identity: extension word followed by the unchanged legacy word.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Run from the package root: swift Scripts/generate-facial-hair.swift
 // Artwork uses the existing facial-hair layer's 168 x 152 point coordinates.
 import AppKit

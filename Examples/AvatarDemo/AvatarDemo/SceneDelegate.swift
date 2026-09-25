@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {

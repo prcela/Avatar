@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Run from the Avatar package root: swift Scripts/import-beer-logo.swift [Android repo]
 // Use the imagegen silhouette as a white shirt-logo mask on the existing canvas.
 import AppKit

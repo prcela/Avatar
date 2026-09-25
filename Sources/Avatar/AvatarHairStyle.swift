@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import UIKit
 
 /// Placement of the shaded hair sprites on the 266 x 280 canvas.

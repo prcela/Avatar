@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import CoreGraphics
 
 /// Soft lighting in the unchanged 200 x 244 body coordinates. Source-atop

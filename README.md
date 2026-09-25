@@ -6,6 +6,8 @@ A customizable avatar editor for iOS, with UIKit and SwiftUI support. Save an en
 
 **iOS 15+** | **Swift tools 5.7+** | **Swift Package Manager**
 
+**Licensing:** Code is MPL-2.0. Bundled artwork licensing is still being verified; see [Licensing](#licensing).
+
 - A ready-to-use UIKit editor with a live preview and Face, Hair, and Style controls.
 - Avatar views for UIKit and SwiftUI, plus image rendering for PNG export.
 - Customizable faces, body proportions, hairstyles, clothing, colors, and accessories.
@@ -229,3 +231,15 @@ The optional bot skin mode doubles the stored configuration count to **83,297,93
 ## Android
 
 A Kotlin implementation is also used in Yamb on Android. For details, contact us through **Yamb > More > Contact us**.
+
+## Licensing
+
+The code is licensed under the [Mozilla Public License 2.0](LICENSE), with
+**Rika Omega Rika** as the copyright holder for the project's own code.
+You can use it in commercial, closed-source applications. When distributing
+it, make the MPL-covered source, including modifications, available to
+recipients under the MPL and explain where they can obtain it.
+
+**Bundled artwork is excluded from this code license.** Its original license
+and redistribution permissions still need verification, including for artwork
+used in exported avatars. See [LICENSING.md](LICENSING.md) for scope and status.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import UIKit
 
 /// Frame color is independent of the lenses, reflections and frame highlights.

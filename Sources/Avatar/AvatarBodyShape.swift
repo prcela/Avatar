@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 import UIKit
 
 /// Local contours on the existing 200 x 244 body canvas. The overall width is

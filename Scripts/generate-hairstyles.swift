@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Run from the package root: swift Scripts/generate-hairstyles.swift
 // Vector artwork in the avatar's 264 x 280 point coordinates, exported as tintable masks.
 import AppKit

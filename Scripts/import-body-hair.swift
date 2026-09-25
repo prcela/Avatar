@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Run from the Avatar package root: swift Scripts/import-body-hair.swift [Android repo]
 // Resize the imagegen master without changing its transparent hair texture.
 import AppKit

@@ -46,3 +46,10 @@ editor uses the package's existing localization behavior.
 
 The layout supports scrolling, iPad widths, light/dark appearance, and Dynamic
 Type. No storyboard, service configuration, or generated project tool is needed.
+
+## Licensing
+
+The demo code is covered by the repository's [MPL-2.0 license](../../LICENSE).
+The bundled artwork and artwork used in exported PNGs have a separate,
+unresolved licensing status. See [LICENSING.md](../../LICENSING.md) before
+redistributing the demo or its artwork.

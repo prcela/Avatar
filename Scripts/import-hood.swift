@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Run from the Avatar package root: swift Scripts/import-hood.swift [Android repo]
 // The imagegen master keeps its original alpha; resize into the avatar canvas.
 import AppKit

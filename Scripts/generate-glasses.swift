@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 // Run from the package root: swift Scripts/generate-glasses.swift [Android repo]
 // Artwork for 17 tintable glasses; Ski Goggles, Monocle and Future Visor keep their originals.
 // Selected styles use their original PNG masters; Prozirne recolors only its bridge.
