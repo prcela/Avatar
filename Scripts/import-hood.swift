@@ -18,8 +18,8 @@ func croppedMaster(_ name: String) -> CGImage {
 }
 let fabric = croppedMaster("Hood")
 let torso = croppedMaster("HoodieRaised")
-// Keep both hood layers aligned after lowering them by 5% of the avatar canvas.
-let hoodOffsetY: CGFloat = 280 * 0.05
+// Shared vertical placement keeps the hood fabric and face shadow aligned.
+let hoodOffsetY: CGFloat = 0
 
 func render(_ scale: Int, name: String) -> Data {
     let height = name == "HoodieRaised" ? 110 : 280

@@ -6,8 +6,9 @@ Both editors expose it through their existing list of accessories and palette.
 
 The hood's middle and lower sections are approximately 25% narrower than the
 previous fit. The fabric is exported at 150 x 234 points, centered horizontally.
-Both fabric and face shadow are lowered by 14 points (5% of the 280-point avatar
-canvas). The transparent face opening ends near y210, and the narrow collar
+Both fabric and face shadow use the base vertical placement, raised by 14 points
+(5% of the 280-point avatar canvas) from the previous fit. The transparent face
+opening ends near y196, and the narrow collar
 covers the lower throat and overlaps the sweatshirt neckline. The drawstring eyelets sit
 close to the neck. The grayscale fabric receives the selected accessory color.
 A separate black alpha gradient casts a soft shadow
@@ -39,16 +40,18 @@ existing `Clothing/Hoodie.imageset/Hoodie.png` as the edit/style reference.
 Only export framing and resizing are applied to the retained masters.
 The hood was then revised with the same tool to narrow and lower the collar.
 That revision used the exported hood as the edit target and the three-avatar
-preview as a fit reference. The latest revision narrows the middle and lower
-sections and lowers both the fabric and shadow; the conditional torso is unchanged.
+preview as a fit reference. The latest artwork narrows the middle and lower
+sections. Both hood layers now use the base vertical placement; the conditional
+torso is unchanged.
 
-### Narrower fit and downward offset
+### Narrower fit and vertical placement
 
 The built-in imagegen tool reshaped the hood using the prior exported PNG as
 the edit target. Export framing retains the reduced width rather than expanding
 the new alpha bounds back to 200 points. At middle and collar sample rows,
 the exported widths are approximately 75% of the previous widths.
-The requested 5% downward offset is applied during export to both hood layers.
+The prior 5% downward offset has been removed from both hood layers, raising
+them by 14 points without changing the retained artwork or its width.
 
 ```text
 Use case: precise-object-edit.
