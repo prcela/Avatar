@@ -6,6 +6,8 @@ Both editors expose it through their existing list of accessories and palette.
 
 The hood's middle and lower sections are approximately 25% narrower than the
 previous fit. The fabric is exported at 150 x 234 points, centered horizontally.
+The inner face opening is approximately 10% larger, with thinner side lining;
+the outer dimensions and placement are retained.
 Both fabric and face shadow use the base vertical placement, raised by 14 points
 (5% of the 280-point avatar canvas) from the previous fit. The transparent face
 opening ends near y196, and the narrow collar
@@ -14,7 +16,8 @@ close to the neck. The grayscale fabric receives the selected accessory color.
 A separate black alpha gradient casts a soft shadow
 across the forehead without coloring the skin. Both layers follow body width.
 Hair and headwear are hidden only while Hood is selected; the saved hair choice
-is preserved. The hood is drawn above the face, beard and glasses.
+is preserved. The hood is drawn immediately before facial hair, so the beard
+overlays its fabric. The nose and glasses retain their normal foreground order.
 
 The original Hoodie assets are unchanged. Only the Hood + Hoodie combination
 uses a separate plain sweatshirt torso to avoid doubled collars and cords.
@@ -40,9 +43,34 @@ existing `Clothing/Hoodie.imageset/Hoodie.png` as the edit/style reference.
 Only export framing and resizing are applied to the retained masters.
 The hood was then revised with the same tool to narrow and lower the collar.
 That revision used the exported hood as the edit target and the three-avatar
-preview as a fit reference. The latest artwork narrows the middle and lower
-sections. Both hood layers now use the base vertical placement; the conditional
-torso is unchanged.
+preview as a fit reference. After narrowing the middle and lower sections, the
+latest artwork widens only the face opening. Both hood layers retain the base
+vertical placement; the conditional torso and shadow are unchanged.
+
+### Wider face opening
+
+The built-in imagegen tool edited the previous exported hood, then made a small
+inner-edge correction. The 3x export has an 11.4% larger transparent face-opening
+area; its outer contour differs by at most one logical point across y25...220.
+The export rectangle, shadow, collar placement and beard layering are retained.
+
+#### Edit 1
+
+```text
+Use case: precise-object-edit.
+EDIT TARGET: the attached grayscale hood accessory with transparent background and transparent face opening.
+Make ONE very small change: widen ONLY the empty inner face opening by 10% HORIZONTALLY, centered on the same vertical centerline. Its width should be 1.10 times its current width at each height. This requires moving only the inner left edge a little left and the inner right edge a little right, thinning the inside lining slightly. Keep the opening's top and bottom at the EXACT SAME vertical positions; do not make it taller or shift it. Preserve its smooth rounded shape.
+The outer hood is already approved: LOCK the entire outer silhouette, size, top dome, seam, outside folds, neck collar, eyelets, strings, vertical placement, lighting and texture. Do not redraw, enlarge, shrink, move, narrow or reshape the outer hood. Keep every unaffected area identical to the reference. No overall rescaling or recentering. Modify ONLY a thin strip of inner lining along the transparent hole's left and right sides to make the hole 10% wider. Blend the new antialiased inner edges naturally into the existing fabric.
+The input is 792x840 pixels with hood centered at x396. Move the INNER boundary with x_new = 396 + 1.10*(x_old-396); keep y unchanged. Do not apply this transform to the outer contour or any other part. Preserve the full original canvas and margins. Output only the edited hood with real transparent alpha inside and outside, neutral grayscale suitable for tinting. No face, head, skin, mannequin, body, shirt, background, text, logos or new elements.
+```
+
+#### Edit 2
+
+```text
+Use case: precise-object-edit. EDIT TARGET: the attached transparent grayscale hood sprite. This is a tiny calibration of the inner hole only.
+Reduce ONLY the WIDTH of its transparent FACE OPENING by THREE PERCENT (multiply its current width by 0.97), symmetrically around the centerline. This is a barely perceptible adjustment, around 1-2 pixels on each side at avatar size. Move only the inner fabric edges slightly inward with soft antialiasing. Keep the opening's height and its top and bottom positions EXACTLY unchanged.
+LOCK the existing OUTER silhouette, hood size, every exterior fold and texture, upper dome, center seam, collar, eyelets and cords. Do not alter the outer boundary or resize/reposition/crop the hood. Keep all unaffected pixels as close as possible to the reference. No redesign. Same grayscale cotton and lighting. Same full transparent canvas and margins. Output the single edited hood only, with actual transparency outside it and inside the face opening. No person, face, head, skin, body, background, text or new objects.
+```
 
 ### Narrower fit and vertical placement
 

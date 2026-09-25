@@ -231,11 +231,12 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, aboveSubview: bodyImgView)
         case .Hairband, .Crown, .KungFuHeadband:
             insertSubview(additionImgView, aboveSubview: hairView)
-        case .Bandana:
+        case .Bandana, .Hood:
+            // Facial hair lies over the fabric at the jaw and neck.
             insertSubview(additionImgView, belowSubview: facialHairImgView)
         case .GoldChain, .GoldEarring, .DiamondEarrings, .BowTie, .Tie, .Scarf, .DiceChain, .GoldMedal, .SilverBlackNecklace:
             insertSubview(additionImgView, belowSubview: hairView)
-        case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing, .Hood:
+        case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
             insertSubview(additionImgView, aboveSubview: glassesView)
         }
     }
