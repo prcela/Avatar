@@ -30,6 +30,7 @@ public class AvatarEditorViewController: UIViewController {
     private let partLabel = UILabel()
     private let proportionsStack = UIStackView()
     private let colorsSection = UIStackView()
+    private lazy var colorsTitle = sectionLabel("")
     private let jerseySection = UIStackView()
     private let jerseyNumberButton = UIButton(type: .system)
     private let jerseyLogoHint = UILabel()
@@ -37,6 +38,7 @@ public class AvatarEditorViewController: UIViewController {
     private let colorsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var symbolsHeight: NSLayoutConstraint!
     private var previewHeight: NSLayoutConstraint!
+    private var needsColorRefresh = false
 
     public required init() {
         super.init(nibName: nil, bundle: nil)
@@ -109,7 +111,7 @@ public class AvatarEditorViewController: UIViewController {
         configureCollections()
         colorsSection.axis = .vertical
         colorsSection.spacing = 8
-        colorsSection.addArrangedSubview(sectionLabel(NSLocalizedString("Avatar color", value: "Color", comment: "Avatar editor")))
+        colorsSection.addArrangedSubview(colorsTitle)
         colorsSection.addArrangedSubview(colorsCollectionView)
         contentStack.addArrangedSubview(colorsSection)
 
@@ -211,6 +213,29 @@ public class AvatarEditorViewController: UIViewController {
             let height = layout.collectionViewContentSize.height
             if symbolsHeight.constant != height { symbolsHeight.constant = height }
         }
+        refreshColorsAfterLayout()
+    }
+
+    private func refreshColorsAfterLayout() {
+        guard needsColorRefresh else { return }
+        // A hidden stack section collapses the collection to zero height.
+        // Restore its bounds before rebuilding the flow layout or scrolling
+        // to the selected color, including the first None -> Kurt selection.
+        contentStack.layoutIfNeeded()
+        colorsSection.layoutIfNeeded()
+        if showsColors {
+            guard colorsCollectionView.bounds.width > 0,
+                  colorsCollectionView.bounds.height >= 52 else { return }
+        }
+        needsColorRefresh = false
+        colorsCollectionView.reloadData()
+        colorsCollectionView.collectionViewLayout.invalidateLayout()
+        guard showsColors else { return }
+        colorsCollectionView.layoutIfNeeded()
+        if let color = avatar.colorIndex(for: selectedPart),
+           color >= 0, color < colorsCollectionView.numberOfItems(inSection: 0) {
+            colorsCollectionView.selectItem(at: IndexPath(item: color, section: 0), animated: false, scrollPosition: .centeredHorizontally)
+        }
     }
 
     private func configureCollections() {
@@ -283,6 +308,7 @@ public class AvatarEditorViewController: UIViewController {
     }
 
     private var showsColors: Bool {
+        if selectedPart == .Glasses { return avatar.glasses.supportsFrameColor }
         if selectedPart == .Addition { return avatar.addition.usesColor }
         if selectedPart == .Clothing { return avatar.clothing.usesColor }
         return !selectedPart.colors().isEmpty
@@ -290,13 +316,14 @@ public class AvatarEditorViewController: UIViewController {
 
     private func reloadPart() {
         partLabel.text = partTitle(selectedPart)
+        colorsTitle.text = selectedPart == .Glasses
+            ? NSLocalizedString("Avatar frame color", value: "Frame color", comment: "Glasses frame color")
+            : NSLocalizedString("Avatar color", value: "Color", comment: "Avatar editor")
         configureProportions()
         colorsSection.isHidden = !showsColors
         updateJerseyNumberMenu()
         symbolsCollectionView.reloadData()
-        colorsCollectionView.reloadData()
         selectCurrentItems()
-        view.setNeedsLayout()
     }
 
     private func selectCurrentItems() {
@@ -305,9 +332,8 @@ public class AvatarEditorViewController: UIViewController {
         if let symbolIndex {
             symbolsCollectionView.selectItem(at: IndexPath(item: symbolIndex, section: 0), animated: false, scrollPosition: [])
         }
-        if showsColors, let color = avatar.colorIndex(for: selectedPart) {
-            colorsCollectionView.selectItem(at: IndexPath(item: color, section: 0), animated: false, scrollPosition: .centeredHorizontally)
-        }
+        needsColorRefresh = true
+        view.setNeedsLayout()
     }
 
     private func configureProportions() {
@@ -468,7 +494,12 @@ extension AvatarEditorViewController: UICollectionViewDataSource, UICollectionVi
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath) as! AvatarEditorOptionCell
         if collectionView == colorsCollectionView {
             let label = String(format: NSLocalizedString("Avatar color number", value: "Color %d", comment: "Avatar color accessibility"), indexPath.item + 1)
-            cell.configure(image: nil, caption: nil, color: selectedPart.colors()[indexPath.item], label: label)
+            if selectedPart == .Glasses && indexPath.item == 0 {
+                let original = NSLocalizedString("Avatar original color", value: "Original", comment: "Original glasses frame color")
+                cell.configure(image: UIImage(systemName: "arrow.counterclockwise"), caption: original, color: nil, label: original)
+            } else {
+                cell.configure(image: nil, caption: nil, color: selectedPart.colors()[indexPath.item], label: label)
+            }
         } else if selectedPart == .Skin {
             let type = bodyTypes[indexPath.item]
             let copy = Avatar.decompress(value: avatar.legacyAvatarId, hexId: avatar.compressHex())
@@ -478,7 +509,7 @@ extension AvatarEditorViewController: UICollectionViewDataSource, UICollectionVi
             cell.configure(image: image, caption: title, color: nil, label: title)
         } else {
             let symbol = selectedPart.symbols()[indexPath.item]
-            let image = symbol.image()
+            let image = (symbol as? Avatar.Glasses)?.image(colorIndex: avatar.glassesColorIdx) ?? symbol.image()
             let none = NSLocalizedString("Avatar none", value: "None", comment: "Avatar style")
             let label = String(format: NSLocalizedString("Avatar style number", value: "%@, style %d", comment: "Avatar style accessibility"), partTitle(selectedPart), indexPath.item + 1)
             cell.configure(image: image ?? UIImage(systemName: "nosign"), caption: image == nil ? none : nil,
@@ -491,7 +522,7 @@ extension AvatarEditorViewController: UICollectionViewDataSource, UICollectionVi
         UISelectionFeedbackGenerator().selectionChanged()
         if collectionView == colorsCollectionView {
             avatar.set(part: selectedPart, colorIdx: indexPath.item)
-            if selectedPart == .Skin {
+            if selectedPart == .Skin || selectedPart == .Glasses {
                 symbolsCollectionView.reloadData()
                 selectCurrentItems()
             }
@@ -502,7 +533,6 @@ extension AvatarEditorViewController: UICollectionViewDataSource, UICollectionVi
                 avatar.set(part: selectedPart, symbol: selectedPart.symbols()[indexPath.item])
             }
             colorsSection.isHidden = !showsColors
-            colorsCollectionView.reloadData()
             updateJerseyNumberMenu()
             selectCurrentItems()
         }

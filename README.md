@@ -151,7 +151,7 @@ Use the editor, views, and image cache on the main thread. The cache keys images
 
 ## How many avatars are possible?
 
-The current catalog supports **2,394,815,603,007,360,484,224,000 human-avatar configurations** (approximately **2.39 x 10^24**) when all supported option values are combined.
+The current catalog supports **38,317,049,648,117,767,747,584,000 human-avatar configurations** (approximately **3.83 x 10^25**) when all supported option values are combined.
 
 | Option | Choices |
 | --- | ---: |
@@ -165,19 +165,19 @@ The current catalog supports **2,394,815,603,007,360,484,224,000 human-avatar co
 | Facial hair x colors | 13 x 28 |
 | Clothing x colors | 34 x 26 |
 | Shirt logos | 27 |
-| Glasses | 21 |
+| Glasses x frame colors | 21 x 16 |
 | Accessories x colors | 23 x 26 |
 | Jersey number settings | 101 (none, plus 0...99) |
 
 ```text
 5 x 9 x (18 x 3 x 3) x 14 x (5 x 3) x (26 x 3)
-  x (65 x 28) x (13 x 28) x (34 x 26) x 27 x 21 x (23 x 26) x 101
-= 2,394,815,603,007,360,484,224,000
+  x (65 x 28) x (13 x 28) x (34 x 26) x 27 x (21 x 16) x (23 x 26) x 101
+= 38,317,049,648,117,767,747,584,000
 ```
 
-This is a count of **stored configurations, not distinct rendered images**. It includes independent values that can be hidden or inactive: hair color with no hair, colors on fixed-color garments, numbers on non-jerseys, a logo hidden by a jersey number, or facial features covered by an accessory. `None` is included where available; retired and reserved choices are excluded. The editor only exposes contextual controls when they apply.
+This is a count of **stored configurations, not distinct rendered images**. It includes independent values that can be hidden or inactive: hair color with no hair, frame color with no glasses or a fixed-color model, colors on fixed-color garments, numbers on non-jerseys, a logo hidden by a jersey number, or facial features covered by an accessory. `None` is included where available; retired and reserved choices are excluded. The editor only exposes contextual controls when they apply.
 
-The optional bot skin mode doubles the stored configuration count to **4,789,631,206,014,720,968,448,000**. It is outside the human editor's body choices and renders as a bot only when `UIAvatarView.enableBots` is enabled. The full 128-bit format has `2^128` possible bit patterns, but reserved patterns are **not** additional supported avatar options.
+The optional bot skin mode doubles the stored configuration count to **76,634,099,296,235,535,495,168,000**. It is outside the human editor's body choices and renders as a bot only when `UIAvatarView.enableBots` is enabled. The full 128-bit format has `2^128` possible bit patterns, but reserved patterns are **not** additional supported avatar options.
 
 ## ID format and advanced use
 
@@ -199,3 +199,15 @@ Use supported catalog values when changing raw fields. See [the hex ID reference
 ## In use
 
 See the avatars in [Yamb on the App Store](https://apps.apple.com/us/app/yamb/id354188615). A Kotlin implementation is also used on Android; contact us through **Yamb > More > Contact us** for details.
+
+## Glasses frame colors
+
+The 17 tintable glasses styles support `avatar.glassesColorIdx`: 0 keeps the
+model's original color, and 1...15 select the shared frame palette. Lenses retain
+their colors, opacity and reflections. Ski Goggles, Monocle and Future Visor
+always use their original artwork and colors. The editor shows **Frame color**
+only for tintable models, with an **Original** option to reset the color.
+
+The setting uses high-word bits 39...43. Values 16...31 are reserved and survive
+unrelated edits. Bits 44...63 (20 bits) remain available. See
+[glasses artwork and palette](Docs/glasses-frame-colors.md).

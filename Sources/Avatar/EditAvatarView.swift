@@ -94,7 +94,7 @@ public class EditAvatarView : UIView {
             browPairView.update(image: avatar.eyebrow.image(),
                 offset: (avatar.bodyType.scaleX - 1) * 20 + avatar.eyeSpacing.offset, scale: 1)
         }
-        glassesView.image = avatar.glasses.image()
+        glassesView.image = avatar.glasses.image(colorIndex: avatar.glassesColorIdx)
         // Follow 60% of the body width change to keep lenses closer to the eyes.
         let glassesScaleX = 1 + (avatar.bodyType.scaleX - 1) * 0.6
         let glassesTransform = CGAffineTransform(scaleX: glassesScaleX, y: 1)
@@ -213,6 +213,10 @@ public class EditAvatarView : UIView {
                 .scaledBy(x: 1.04, y: 1.1)
         }
         clothingLogoImgView.image = avatar.shirtMarkImage()
+        if !avatar.clothing.isJersey || !(1...100).contains(avatar.jerseyNumber) {
+            // Place the logo on the viewer's right, following the chest width.
+            clothingLogoImgView.transform = CGAffineTransform(translationX: 36 * avatar.bodyType.scaleX, y: 0)
+        }
         
         switch avatar.addition {
         case .None:

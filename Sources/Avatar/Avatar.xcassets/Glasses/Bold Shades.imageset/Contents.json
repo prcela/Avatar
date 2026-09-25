@@ -6,10 +6,12 @@
       "scale" : "1x"
     },
     {
+      "filename" : "Bold Shades@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "Bold Shades@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

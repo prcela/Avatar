@@ -75,6 +75,9 @@ public class Avatar {
     var additionColorIdx = 0 {
         didSet { loadedHexID?.additionColor = additionColorIdx }
     }
+    public var glassesColorIdx = 0 {
+        didSet { loadedHexID?.glassesColor = glassesColorIdx }
+    }
     var jerseyNumber = 0 {
         didSet { loadedHexID?.jerseyNumber = jerseyNumber }
     }
@@ -304,6 +307,17 @@ public class Avatar {
         
         case Monocle
         case FutureVisor
+
+        var supportsFrameColor: Bool {
+            switch self {
+            case .None, .SkiGoggles, .Monocle, .FutureVisor: return false
+            default: return true
+            }
+        }
+
+        func image(colorIndex: Int) -> UIImage? {
+            AvatarGlassesStyle.image(for: self, colorIndex: colorIndex)
+        }
 
         func image() -> UIImage? {
             switch self {
@@ -1252,6 +1266,25 @@ public class Avatar {
                     UIColor(netHex: 0xff2B936B), // Emerald
                     UIColor(netHex: 0xff96DCC2)  // Mint
                 ]
+            case .Glasses:
+                // Index zero is the original color; append new colors only.
+                return [.clear,
+                    UIColor(netHex: 0xff242A30),
+                    UIColor(netHex: 0xff59616B),
+                    UIColor(netHex: 0xffBFC8D2),
+                    UIColor(netHex: 0xffF4F3ED),
+                    UIColor(netHex: 0xffD9AC48),
+                    UIColor(netHex: 0xffB9754E),
+                    UIColor(netHex: 0xff674431),
+                    UIColor(netHex: 0xffDB4549),
+                    UIColor(netHex: 0xffED76AC),
+                    UIColor(netHex: 0xff8653B9),
+                    UIColor(netHex: 0xff263D63),
+                    UIColor(netHex: 0xff3A84D6),
+                    UIColor(netHex: 0xff3AB8BB),
+                    UIColor(netHex: 0xff478E69),
+                    UIColor(netHex: 0xffEC963E)
+                ]
             case .Addition:
                 return Part.Clothing.colors()
             case .Clothing:
@@ -1356,6 +1389,8 @@ public class Avatar {
             hairColorIdx = colorIdx
         case .FacialHair:
             facialHairColorIdx = colorIdx
+        case .Glasses:
+            glassesColorIdx = colorIdx
         case .Addition:
             additionColorIdx = colorIdx
         case .Clothing:
@@ -1485,6 +1520,7 @@ public class Avatar {
             result.eyeSize = eyeSize.rawValue
             result.mouthWidth = mouthWidth.rawValue
             result.noseSize = noseSize.rawValue
+            result.glassesColor = glassesColorIdx
         }
         return result.hex
     }
@@ -1528,6 +1564,7 @@ public class Avatar {
         avatar.eyeSize = FeatureSize(rawValue: hex.eyeSize) ?? .normal
         avatar.mouthWidth = FeatureSize(rawValue: hex.mouthWidth) ?? .normal
         avatar.noseSize = FeatureSize(rawValue: hex.noseSize) ?? .normal
+        avatar.glassesColorIdx = Part.Glasses.colors().indices.contains(hex.glassesColor) ? hex.glassesColor : 0
         // Keep unknown future values and reserved bits when editing another part.
         avatar.loadedValues = avatar.fieldValues
         avatar.loadedHexID = hex
@@ -1569,6 +1606,8 @@ public class Avatar {
             return hairColorIdx
         case .FacialHair:
             return facialHairColorIdx
+        case .Glasses:
+            return glassesColorIdx
         case .Addition:
             return additionColorIdx
         case .Clothing:
@@ -1593,7 +1632,7 @@ protocol AvatarSymbol: Any {
 }
 
 private extension UIImage {
-    func avatarTinted(_ color: UIColor) -> UIImage {
+    public func avatarTinted(_ color: UIColor) -> UIImage {
         let bounds = CGRect(origin: .zero, size: size)
         let format = UIGraphicsImageRendererFormat()
         format.scale = scale

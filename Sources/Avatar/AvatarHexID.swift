@@ -102,6 +102,15 @@ public struct AvatarHexID: Equatable, Hashable {
         set { setProportion(newValue, at: 37) }
     }
 
+    /// High-word bits 39...43; zero keeps the model's original frame color.
+    public var glassesColor: Int {
+        get { Int((high >> 39) & 31) }
+        set {
+            precondition((0...31).contains(newValue))
+            high = (high & ~(UInt64(31) << 39)) | (UInt64(newValue) << 39)
+        }
+    }
+
     private func proportion(at offset: Int) -> Int {
         Int((high >> offset) & 3)
     }

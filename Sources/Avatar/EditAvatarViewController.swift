@@ -296,7 +296,8 @@ extension EditAvatarViewController: UICollectionViewDataSource {
             } else {
                 let symbol = part.symbols()[indexPath.row]
                 let config = UIImage.SymbolConfiguration(scale: .large)
-                cell.img.image = symbol.image() ?? UIImage(systemName: "xmark")?.applyingSymbolConfiguration(config)
+                cell.img.image = (symbol as? Avatar.Glasses)?.image(colorIndex: avatar.glassesColorIdx)
+                    ?? symbol.image() ?? UIImage(systemName: "xmark")?.applyingSymbolConfiguration(config)
                 cell.setCaption(nil)
             }
             // Selection styling
@@ -312,6 +313,19 @@ extension EditAvatarViewController: UICollectionViewDataSource {
             // colors
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath)
             cell.contentView.backgroundColor = part.colors()[indexPath.row]
+            let original = part == .Glasses && indexPath.row == 0
+            cell.contentView.subviews.filter { $0.tag == 7319 }.forEach { $0.removeFromSuperview() }
+            if original {
+                let label = UILabel(frame: cell.contentView.bounds)
+                label.tag = 7319
+                label.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                label.text = NSLocalizedString("Avatar original color", value: "Original", comment: "Original glasses frame color")
+                label.font = .systemFont(ofSize: 10)
+                label.textAlignment = .center
+                label.adjustsFontSizeToFitWidth = true
+                cell.contentView.addSubview(label)
+                cell.contentView.backgroundColor = .secondarySystemBackground
+            }
             cell.contentView.layer.cornerRadius = 8
             cell.contentView.layer.masksToBounds = true
             if collectionView.indexPathsForSelectedItems?.contains(indexPath) == true {
@@ -330,6 +344,7 @@ extension EditAvatarViewController: UICollectionViewDataSource {
         case symbolsCollectionView:
             return part == .Skin ? bodyTypes.count : part.symbols().count
         default:
+            if part == .Glasses && !avatar.glasses.supportsFrameColor { return 0 }
             if part == .Addition && !avatar.addition.usesColor { return 0 }
             if part == .Clothing && !avatar.clothing.usesColor { return 0 }
             return part.colors().count
@@ -358,6 +373,7 @@ extension EditAvatarViewController: UICollectionViewDelegate {
             updateJerseyNumberMenu()
         default:
             avatar.set(part: part, colorIdx: indexPath.row)
+            if part == .Glasses { symbolsCollectionView.reloadData() }
             if part == .Skin {
                 symbolsCollectionView.reloadData()
                 selectCurrentItemsIfPossible()
