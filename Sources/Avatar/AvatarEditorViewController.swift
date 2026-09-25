@@ -12,7 +12,7 @@ public class AvatarEditorViewController: UIViewController {
     private let groups: [[Avatar.Part]] = [
         [.Skin, .Eyes, .Eyebrow, .Nose, .Mouth],
         [.Hair, .FacialHair],
-        [.Clothing, .ClothLogo, .Glasses, .Addition]
+        [.Clothing, .Glasses, .Addition, .ClothLogo]
     ]
     private let bodyTypes: [Avatar.BodyType] = [.verySlim, .slim, .normal, .broad, .veryBroad]
     private let sizes: [Avatar.FeatureSize] = [.small, .normal, .large]
