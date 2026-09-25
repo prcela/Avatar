@@ -801,8 +801,10 @@ public class Avatar {
             }
         }
 
-        func image(color: UIColor) -> UIImage? {
-            guard let original = usesColor ? image()?.avatarTinted(color) : image() else { return nil }
+        func image(color: UIColor, raisedHood: Bool = false) -> UIImage? {
+            let source = self == .Hoodie && raisedHood
+                ? UIImage(named: "HoodieRaised", in: .module, compatibleWith: nil) : image()
+            guard let original = usesColor ? source?.avatarTinted(color) : source else { return nil }
             guard verticalOffset != 0 else { return original }
             let format = UIGraphicsImageRendererFormat()
             format.scale = original.scale
@@ -954,6 +956,7 @@ public class Avatar {
         case DiceChain
         case GoldMedal
         case SilverBlackNecklace
+        case Hood = 23
 
         func image() -> UIImage? {
             switch self {
@@ -1003,12 +1006,25 @@ public class Avatar {
                 return UIImage(named: "GoldMedal", in: .module, compatibleWith: .current)
             case .SilverBlackNecklace:
                 return UIImage(named: "SilverBlackNecklace", in: .module, compatibleWith: .current)
+            case .Hood:
+                return UIImage(named: "Hood", in: .module, compatibleWith: .current)
             }
         }
 
-        var usesColor: Bool { self == .BowTie || self == .Tie || self == .Scarf }
+        var usesColor: Bool { self == .BowTie || self == .Tie || self == .Scarf || self == .Hood }
 
         func avatarImage(color: UIColor? = nil) -> UIImage? {
+            if self == .Hood {
+                guard let fabric = image() else { return nil }
+                let shadow = UIImage(named: "HoodShadow", in: .module, compatibleWith: nil)
+                let format = UIGraphicsImageRendererFormat()
+                format.scale = fabric.scale
+                return UIGraphicsImageRenderer(size: fabric.size, format: format).image { _ in
+                    // Only fabric receives color; the shadow over the face stays neutral.
+                    shadow?.draw(at: .zero)
+                    (color.map { fabric.avatarTinted($0) } ?? fabric).draw(at: .zero)
+                }.withRenderingMode(.alwaysOriginal)
+            }
             let frames: [CGRect]
             switch self {
             case .Crown:
@@ -1631,7 +1647,7 @@ protocol AvatarSymbol: Any {
     var rawValue: Int { get }
 }
 
-private extension UIImage {
+public extension UIImage {
     public func avatarTinted(_ color: UIColor) -> UIImage {
         let bounds = CGRect(origin: .zero, size: size)
         let format = UIGraphicsImageRendererFormat()

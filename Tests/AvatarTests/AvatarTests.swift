@@ -479,3 +479,52 @@ extension AvatarTests {
         }
     }
 }
+
+extension AvatarTests {
+    func testHoodRoundTripsWithColorAndPreservesOtherFields() throws {
+        for body in Avatar.BodyType.allCases {
+            for color in Avatar.Part.Addition.colors().indices {
+                let avatar = Avatar.decompress(value: 0, hexId: "8000004cc00000000c8849616c39285a")
+                var expected = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+                avatar.set(part: .Addition, symbol: Avatar.Addition.Hood)
+                avatar.set(part: .Addition, colorIdx: color)
+                avatar.bodyType = body
+                expected[.addition] = 23
+                expected.additionColor = color
+                expected.bodyType = body.rawValue
+                XCTAssertEqual(avatar.compressHex(), expected.hex)
+                let restored = Avatar.decompress(value: avatar.legacyAvatarId, hexId: expected.hex)
+                XCTAssertEqual(restored.addition, .Hood)
+                XCTAssertTrue(restored.addition.usesColor)
+                XCTAssertEqual(restored.additionColorIdx, color)
+                XCTAssertEqual(restored.compressHex(), expected.hex)
+            }
+        }
+    }
+
+    @MainActor
+    func testRemovingHoodRestoresHairAndOriginalHoodie() throws {
+        let view = try XCTUnwrap(Bundle.module.loadNibNamed("EditAvatarView", owner: nil)?.first as? EditAvatarView)
+        let avatar = Avatar.decompress(value: legacy)
+        avatar.set(part: .Addition, symbol: Avatar.Addition.None)
+        avatar.set(part: .Clothing, symbol: Avatar.Clothing.Hoodie)
+        view.avatar = avatar
+        view.layoutIfNeeded()
+        for hair in [Avatar.Hair.LongWavy, .CowboyHat] {
+            avatar.set(part: .Hair, symbol: hair)
+            view.update()
+            let original = try XCTUnwrap(view.image()?.pngData())
+            avatar.set(part: .Addition, symbol: Avatar.Addition.Hood)
+            view.update()
+            XCTAssertTrue(view.hairView.isHidden)
+            XCTAssertEqual(avatar.hair, hair)
+            XCTAssertNotNil(view.additionImgView.image)
+            XCTAssertNotEqual(view.image()?.pngData(), original)
+            avatar.set(part: .Addition, symbol: Avatar.Addition.None)
+            view.update()
+            XCTAssertFalse(view.hairView.isHidden)
+            XCTAssertEqual(avatar.hair, hair)
+            XCTAssertEqual(view.image()?.pngData(), original)
+        }
+    }
+}

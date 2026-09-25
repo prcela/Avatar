@@ -47,6 +47,10 @@ public class EditAvatarView : UIView {
             avatar.skinColorIdx = 0
         }
         let isBot = avatar.skin == .Bot && UIAvatarView.enableBots
+        // Tuck hair and headwear under the hood without changing the saved style.
+        let wearsHood = avatar.addition == .Hood
+        hairView.isHidden = wearsHood
+        hairBackingView.isHidden = wearsHood
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         let bodyImage = isBot ? avatar.skin.image()
             : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
@@ -182,7 +186,7 @@ public class EditAvatarView : UIView {
         if avatar.clothingColorIdx >= clothingColors.count {
             avatar.clothingColorIdx = 0
         }
-        clothingImgView.image = avatar.clothing.image(color: clothingColors[avatar.clothingColorIdx])
+        clothingImgView.image = avatar.clothing.image(color: clothingColors[avatar.clothingColorIdx], raisedHood: wearsHood)
         clothingImgView.tintColor = clothingColors[avatar.clothingColorIdx]
         let additionColors = Avatar.Part.Addition.colors()
         let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
@@ -231,7 +235,7 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, belowSubview: facialHairImgView)
         case .GoldChain, .GoldEarring, .DiamondEarrings, .BowTie, .Tie, .Scarf, .DiceChain, .GoldMedal, .SilverBlackNecklace:
             insertSubview(additionImgView, belowSubview: hairView)
-        case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
+        case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing, .Hood:
             insertSubview(additionImgView, aboveSubview: glassesView)
         }
     }
