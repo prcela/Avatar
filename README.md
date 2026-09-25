@@ -199,15 +199,3 @@ Use supported catalog values when changing raw fields. See [the hex ID reference
 ## In use
 
 See the avatars in [Yamb on the App Store](https://apps.apple.com/us/app/yamb/id354188615). A Kotlin implementation is also used on Android; contact us through **Yamb > More > Contact us** for details.
-
-## Glasses frame colors
-
-The 17 tintable glasses styles support `avatar.glassesColorIdx`: 0 keeps the
-model's original color, and 1...15 select the shared frame palette. Lenses retain
-their colors, opacity and reflections. Ski Goggles, Monocle and Future Visor
-always use their original artwork and colors. The editor shows **Frame color**
-only for tintable models, with an **Original** option to reset the color.
-
-The setting uses high-word bits 39...43. Values 16...31 are reserved and survive
-unrelated edits. Bits 44...63 (20 bits) remain available. See
-[glasses artwork and palette](Docs/glasses-frame-colors.md).
