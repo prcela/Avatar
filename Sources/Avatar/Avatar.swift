@@ -957,6 +957,7 @@ public class Avatar {
         case GoldMedal
         case SilverBlackNecklace
         case Hood = 23
+        case BodyHair = 24
 
         func image() -> UIImage? {
             switch self {
@@ -1008,6 +1009,8 @@ public class Avatar {
                 return UIImage(named: "SilverBlackNecklace", in: .module, compatibleWith: .current)
             case .Hood:
                 return UIImage(named: "Hood", in: .module, compatibleWith: .current)
+            case .BodyHair:
+                return UIImage(named: "BodyHair", in: .module, compatibleWith: .current)
             }
         }
 

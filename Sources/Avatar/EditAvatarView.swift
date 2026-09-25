@@ -54,7 +54,7 @@ public class EditAvatarView : UIView {
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         let bodyImage = isBot ? avatar.skin.image()
             : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
-        bodyImgView.image = bodyImageForClothing(bodyImage)
+        bodyImgView.image = bodyImageForClothing(bodyImageWithHair(bodyImage, isBot: isBot))
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
@@ -190,7 +190,8 @@ public class EditAvatarView : UIView {
         clothingImgView.tintColor = clothingColors[avatar.clothingColorIdx]
         let additionColors = Avatar.Part.Addition.colors()
         let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
-        additionImgView.image = avatar.addition.avatarImage(color: additionColor)
+        // Body hair belongs to the skin layer, beneath every garment.
+        additionImgView.image = avatar.addition == .BodyHair ? nil : avatar.addition.avatarImage(color: additionColor)
         if avatar.addition == .Crown && avatar.hair != .None && avatar.hair != .Eyepatch {
             // Leave bald heads at the base position; make room for hair or headwear.
             additionImgView.transform = bodyTransform.translatedBy(x: 0, y: -8)
@@ -223,7 +224,7 @@ public class EditAvatarView : UIView {
         }
         
         switch avatar.addition {
-        case .None:
+        case .None, .BodyHair:
             break
         case .Blazer:
             insertSubview(additionImgView, aboveSubview: clothingImgView)
@@ -239,6 +240,24 @@ public class EditAvatarView : UIView {
         case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
             insertSubview(additionImgView, aboveSubview: glassesView)
         }
+    }
+
+    private func bodyImageWithHair(_ image: UIImage?, isBot: Bool) -> UIImage? {
+        guard avatar.addition == .BodyHair, !isBot,
+              let image, let hair = Avatar.Addition.BodyHair.image() else { return image }
+        let colors = Avatar.Part.Hair.colors()
+        let color = colors[colors.indices.contains(avatar.hairColorIdx) ? avatar.hairColorIdx : 0]
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+            image.draw(at: .zero)
+            // Body-local y=166 is avatar y=202, safely below the face and neck.
+            // Source-atop keeps the original skin alpha, including shoulder edges.
+            let frame = CGRect(x: 0, y: image.size.height * 166 / 244,
+                               width: image.size.width, height: image.size.height * 78 / 244)
+            hair.withTintColor(color, renderingMode: .alwaysOriginal)
+                .draw(in: frame, blendMode: .sourceAtop, alpha: 1)
+        }.withRenderingMode(.alwaysOriginal)
     }
 
     private func bodyImageForClothing(_ image: UIImage?) -> UIImage? {

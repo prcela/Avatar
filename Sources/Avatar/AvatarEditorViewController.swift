@@ -10,7 +10,8 @@ public class AvatarEditorViewController: UIViewController {
     public var avatar = Avatar()
 
     private let groups: [[Avatar.Part]] = [
-        [.Skin, .Eyes, .Eyebrow, .Nose, .Mouth],
+        [.Skin],
+        [.Eyes, .Eyebrow, .Nose, .Mouth],
         [.Hair, .FacialHair],
         [.Clothing, .Glasses, .Addition, .ClothLogo]
     ]
@@ -18,8 +19,8 @@ public class AvatarEditorViewController: UIViewController {
     private let sizes: [Avatar.FeatureSize] = [.small, .normal, .large]
     private let spacings: [Avatar.EyeSpacing] = [.narrow, .normal, .wide]
     private var selectedPart: Avatar.Part = .Eyes
-    private var selectedGroup = 0
-    private var rememberedParts: [Avatar.Part] = [.Eyes, .Hair, .Clothing]
+    private var selectedGroup = 1 // Keep Face as the initial category.
+    private var rememberedParts: [Avatar.Part] = [.Skin, .Eyes, .Hair, .Clothing]
 
     private let preview = UIImageView()
     private let groupControl = UISegmentedControl()
@@ -38,6 +39,8 @@ public class AvatarEditorViewController: UIViewController {
     private let colorsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var symbolsHeight: NSLayoutConstraint!
     private var previewHeight: NSLayoutConstraint!
+    private var partButtonsMinimumHeight: NSLayoutConstraint!
+    private var partButtonsCollapsedHeight: NSLayoutConstraint!
     private var needsColorRefresh = false
 
     public required init() {
@@ -79,6 +82,7 @@ public class AvatarEditorViewController: UIViewController {
         preview.layer.cornerRadius = 18
 
         for (index, name) in [
+            partTitle(.Skin),
             NSLocalizedString("Avatar group face", value: "Face", comment: "Avatar editor group"),
             NSLocalizedString("Avatar group hair", value: "Hair", comment: "Avatar editor group"),
             NSLocalizedString("Avatar group style", value: "Style", comment: "Avatar editor group")
@@ -146,6 +150,8 @@ public class AvatarEditorViewController: UIViewController {
         let safeArea = view.safeAreaLayoutGuide
         previewHeight = preview.heightAnchor.constraint(equalToConstant: 180)
         symbolsHeight = symbolsCollectionView.heightAnchor.constraint(equalToConstant: 100)
+        partButtonsMinimumHeight = partStack.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
+        partButtonsCollapsedHeight = partStack.heightAnchor.constraint(equalToConstant: 0)
         // Hidden stack sections must be able to collapse their fixed-height children.
         let colorsHeight = colorsCollectionView.heightAnchor.constraint(equalToConstant: 52)
         colorsHeight.priority = UILayoutPriority(999)
@@ -170,7 +176,7 @@ public class AvatarEditorViewController: UIViewController {
             partStack.leadingAnchor.constraint(equalTo: partScrollView.contentLayoutGuide.leadingAnchor),
             partStack.trailingAnchor.constraint(equalTo: partScrollView.contentLayoutGuide.trailingAnchor),
             partStack.heightAnchor.constraint(equalTo: partScrollView.frameLayoutGuide.heightAnchor),
-            partStack.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
+            partButtonsMinimumHeight,
             scrollView.topAnchor.constraint(equalTo: partScrollView.bottomAnchor, constant: 12),
             scrollView.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
@@ -283,7 +289,18 @@ public class AvatarEditorViewController: UIViewController {
 
     private func rebuildPartButtons() {
         partStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        for part in groups[selectedGroup] {
+        let parts = groups[selectedGroup]
+        let showsPartButtons = parts.count > 1
+        // A single-part category opens its settings directly, without a duplicate tab.
+        partScrollView.isHidden = !showsPartButtons
+        NSLayoutConstraint.deactivate([partButtonsMinimumHeight, partButtonsCollapsedHeight])
+        if showsPartButtons {
+            partButtonsMinimumHeight.isActive = true
+        } else {
+            partButtonsCollapsedHeight.isActive = true
+        }
+        guard showsPartButtons else { return }
+        for part in parts {
             let button = UIButton(type: .system)
             var config: UIButton.Configuration = part == selectedPart ? .filled() : .tinted()
             config.title = partTitle(part)

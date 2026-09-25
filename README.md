@@ -198,7 +198,7 @@ Use supported catalog values when changing raw fields. See [the hex ID reference
 
 ## How many avatars are possible?
 
-The current catalog supports **39,983,008,328,470,714,171,392,000 human-avatar configurations** (approximately **4.00 x 10^25**) when all supported option values are combined.
+The current catalog supports **41,648,967,008,823,660,595,200,000 human-avatar configurations** (approximately **4.16 x 10^25**) when all supported option values are combined.
 
 | Option | Choices |
 | --- | ---: |
@@ -213,18 +213,18 @@ The current catalog supports **39,983,008,328,470,714,171,392,000 human-avatar c
 | Clothing x colors | 34 x 26 |
 | Shirt logos | 27 |
 | Glasses x frame colors | 21 x 16 |
-| Accessories x colors | 24 x 26 |
+| Accessories x colors | 25 x 26 |
 | Jersey number settings | 101 (none, plus 0...99) |
 
 ```text
 5 x 9 x (18 x 3 x 3) x 14 x (5 x 3) x (26 x 3)
-  x (65 x 28) x (13 x 28) x (34 x 26) x 27 x (21 x 16) x (24 x 26) x 101
-= 39,983,008,328,470,714,171,392,000
+  x (65 x 28) x (13 x 28) x (34 x 26) x 27 x (21 x 16) x (25 x 26) x 101
+= 41,648,967,008,823,660,595,200,000
 ```
 
-This is a count of **stored configurations, not distinct rendered images**. It includes independent values that can be hidden or inactive: hair color with no hair, frame color with no glasses or a fixed-color model, colors on fixed-color garments, numbers on non-jerseys, a logo hidden by a jersey number, or facial features covered by an accessory. `None` is included where available; retired and reserved choices are excluded. The editor only exposes contextual controls when they apply.
+This is a count of **stored configurations, not distinct rendered images**. It includes independent values that can be hidden or inactive: hair color with no hair, frame color with no glasses or a fixed-color model, colors on fixed-color garments, numbers on non-jerseys, a logo hidden by a jersey number, or facial features covered by an accessory. `None` is included where available; retired and reserved choices are excluded. The editor only exposes contextual controls when they apply. The body-hair accessory follows the hair color and stays below clothing, with the face and neck left clear.
 
-The optional bot skin mode doubles the stored configuration count to **79,966,016,656,941,428,342,784,000**. It is outside the human editor's body choices and renders as a bot only when `UIAvatarView.enableBots` is enabled. The full 128-bit format has `2^128` possible bit patterns, but reserved patterns are **not** additional supported avatar options.
+The optional bot skin mode doubles the stored configuration count to **83,297,934,017,647,321,190,400,000**. It is outside the human editor's body choices and renders as a bot only when `UIAvatarView.enableBots` is enabled. The full 128-bit format has `2^128` possible bit patterns, but reserved patterns are **not** additional supported avatar options.
 
 ## Android
 

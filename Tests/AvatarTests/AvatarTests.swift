@@ -481,6 +481,62 @@ extension AvatarTests {
 }
 
 extension AvatarTests {
+    func testBodyHairRoundTripsUsingExistingHairColorWithoutChangingOtherFields() throws {
+        for color in Avatar.Part.Hair.colors().indices {
+            let avatar = Avatar.decompress(value: 0, hexId: "8000004cc00000000c8849616c39285a")
+            var expected = try XCTUnwrap(AvatarHexID(avatar.compressHex()))
+            avatar.set(part: .Addition, symbol: Avatar.Addition.BodyHair)
+            avatar.set(part: .Hair, colorIdx: color)
+            expected[.addition] = 24
+            expected[.hairColor] = color
+            XCTAssertEqual(avatar.compressHex(), expected.hex)
+            let restored = Avatar.decompress(value: avatar.legacyAvatarId, hexId: expected.hex)
+            XCTAssertEqual(restored.addition, .BodyHair)
+            XCTAssertFalse(restored.addition.usesColor)
+            XCTAssertEqual(restored.hairColorIdx, color)
+            XCTAssertEqual(restored.additionColorIdx, expected.additionColor)
+            XCTAssertEqual(restored.compressHex(), expected.hex)
+        }
+    }
+
+    @MainActor
+    func testBodyHairLeavesFaceAndNeckUnchangedAndFollowsHairColor() throws {
+        let view = try XCTUnwrap(Bundle.module.loadNibNamed("EditAvatarView", owner: nil)?.first as? EditAvatarView)
+        let avatar = Avatar.decompress(value: legacy)
+        avatar.skin = .Normal
+        avatar.set(part: .Clothing, symbol: Avatar.Clothing.Undershirt)
+        avatar.set(part: .Hair, symbol: Avatar.Hair.None)
+        view.avatar = avatar
+        view.layoutIfNeeded()
+        func protectedPixels() throws -> Data {
+            let image = try XCTUnwrap(view.bodyImgView.image)
+            let crop = try XCTUnwrap(image.cgImage?.cropping(to: CGRect(
+                x: 0, y: 0, width: image.size.width * image.scale, height: 166 * image.scale)))
+            return try XCTUnwrap(UIImage(cgImage: crop).pngData())
+        }
+        for body in Avatar.BodyType.allCases {
+            avatar.bodyType = body
+            avatar.set(part: .Addition, symbol: Avatar.Addition.None)
+            view.update()
+            let original = try XCTUnwrap(view.bodyImgView.image?.pngData())
+            let protected = try protectedPixels()
+            avatar.set(part: .Addition, symbol: Avatar.Addition.BodyHair)
+            avatar.set(part: .Hair, colorIdx: 0)
+            view.update()
+            XCTAssertNil(view.additionImgView.image)
+            XCTAssertEqual(try protectedPixels(), protected)
+            let dark = try XCTUnwrap(view.bodyImgView.image?.pngData())
+            XCTAssertNotEqual(dark, original)
+            avatar.set(part: .Hair, colorIdx: 5)
+            view.update()
+            XCTAssertEqual(try protectedPixels(), protected)
+            XCTAssertNotEqual(view.bodyImgView.image?.pngData(), dark)
+            avatar.set(part: .Addition, symbol: Avatar.Addition.None)
+            view.update()
+            XCTAssertEqual(view.bodyImgView.image?.pngData(), original)
+        }
+    }
+
     func testHoodRoundTripsWithColorAndPreservesOtherFields() throws {
         for body in Avatar.BodyType.allCases {
             for color in Avatar.Part.Addition.colors().indices {
