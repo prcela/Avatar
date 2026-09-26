@@ -404,7 +404,7 @@ extension AvatarTests {
         XCTAssertEqual(avatar.eyeSize, .large)
         XCTAssertEqual(avatar.mouthWidth, .small)
         XCTAssertEqual(avatar.noseSize, .large)
-        // An unsupported clothing style must also survive an unrelated face edit.
+        // The extended clothing bit must also survive an unrelated face edit.
         avatar.eyeSpacing = .wide
         hex.eyeSpacing = 2
         XCTAssertEqual(avatar.compressHex(), hex.hex)

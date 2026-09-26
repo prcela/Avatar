@@ -53,10 +53,17 @@ public class EditAvatarView : UIView {
         let wearsHood = avatar.addition == .Hood
         hairView.isHidden = wearsHood
         hairBackingView.isHidden = wearsHood
+        // Keep selected facial features saved while costume fabric covers them.
+        let wearsNinjaMask = !wearsHood && avatar.hair == .NinjaHood
+        let wearsHelmet = !wearsHood && (avatar.hair == .MotorcycleHelmet || avatar.hair == .AstronautHelmet)
+        mouthImgView.isHidden = wearsNinjaMask || (!wearsHood && avatar.hair == .MotorcycleHelmet)
+        noseImgView.isHidden = wearsNinjaMask
+        facialHairImgView.isHidden = wearsNinjaMask || wearsHelmet
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         let bodyImage = isBot ? avatar.skin.image()
             : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
-        bodyImgView.image = bodyImageForClothing(bodyImageWithHair(bodyImage, isBot: isBot))
+        let dressedBody = bodyImageForClothing(bodyImageWithHair(bodyImage, isBot: isBot))
+        bodyImgView.image = bodyImageForHeadwear(dressedBody, isBot: isBot, wearsHood: wearsHood)
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
@@ -118,8 +125,20 @@ public class EditAvatarView : UIView {
             hairView.image = AvatarBodyShape.fittedHair(avatar.hair, bodyType: avatar.bodyType)
         }
         hairView.tintColor = hairColors[avatar.hairColorIdx]
-        let hairScale = avatar.hair.appearanceScale
-        let hairScaleY = avatar.hair.appearanceScaleY
+        var hairScale = avatar.hair.appearanceScale
+        var hairScaleY = avatar.hair.appearanceScaleY
+        // Fit only the headwear around its brim/eye anchor; body and face stay the same size.
+        let headwearFit: CGFloat
+        switch avatar.hair {
+        case .WitchHat:
+            headwearFit = min(1, 106 / (105 * hairScaleY),
+                262 / (216 * hairScale * avatar.bodyType.scaleX))
+        case .AstronautHelmet:
+            headwearFit = min(1, 109 / (97 * hairScaleY))
+        default: headwearFit = 1
+        }
+        hairScale *= headwearFit
+        hairScaleY *= headwearFit
         let hairWidthScale = isBot ? 1 : avatar.hair.widthScale(for: avatar.bodyType)
         let hairStyle = avatar.hair.style
         let hairOffsetX: CGFloat = hairStyle?.offsetX ?? (avatar.hair == .Beret ? -4 : 0)
@@ -228,6 +247,8 @@ public class EditAvatarView : UIView {
         switch avatar.addition {
         case .None, .BodyHair:
             break
+        case .Laptop:
+            insertSubview(additionImgView, aboveSubview: glassesView)
         case .Blazer:
             insertSubview(additionImgView, aboveSubview: clothingImgView)
         case .Freckles, .Old, .Makeup:
@@ -242,6 +263,19 @@ public class EditAvatarView : UIView {
         case .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
             insertSubview(additionImgView, aboveSubview: glassesView)
         }
+    }
+
+    private func bodyImageForHeadwear(_ image: UIImage?, isBot: Bool, wearsHood: Bool) -> UIImage? {
+        guard let image, !isBot, !wearsHood, avatar.hair == .WitchHat else { return image }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { renderer in
+            // The hat covers the scalp above avatar y=100; retain the face and ears below it.
+            let top = image.size.height * 64 / 244
+            renderer.cgContext.clip(to: CGRect(x: 0, y: top,
+                width: image.size.width, height: image.size.height - top))
+            image.draw(at: .zero)
+        }.withRenderingMode(image.renderingMode)
     }
 
     private func bodyImageWithHair(_ image: UIImage?, isBot: Bool) -> UIImage? {
@@ -273,6 +307,11 @@ public class EditAvatarView : UIView {
             let scaleY = image.size.height / 244
             let visibleSkin = UIBezierPath(rect: CGRect(x: 0, y: 0, width: image.size.width, height: 160 * scaleY))
             visibleSkin.append(UIBezierPath(rect: CGRect(x: (200 - torsoWidth) / 2 * scaleX, y: 160 * scaleY, width: torsoWidth * scaleX, height: 84 * scaleY)))
+            if let armsStartY = avatar.clothing.visibleArmsStartY {
+                // Restore skin below short cuffs while keeping it hidden outside the shoulders.
+                visibleSkin.append(UIBezierPath(rect: CGRect(x: 0, y: armsStartY * scaleY,
+                    width: image.size.width, height: (244 - armsStartY) * scaleY)))
+            }
             visibleSkin.addClip()
             image.draw(at: .zero)
         }.withRenderingMode(image.renderingMode)

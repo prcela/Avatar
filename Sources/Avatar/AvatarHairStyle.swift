@@ -62,7 +62,13 @@ struct AvatarHairStyle {
         .FlatTop: .init(scaleX: 0.88, scaleY: 0.901, offsetX: -0.147, offsetY: -2.292),
         .TwinBraids: .init(scaleX: 0.934, scaleY: 0.821, offsetX: 0.0, offsetY: -3.393),
         .LongStraightBangs: .init(scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0, foreheadInset: 6),
-        .Einstein: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: -24.1)
+        .Einstein: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: -24.1),
+        .CurlyFade: .init(scaleX: 0.88, scaleY: 0.88, offsetX: 0, offsetY: -15),
+        .FrenchBob: .init(scaleX: 0.9, scaleY: 1, offsetX: 0, offsetY: -16, foreheadInset: 6),
+        .SideBraid: .init(scaleX: 0.9, scaleY: 0.92, offsetX: -0.5, offsetY: -2),
+        .SlickBack: .init(scaleX: 0.9, scaleY: 0.9, offsetX: 0, offsetY: -11),
+        .PixieCut: .init(scaleX: 0.92, scaleY: 0.8, offsetX: 0, offsetY: -6),
+        .LowBun: .init(scaleX: 0.88, scaleY: 0.92, offsetX: -0.5, offsetY: 0)
     ]
 
     /// Protect the face after placement, leaving side lengths in front of clothing.
