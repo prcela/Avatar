@@ -198,11 +198,13 @@ if var id = AvatarHexID(savedHexId) {
 
 Use supported catalog values when changing raw fields. See [the hex ID reference](Docs/hex-id.md) for bit positions, reserved values, and face-proportion behavior.
 
+Hair contains only hairstyles. All caps, helmets, hijabs, turbans, winter/Santa hats, and the eyepatch are in Accessories. Removing headwear restores the selected hairstyle and hair color. The six newest hairstyles occupy IDs 19...24 in the compacted hair catalog.
+
 The latest [costume assets](Docs/costume-assets.md) add seven hats and helmets, six uniforms, a superhero eye mask, a laptop, and a NASA shirt logo.
 
 ## How many avatars are possible?
 
-The current catalog supports **66,435,092,996,035,580,264,448,000 human-avatar configurations** (approximately **6.64 x 10^25**) when all supported option values are combined.
+The current catalog supports **88,055,981,249,183,254,315,008,000 human-avatar configurations** (approximately **8.81 x 10^25**) when all supported option values are combined.
 
 | Option | Choices |
 | --- | ---: |
@@ -212,23 +214,23 @@ The current catalog supports **66,435,092,996,035,580,264,448,000 human-avatar c
 | Eyebrows | 14 |
 | Noses x nose sizes | 5 x 3 |
 | Mouths x mouth widths | 26 x 3 |
-| Hairstyles / headwear x colors | 78 x 28 |
+| Hairstyles x colors | 56 x 28 |
 | Facial hair x colors | 13 x 28 |
 | Clothing x colors | 40 x 26 |
 | Shirt logos | 28 |
 | Glasses x frame colors | 22 x 16 |
-| Accessories x colors | 26 x 26 |
+| Accessories x colors | 48 x 26 |
 | Jersey number settings | 101 (none, plus 0...99) |
 
 ```text
 5 x 9 x (18 x 3 x 3) x 14 x (5 x 3) x (26 x 3)
-  x (78 x 28) x (13 x 28) x (40 x 26) x 28 x (22 x 16) x (26 x 26) x 101
-= 66,435,092,996,035,580,264,448,000
+  x (56 x 28) x (13 x 28) x (40 x 26) x 28 x (22 x 16) x (48 x 26) x 101
+= 88,055,981,249,183,254,315,008,000
 ```
 
-This is a count of **stored configurations, not distinct rendered images**. It includes independent values that can be hidden or inactive: hair color with no hair, frame color with no glasses or a fixed-color model, colors on fixed-color garments, numbers on non-jerseys, a logo hidden by a jersey number, or facial features covered by an accessory. `None` is included where available; retired and reserved choices are excluded. The editor only exposes contextual controls when they apply. The body-hair accessory follows the hair color and stays below clothing, with the face and neck left clear.
+This is a count of **stored configurations, not distinct rendered images**. It includes independent values that can be hidden or inactive: hair hidden by headwear, hair color with no hair, frame color with no glasses or a fixed-color model, colors on fixed-color garments, numbers on non-jerseys, a logo hidden by a jersey number, or facial features covered by an accessory. `None` is included where available; retired and reserved choices are excluded. The editor only exposes contextual controls when they apply. The body-hair accessory follows the hair color and stays below clothing, with the face and neck left clear.
 
-The optional bot skin mode doubles the stored configuration count to **132,870,185,992,071,160,528,896,000**. It is outside the human editor's body choices and renders as a bot only when `UIAvatarView.enableBots` is enabled. The full 128-bit format has `2^128` possible bit patterns, but reserved patterns are **not** additional supported avatar options.
+The optional bot skin mode doubles the stored configuration count to **176,111,962,498,366,508,630,016,000**. It is outside the human editor's body choices and renders as a bot only when `UIAvatarView.enableBots` is enabled. The full 128-bit format has `2^128` possible bit patterns, but reserved patterns are **not** additional supported avatar options.
 
 ## Android
 

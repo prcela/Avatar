@@ -15,8 +15,8 @@ covers the lower throat and overlaps the sweatshirt neckline. The drawstring eye
 close to the neck. The grayscale fabric receives the selected accessory color.
 A separate black alpha gradient casts a soft shadow
 across the forehead without coloring the skin. Both layers follow body width.
-Hair and headwear are hidden only while Hood is selected; the saved hair choice
-is preserved. The hood is drawn immediately before facial hair, so the beard
+Hair is hidden only while Hood is selected; the saved hair choice is preserved.
+Other headwear shares the accessory category with Hood, so selecting it replaces Hood. The hood is drawn immediately before facial hair, so the beard
 overlays its fabric. The nose and glasses retain their normal foreground order.
 
 The original Hoodie assets are unchanged. Only the Hood + Hoodie combination

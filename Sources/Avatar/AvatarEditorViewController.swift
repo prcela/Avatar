@@ -327,7 +327,6 @@ public class AvatarEditorViewController: UIViewController {
     }
 
     private var showsColors: Bool {
-        if selectedPart == .Hair && avatar.hair.isCostume { return false }
         if selectedPart == .Glasses { return avatar.glasses.supportsFrameColor }
         if selectedPart == .Addition { return avatar.addition.usesColor }
         if selectedPart == .Clothing { return avatar.clothing.usesColor }

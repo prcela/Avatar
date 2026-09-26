@@ -8,8 +8,7 @@ edge are preserved. The new artwork is 56 points tall, leaving headroom above
 all five tips. Visible bounds change from (69, 0, 127, 87) to (69, 31, 127, 56),
 so the crown is about 36% shorter while retaining its 127-point width and y=87
 bottom edge. iOS includes 1x, 2x and 3x exports; Android uses matching 1x and 3x
-PNGs. Both renderers lift the crown by 18 points on bald heads (including the
-eyepatch-only style). Hair or headwear raises it another 8 points, for a total
+PNGs. Both renderers lift the crown by 18 points on bald heads. Hair raises it another 8 points, for a total
 lift of 26 points. Visible bounds are (69, 13, 127, 56) without hair and
 (69, 5, 127, 56) with hair. Size and avatar IDs are unchanged.
 

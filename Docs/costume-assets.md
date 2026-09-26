@@ -1,6 +1,6 @@
 # Costume assets
 
-Sixteen independently selectable additions to the existing avatar catalog. The two removed hats were not released, so the remaining new headwear is numbered consecutively from 71 through 77. These options use the existing hex ID fields.
+Sixteen independently selectable additions to the existing avatar catalog. All headwear belongs to Accessories (`Addition`), including the older hats, hijab, turban, and winter/Santa hats. The seven new caps and helmets use accessory IDs 41...47. Accessories use high-word bit 44 for values above 31; see [the hex ID reference](hex-id.md).
 
 ![Costume artwork on avatars](costume-preview.png)
 
@@ -10,13 +10,13 @@ This is an artwork placement proof composed from the package assets and XIB coor
 
 | Asset | Editor category | Raw value | Canvas (pt) | Artwork frame (x, y, w, h) |
 | --- | --- | ---: | --- | --- |
-| `PoliceCap` | Hair | 71 | 266 x 280 | 57, 17, 152, 79 |
-| `ConstructionHelmet` | Hair | 72 | 266 x 280 | 61, 27, 144, 70 |
-| `PilotCap` | Hair | 73 | 266 x 280 | 59, 21, 148, 74 |
-| `MotorcycleHelmet` | Hair | 74 | 266 x 280 | 57, 20, 152, 197.5 |
-| `AstronautHelmet` | Hair | 75 | 266 x 280 | 44, 13, 178, 213.25 |
-| `NinjaHood` | Hair | 76 | 266 x 280 | 55, 30, 184, 203 |
-| `WitchHat` | Hair | 77 | 266 x 280 | 25, 2, 216, 105 |
+| `PoliceCap` | Addition | 41 | 266 x 280 | 57, 17, 152, 79 |
+| `ConstructionHelmet` | Addition | 42 | 266 x 280 | 61, 27, 144, 70 |
+| `PilotCap` | Addition | 43 | 266 x 280 | 59, 21, 148, 74 |
+| `MotorcycleHelmet` | Addition | 44 | 266 x 280 | 57, 20, 152, 197.5 |
+| `AstronautHelmet` | Addition | 45 | 266 x 280 | 44, 13, 178, 213.25 |
+| `NinjaHood` | Addition | 46 | 266 x 280 | 55, 30, 184, 203 |
+| `WitchHat` | Addition | 47 | 266 x 280 | 25, 2, 216, 105 |
 | `PoliceUniform` | Clothing | 34 | 264 x 110 | 32, 14, 200, 96 |
 | `WorkerOveralls` | Clothing | 35 | 264 x 110 | 32, 14, 200, 96 |
 | `GuardsUniform` | Clothing | 36 | 264 x 110 | 32, 14, 200, 96 |
@@ -35,7 +35,7 @@ The lower sections of the motorcycle and astronaut helmets were extended downwar
 
 New headwear, uniforms, the laptop, and the eye mask preserve their original colors. The editor hides color controls for these fixed-color options. Clothing uses the existing 64-point torso mask to hide skin outside its shoulders. The six costume garments restore the full body width below their short sleeve cuffs (body-local y=222, avatar y=258), so exposed arms retain the selected skin color and shading.
 
-The ninja hood covers the mouth, nose, and facial hair. The motorcycle helmet has a raised visor and covers the mouth and facial hair behind its chin guard. The astronaut helmet covers facial hair. Changing headwear restores those views; selections remain saved. The existing raised hood takes precedence over headwear. The laptop appears in front of the torso.
+The ninja hood covers the mouth, nose, and facial hair. The motorcycle helmet has a raised visor and covers the mouth and facial hair behind its chin guard. The astronaut helmet covers facial hair. Changing headwear restores those views; selections remain saved. Headwear and the raised hood are mutually exclusive accessory choices. They preserve the selected hairstyle and hair color, which reappear when headwear is removed. Tintable hats use the independent accessory color. The eyepatch is also an accessory and leaves the hairstyle visible. The laptop appears in front of the torso.
 
 PNG assets use a transparent 3x canvas. Importing only crops to alpha bounds and resizes into the frame above; generated alpha and colors are preserved. The NASA logo is aspect-fitted into its frame.
 

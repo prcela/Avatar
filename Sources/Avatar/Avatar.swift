@@ -391,15 +391,12 @@ public class Avatar {
         case Frida
         case ShavedSides
         case Straight
-        // top accessories
-        case Eyepatch
-        case Hat
-        case Turban
-        case Hijab
-        case WinterHat1
-        case WinterHat2
-        case WinterHat3
-        case WinterHat4
+        case CurlyFade
+        case FrenchBob
+        case SideBraid
+        case SlickBack
+        case PixieCut
+        case LowBun
         case StraightStrand
         case LStraight
         case MiaWallace
@@ -421,62 +418,27 @@ public class Avatar {
         case TexturedCrop
         case SideSweep
         case Spiky
-        case CowboyHat
-        case BaseballCap
-        case ChefHat
-        case VikingHelmet
         case Mohawk
         case Pompadour
         case CurtainPart
         case HighPonytail
         case SpaceBuns
         
-        case BucketHat
-        case Beret
-        case BackwardCap
         case LowFade
         case FlatTop
         case TwinBraids
         case LongStraightBangs
         case Einstein
-        case CurlyFade
-        case FrenchBob
-        case SideBraid
-        case SlickBack
-        case PixieCut
-        case LowBun
-        case PoliceCap
-        case ConstructionHelmet
-        case PilotCap
-        case MotorcycleHelmet
-        case AstronautHelmet
-        case NinjaHood
-        case WitchHat
-
-        /// Fixed-color costume headwear, already positioned on the avatar canvas.
-        var isCostume: Bool {
-            switch self {
-            case .PoliceCap, .ConstructionHelmet, .PilotCap,
-                 .MotorcycleHelmet, .AstronautHelmet, .NinjaHood, .WitchHat:
-                return true
-            default: return false
-            }
-        }
 
         var style: AvatarHairStyle? { AvatarHairStyle.placement(for: self) }
 
         var appearanceScale: CGFloat {
             if let style { return style.scaleX }
             switch self {
-            case .PoliceCap, .ConstructionHelmet, .PilotCap,
-                 .MotorcycleHelmet, .AstronautHelmet: return 1.15
-            case .WitchHat: return 1.38
             // Move the hairline about 5 points outward at each temple.
             case .HighPonytail: return 1.134
             case .SpaceBuns: return 0.861
-            case .BucketHat: return 1.08
-            case .Beret, .LowFade: return 1.15
-            case .BackwardCap: return 1.0925
+            case .LowFade: return 1.15
             case .FlatTop: return 1.10
             default: return 1
             }
@@ -485,8 +447,6 @@ public class Avatar {
         var appearanceScaleY: CGFloat {
             if let style { return style.scaleY }
             switch self {
-            case .ConstructionHelmet: return 1.38
-            case .NinjaHood: return 1.06
             case .SideFringe: return 0.82
             case .HighPonytail: return 0.935
             case .SpaceBuns: return 0.72
@@ -501,13 +461,6 @@ public class Avatar {
                 switch bodyType {
                 case .broad: return 1.05
                 case .veryBroad: return 1.10
-                default: return 1
-                }
-            case .NinjaHood:
-                // Preserve the rounded silhouette when covering broader jaws.
-                switch bodyType {
-                case .broad: return 1.04
-                case .veryBroad: return 1.11
                 default: return 1
                 }
             case .SleekBob:
@@ -534,17 +487,8 @@ public class Avatar {
         var scaleAnchorY: CGFloat {
             if style != nil { return 0 }
             switch self {
-            // Keep cap brims and helmet openings close to their original positions.
-            case .PoliceCap: return 96
-            case .ConstructionHelmet: return 97
-            case .PilotCap: return 95
-            case .MotorcycleHelmet, .AstronautHelmet, .NinjaHood: return 110
-            case .WitchHat: return 107
             case .HighPonytail, .SpaceBuns: return 0
             case .SideFringe: return 24
-            case .BucketHat: return 51.5
-            case .Beret: return 45.5
-            case .BackwardCap: return 51
             case .LowFade: return 75.5
             case .FlatTop: return 65.5
             default: return 140
@@ -553,20 +497,6 @@ public class Avatar {
 
         func image() -> UIImage? {
             switch self {
-            case .PoliceCap:
-                return UIImage(named: "PoliceCap", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
-            case .ConstructionHelmet:
-                return UIImage(named: "ConstructionHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
-            case .PilotCap:
-                return UIImage(named: "PilotCap", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
-            case .MotorcycleHelmet:
-                return UIImage(named: "MotorcycleHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
-            case .AstronautHelmet:
-                return UIImage(named: "AstronautHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
-            case .NinjaHood:
-                return UIImage(named: "NinjaHood", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
-            case .WitchHat:
-                return UIImage(named: "WitchHat", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
             case .None:
                 return nil
             case .Dreads1:
@@ -605,22 +535,6 @@ public class Avatar {
                 return UIImage(named: "Shaved Sides", in: .module, compatibleWith: .current)
             case .Straight:
                 return UIImage(named: "Straight", in: .module, compatibleWith: .current)
-            case .Eyepatch:
-                return UIImage(named: "Eyepatch", in: .module, compatibleWith: .current)
-            case .Hat:
-                return UIImage(named: "Hat", in: .module, compatibleWith: .current)
-            case .Turban:
-                return UIImage(named: "Turban", in: .module, compatibleWith: .current)
-            case .Hijab:
-                return UIImage(named: "Hijab", in: .module, compatibleWith: .current)
-            case .WinterHat1:
-                return UIImage(named: "Winter Hat 1", in: .module, compatibleWith: .current)
-            case .WinterHat2:
-                return UIImage(named: "Winter Hat 2", in: .module, compatibleWith: .current)
-            case .WinterHat3:
-                return UIImage(named: "Winter Hat 3", in: .module, compatibleWith: .current)
-            case .WinterHat4:
-                return UIImage(named: "Winter Hat 4", in: .module, compatibleWith: .current)
             case .StraightStrand:
                 return UIImage(named: "StraightStrand", in: .module, compatibleWith: .current)
             case .LStraight:
@@ -663,14 +577,6 @@ public class Avatar {
                 return UIImage(named: "Side Sweep", in: .module, compatibleWith: .current)
             case .Spiky:
                 return UIImage(named: "Spiky", in: .module, compatibleWith: .current)
-            case .CowboyHat:
-                return UIImage(named: "CowboyHat", in: .module, compatibleWith: .current)
-            case .BaseballCap:
-                return UIImage(named: "BaseballCap", in: .module, compatibleWith: .current)
-            case .ChefHat:
-                return UIImage(named: "ChefHat", in: .module, compatibleWith: .current)
-            case .VikingHelmet:
-                return UIImage(named: "VikingHelmet", in: .module, compatibleWith: .current)
             case .Mohawk:
                 return UIImage(named: "Mohawk", in: .module, compatibleWith: .current)
             case .Pompadour:
@@ -681,12 +587,6 @@ public class Avatar {
                 return UIImage(named: "HighPonytail", in: .module, compatibleWith: .current)
             case .SpaceBuns:
                 return UIImage(named: "SpaceBuns", in: .module, compatibleWith: .current)
-            case .BucketHat:
-                return UIImage(named: "BucketHat", in: .module, compatibleWith: .current)
-            case .Beret:
-                return UIImage(named: "Beret", in: .module, compatibleWith: .current)
-            case .BackwardCap:
-                return UIImage(named: "BackwardCap", in: .module, compatibleWith: .current)
             case .LowFade:
                 return UIImage(named: "LowFade", in: .module, compatibleWith: .current)
             case .FlatTop:
@@ -719,47 +619,10 @@ public class Avatar {
             if style != nil && self != .Frida {
                 return image()?.avatarTinted(color)
             }
-            if [.SideFringe, .HighPonytail, .SpaceBuns, .BucketHat, .Beret, .BackwardCap, .LowFade, .FlatTop, .TwinBraids].contains(self) {
+            if [.SideFringe, .HighPonytail, .SpaceBuns, .LowFade, .FlatTop, .TwinBraids].contains(self) {
                 return image()?.avatarTinted(color)
             }
-            guard self == .CowboyHat || self == .BaseballCap, let image = image() else {
-                return image()
-            }
-
-            let bounds = CGRect(origin: .zero, size: image.size)
-            let format = UIGraphicsImageRendererFormat()
-            format.scale = image.scale
-            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-            let shading = renderer.image { context in
-                UIColor.white.setFill()
-                context.cgContext.fill(bounds)
-                image.draw(in: bounds, blendMode: .luminosity, alpha: 1)
-                context.cgContext.setBlendMode(.plusLighter)
-                UIColor(white: 0.55, alpha: 1).setFill()
-                context.cgContext.fill(bounds)
-            }
-
-            return renderer.image { context in
-                color.setFill()
-                context.cgContext.fill(bounds)
-                shading.draw(in: bounds, blendMode: .multiply, alpha: 1)
-                image.draw(in: bounds, blendMode: .destinationIn, alpha: 1)
-
-                if self == .CowboyHat {
-                    // Preserve the original band in the 264 x 280 artwork coordinates.
-                    let band = UIBezierPath()
-                    band.move(to: CGPoint(x: 70.7, y: 58.5))
-                    band.addQuadCurve(to: CGPoint(x: 193, y: 58.8), controlPoint: CGPoint(x: 132, y: 41.5))
-                    band.addLine(to: CGPoint(x: 195.5, y: 68.3))
-                    band.addQuadCurve(to: CGPoint(x: 68.5, y: 68.3), controlPoint: CGPoint(x: 132, y: 52.2))
-                    band.close()
-                    band.apply(CGAffineTransform(scaleX: bounds.width / 264, y: bounds.height / 280))
-                    context.cgContext.saveGState()
-                    band.addClip()
-                    image.draw(in: bounds, blendMode: .normal, alpha: 1)
-                    context.cgContext.restoreGState()
-                }
-            }.withRenderingMode(.alwaysOriginal)
+            return image()
         }
         
     }
@@ -1032,7 +895,7 @@ public class Avatar {
         
     }
     enum Addition: Int, CaseIterable, AvatarSymbol {
-        // 4 legacy bits plus one extension bit in the hex ID.
+        // 4 legacy bits plus two extension bits in the hex ID.
         case None
         case Blazer
         case Freckles
@@ -1060,9 +923,75 @@ public class Avatar {
         case Hood = 23
         case BodyHair = 24
         case Laptop
+        case Eyepatch
+        case Hat
+        case Turban
+        case Hijab
+        case WinterHat1
+        case WinterHat2
+        case WinterHat3
+        case WinterHat4
+        case CowboyHat
+        case BaseballCap
+        case ChefHat
+        case VikingHelmet
+        case BucketHat
+        case Beret
+        case BackwardCap
+        case PoliceCap
+        case ConstructionHelmet
+        case PilotCap
+        case MotorcycleHelmet
+        case AstronautHelmet
+        case NinjaHood
+        case WitchHat
 
         func image() -> UIImage? {
             switch self {
+            case .PoliceCap:
+                return UIImage(named: "PoliceCap", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .ConstructionHelmet:
+                return UIImage(named: "ConstructionHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .PilotCap:
+                return UIImage(named: "PilotCap", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .MotorcycleHelmet:
+                return UIImage(named: "MotorcycleHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .AstronautHelmet:
+                return UIImage(named: "AstronautHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .NinjaHood:
+                return UIImage(named: "NinjaHood", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .WitchHat:
+                return UIImage(named: "WitchHat", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .Eyepatch:
+                return UIImage(named: "Eyepatch", in: .module, compatibleWith: .current)
+            case .Hat:
+                return UIImage(named: "Hat", in: .module, compatibleWith: .current)
+            case .Turban:
+                return UIImage(named: "Turban", in: .module, compatibleWith: .current)
+            case .Hijab:
+                return UIImage(named: "Hijab", in: .module, compatibleWith: .current)
+            case .WinterHat1:
+                return UIImage(named: "Winter Hat 1", in: .module, compatibleWith: .current)
+            case .WinterHat2:
+                return UIImage(named: "Winter Hat 2", in: .module, compatibleWith: .current)
+            case .WinterHat3:
+                return UIImage(named: "Winter Hat 3", in: .module, compatibleWith: .current)
+            case .WinterHat4:
+                return UIImage(named: "Winter Hat 4", in: .module, compatibleWith: .current)
+            case .CowboyHat:
+                return UIImage(named: "CowboyHat", in: .module, compatibleWith: .current)
+            case .BaseballCap:
+                return UIImage(named: "BaseballCap", in: .module, compatibleWith: .current)
+            case .ChefHat:
+                return UIImage(named: "ChefHat", in: .module, compatibleWith: .current)
+            case .VikingHelmet:
+                return UIImage(named: "VikingHelmet", in: .module, compatibleWith: .current)
+            case .BucketHat:
+                return UIImage(named: "BucketHat", in: .module, compatibleWith: .current)
+            case .Beret:
+                return UIImage(named: "Beret", in: .module, compatibleWith: .current)
+            case .BackwardCap:
+                return UIImage(named: "BackwardCap", in: .module, compatibleWith: .current)
             case .Laptop:
                 return UIImage(named: "Laptop", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
             case .None:
@@ -1118,7 +1047,117 @@ public class Avatar {
             }
         }
 
-        var usesColor: Bool { self == .BowTie || self == .Tie || self == .Scarf || self == .Hood }
+        /// Headwear replaces the visible hair while retaining the selected hairstyle.
+        var isHeadwear: Bool {
+            switch self {
+            case .Hat, .Turban, .Hijab, .WinterHat1, .WinterHat2, .WinterHat3, .WinterHat4,
+                 .CowboyHat, .BaseballCap, .ChefHat, .VikingHelmet, .BucketHat, .Beret, .BackwardCap,
+                 .PoliceCap, .ConstructionHelmet, .PilotCap, .MotorcycleHelmet,
+                 .AstronautHelmet, .NinjaHood, .WitchHat:
+                return true
+            default: return false
+            }
+        }
+
+        var headwearScale: CGFloat {
+            switch self {
+            case .CowboyHat: return 0.95
+            case .PoliceCap, .ConstructionHelmet, .PilotCap,
+                 .MotorcycleHelmet, .AstronautHelmet, .Beret: return 1.15
+            case .WitchHat: return 1.38
+            case .BucketHat: return 1.08
+            case .BackwardCap: return 1.0925
+            default: return 1
+            }
+        }
+
+        var headwearScaleY: CGFloat {
+            switch self {
+            case .CowboyHat: return 1
+            case .ConstructionHelmet: return 1.38
+            case .NinjaHood: return 1.06
+            default: return headwearScale
+            }
+        }
+
+        func headwearWidthScale(for bodyType: BodyType) -> CGFloat {
+            guard self == .NinjaHood else { return 1 }
+            // Preserve the rounded silhouette when covering broader jaws.
+            switch bodyType {
+            case .broad: return 1.04
+            case .veryBroad: return 1.11
+            default: return 1
+            }
+        }
+
+        var headwearAnchorY: CGFloat {
+            // Keep cap brims and helmet openings close to their original positions.
+            switch self {
+            case .PoliceCap: return 96
+            case .ConstructionHelmet: return 97
+            case .PilotCap: return 95
+            case .MotorcycleHelmet, .AstronautHelmet, .NinjaHood: return 110
+            case .WitchHat: return 107
+            case .BucketHat: return 51.5
+            case .Beret: return 45.5
+            case .BackwardCap: return 51
+            default: return 140
+            }
+        }
+
+        var usesColor: Bool {
+            switch self {
+            case .BowTie, .Tie, .Scarf, .Hood,
+                 .Hat, .Turban, .Hijab, .WinterHat1, .WinterHat2, .WinterHat3, .WinterHat4,
+                 .CowboyHat, .BaseballCap, .ChefHat, .VikingHelmet, .BucketHat, .Beret, .BackwardCap:
+                return true
+            default: return false
+            }
+        }
+
+        func headwearImage(color: UIColor) -> UIImage? {
+            if [.BucketHat, .Beret, .BackwardCap].contains(self) {
+                return image()?.avatarTinted(color)
+            }
+            guard self == .CowboyHat || self == .BaseballCap, let image = image() else {
+                return image()
+            }
+
+            let bounds = CGRect(origin: .zero, size: image.size)
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = image.scale
+            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+            let shading = renderer.image { context in
+                UIColor.white.setFill()
+                context.cgContext.fill(bounds)
+                image.draw(in: bounds, blendMode: .luminosity, alpha: 1)
+                context.cgContext.setBlendMode(.plusLighter)
+                UIColor(white: 0.55, alpha: 1).setFill()
+                context.cgContext.fill(bounds)
+            }
+
+            return renderer.image { context in
+                color.setFill()
+                context.cgContext.fill(bounds)
+                shading.draw(in: bounds, blendMode: .multiply, alpha: 1)
+                image.draw(in: bounds, blendMode: .destinationIn, alpha: 1)
+
+                if self == .CowboyHat {
+                    // Preserve the original band in the 264 x 280 artwork coordinates.
+                    let band = UIBezierPath()
+                    band.move(to: CGPoint(x: 70.7, y: 58.5))
+                    band.addQuadCurve(to: CGPoint(x: 193, y: 58.8), controlPoint: CGPoint(x: 132, y: 41.5))
+                    band.addLine(to: CGPoint(x: 195.5, y: 68.3))
+                    band.addQuadCurve(to: CGPoint(x: 68.5, y: 68.3), controlPoint: CGPoint(x: 132, y: 52.2))
+                    band.close()
+                    band.apply(CGAffineTransform(scaleX: bounds.width / 264, y: bounds.height / 280))
+                    context.cgContext.saveGState()
+                    band.addClip()
+                    image.draw(in: bounds, blendMode: .normal, alpha: 1)
+                    context.cgContext.restoreGState()
+                }
+            }.withRenderingMode(.alwaysOriginal)
+        }
 
         func avatarImage(color: UIColor? = nil) -> UIImage? {
             if self == .Hood {
@@ -1134,6 +1173,8 @@ public class Avatar {
             }
             let frames: [CGRect]
             switch self {
+            case .Eyepatch:
+                frames = [CGRect(x: -1, y: 0, width: 266, height: 280)]
             case .Crown:
                 // Lift the compact crown without changing its size.
                 frames = [CGRect(x: 0, y: -18, width: 264, height: 280)]

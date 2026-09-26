@@ -1,7 +1,7 @@
 # Body hair accessory
 
 `Addition.BodyHair` uses accessory ID 24 on iOS and Android. It reuses the existing
-hair color, including with a bald head or fixed-color headwear. It needs no new
+hair color, including with a bald head. It needs no new
 hex-ID fields, and the accessory color stays saved independently.
 
 The transparent sprite has slightly thicker, longer irregular curls and overlapping open loops on the chest,

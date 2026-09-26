@@ -213,23 +213,50 @@ final class AvatarTests: XCTestCase {
         XCTAssertEqual(avatar.compressHex(), hex.hex)
     }
 
-    func testFirstExtendedHairRoundTripsWithoutChangingLegacyNeighbors() throws {
+    func testFirstSixBitAccessoryRoundTripsWithoutChangingLegacyNeighbors() throws {
         let avatar = Avatar.decompress(value: legacy)
-        avatar.set(part: .Hair, symbol: Avatar.Hair.Einstein)
+        avatar.set(part: .Addition, symbol: Avatar.Addition.WinterHat3)
         let hex = avatar.compressHex()
-        XCTAssertEqual(hex, "00000000000000400c8849016c39285a")
+        XCTAssertEqual(hex, "00001000000000000c8849616c39205a")
         let saved = Avatar.decompress(value: 0, hexId: hex)
-        XCTAssertEqual(saved.hair, .Einstein)
+        XCTAssertEqual(saved.addition, .WinterHat3)
         XCTAssertEqual(saved.compressHex(), hex)
 
-        let expectedLegacy = legacy & ~(Int64(63) << 33)
+        let expectedLegacy = legacy & ~(Int64(15) << 8)
         XCTAssertEqual(avatar.compress(), expectedLegacy)
         XCTAssertEqual(saved.legacyAvatarId, expectedLegacy)
-        XCTAssertEqual(Avatar.decompress(value: expectedLegacy).hair, .None)
+        XCTAssertEqual(Avatar.decompress(value: expectedLegacy).addition, .None)
         let encoded = try XCTUnwrap(AvatarHexID(hex))
         let original = AvatarHexID(legacyID: legacy)
-        for field in AvatarHexID.Field.allCases where field != .hair {
+        for field in AvatarHexID.Field.allCases where field != .addition {
             XCTAssertEqual(encoded[field], original[field])
+        }
+    }
+
+    func testSixBitAccessoriesPreserveColorsProportionsAndReservedBits() throws {
+        let original = try XCTUnwrap(AvatarHexID("ffffefffffffffffffffffffffffffff"))
+        for value in 0...63 {
+            var hex = original
+            hex[.addition] = value
+            XCTAssertEqual(AvatarHexID(hex.hex)?[.addition], value)
+            for field in AvatarHexID.Field.allCases where field != .addition {
+                XCTAssertEqual(hex[field], original[field])
+            }
+            XCTAssertEqual(hex.bodyType, original.bodyType)
+            XCTAssertEqual(hex.additionColor, original.additionColor)
+            XCTAssertEqual(hex.glassesColor, original.glassesColor)
+            XCTAssertEqual(hex.jerseyNumber, original.jerseyNumber)
+            XCTAssertEqual(hex.eyeSpacing, original.eyeSpacing)
+            XCTAssertEqual(hex.eyeSize, original.eyeSize)
+            XCTAssertEqual(hex.mouthWidth, original.mouthWidth)
+            XCTAssertEqual(hex.noseSize, original.noseSize)
+            let mask = (UInt64(1) << 12) | (UInt64(1) << 44)
+            let expectedHigh = (UInt64.max & ~mask)
+                | (UInt64((value >> 4) & 1) << 12) | (UInt64((value >> 5) & 1) << 44)
+            let expectedLow = (UInt64.max & ~(UInt64(15) << 8)) | (UInt64(value & 15) << 8)
+            XCTAssertEqual(hex.hex, String(format: "%016llx%016llx", expectedHigh, expectedLow))
+            hex[.addition] = original[.addition]
+            XCTAssertEqual(hex, original)
         }
     }
 
@@ -260,7 +287,7 @@ final class AvatarTests: XCTestCase {
 
     func testSharedHexFixtureAndBodyOnlyEdit() {
         let avatar = Avatar.decompress(value: 0, hexId: "00000000000080000c8849616c39285a")
-        XCTAssertEqual(avatar.hair, .CowboyHat)
+        XCTAssertEqual(avatar.hair, .CurtainPart)
         XCTAssertEqual(avatar.bodyType, .slim)
         XCTAssertEqual(avatar.legacyAvatarId, legacy)
         avatar.bodyType = .broad
@@ -568,7 +595,7 @@ extension AvatarTests {
         avatar.set(part: .Clothing, symbol: Avatar.Clothing.Hoodie)
         view.avatar = avatar
         view.layoutIfNeeded()
-        for hair in [Avatar.Hair.LongWavy, .CowboyHat] {
+        for hair in [Avatar.Hair.LongWavy, .FrenchBob] {
             avatar.set(part: .Hair, symbol: hair)
             view.update()
             let original = try XCTUnwrap(view.image()?.pngData())

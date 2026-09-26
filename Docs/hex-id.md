@@ -11,7 +11,7 @@ The space above is only a visual separator; an actual ID contains no spaces. Bit
 
 ## Part fields
 
-Each field gets one extra bit in the high word. Clothing gets a second extra bit at high-word position 30.
+Each field gets one extra bit in the high word. Clothing gets a second extra bit at high-word position 30; accessories get a second extra bit at position 44.
 
 | Field | Low-word bits | High-word extension bit(s) | Encoded range |
 | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ Each field gets one extra bit in the high word. Clothing gets a second extra bit
 | Clothing color | 20...24 | 9 | 0...63 |
 | Facial hair | 16...19 | 10 | 0...31 |
 | Facial hair color | 12...15 | 11 | 0...31 |
-| Accessory (`addition`) | 8...11 | 12 | 0...31 |
+| Accessory (`addition`) | 8...11 | 12 (bit 4), 44 (bit 5) | 0...63 |
 | Nose | 5...7 | 13 | 0...15 |
 | Shirt logo | 0...4 | 14 | 0...63 |
 
@@ -45,7 +45,9 @@ These are storage capacities, not counts of currently available parts. Low-word 
 | 33...34 | Eye size | 0 normal, 1 small, 2 large; 3 reserved |
 | 35...36 | Mouth width | 0 normal, 1 narrow, 2 wide; 3 reserved |
 | 37...38 | Nose size | 0 normal, 1 small, 2 large; 3 reserved |
-| 39...63 | Reserved | Preserve on unrelated edits |
+| 39...43 | Glasses frame color | 0 original color, palette indices 1...15; 16...31 reserved |
+| 44 | Accessory bit 5 | See the part-field table |
+| 45...63 | Reserved | Preserve on unrelated edits |
 
 Raw setters enforce the encoded range with a precondition. A value fitting that range is not necessarily a supported catalog option. Facial-hair raw value 11 is retired; current options continue at 12 and 13, so enum case counts must not be inferred from the maximum raw value.
 

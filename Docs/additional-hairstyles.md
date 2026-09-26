@@ -4,14 +4,14 @@ The built-in `imagegen` tool created six grayscale sprites in the same shaded st
 
 | Style | Hair ID | Asset directory |
 | --- | ---: | --- |
-| Short curls with tapered sides (`CurlyFade`) | 65 | `Sources/Avatar/Avatar.xcassets/Short Hair/CurlyFade.imageset` |
-| Short bob with straight bangs (`FrenchBob`) | 66 | `Sources/Avatar/Avatar.xcassets/Long Hair/FrenchBob.imageset` |
-| Single braid over the right shoulder (`SideBraid`) | 67 | `Sources/Avatar/Avatar.xcassets/Long Hair/SideBraid.imageset` |
-| Combed-back short hair (`SlickBack`) | 68 | `Sources/Avatar/Avatar.xcassets/Short Hair/SlickBack.imageset` |
-| Short layered pixie (`PixieCut`) | 69 | `Sources/Avatar/Avatar.xcassets/Short Hair/PixieCut.imageset` |
-| Low side chignon with loose strands (`LowBun`) | 70 | `Sources/Avatar/Avatar.xcassets/Long Hair/LowBun.imageset` |
+| Short curls with tapered sides (`CurlyFade`) | 19 | `Sources/Avatar/Avatar.xcassets/Short Hair/CurlyFade.imageset` |
+| Short bob with straight bangs (`FrenchBob`) | 20 | `Sources/Avatar/Avatar.xcassets/Long Hair/FrenchBob.imageset` |
+| Single braid over the right shoulder (`SideBraid`) | 21 | `Sources/Avatar/Avatar.xcassets/Long Hair/SideBraid.imageset` |
+| Combed-back short hair (`SlickBack`) | 22 | `Sources/Avatar/Avatar.xcassets/Short Hair/SlickBack.imageset` |
+| Short layered pixie (`PixieCut`) | 23 | `Sources/Avatar/Avatar.xcassets/Short Hair/PixieCut.imageset` |
+| Low side chignon with loose strands (`LowBun`) | 24 | `Sources/Avatar/Avatar.xcassets/Long Hair/LowBun.imageset` |
 
-IDs are appended after `Einstein` (64). They use the existing hair extension bit in the hex ID; no encoding fields or previous values change. `Hair.allCases` exposes them in both editors and random avatar generation. Placement and face protection are defined in `AvatarHairStyle.swift`; the existing front and rear layers keep long hair visible over clothing. `FrenchBob` uses the same six-point forehead inset as `LongStraightBangs`.
+IDs 19...24 fill the first places freed by moving headwear to accessories. The unreleased hair catalog is compacted to IDs 0...55, with only hairstyles and `None` remaining. `Hair.allCases` exposes them in both editors and random avatar generation. Placement and face protection are defined in `AvatarHairStyle.swift`; the existing front and rear layers keep long hair visible over clothing. `FrenchBob` uses the same six-point forehead inset as `LongStraightBangs`.
 
 ## Generation prompts
 

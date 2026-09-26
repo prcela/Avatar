@@ -49,21 +49,22 @@ public class EditAvatarView : UIView {
             avatar.skinColorIdx = 0
         }
         let isBot = avatar.skin == .Bot && UIAvatarView.enableBots
-        // Tuck hair and headwear under the hood without changing the saved style.
+        // Keep the selected hairstyle saved while a hood or headwear covers it.
         let wearsHood = avatar.addition == .Hood
+        let wearsHeadwear = avatar.addition.isHeadwear
         hairView.isHidden = wearsHood
         hairBackingView.isHidden = wearsHood
         // Keep selected facial features saved while costume fabric covers them.
-        let wearsNinjaMask = !wearsHood && avatar.hair == .NinjaHood
-        let wearsHelmet = !wearsHood && (avatar.hair == .MotorcycleHelmet || avatar.hair == .AstronautHelmet)
-        mouthImgView.isHidden = wearsNinjaMask || (!wearsHood && avatar.hair == .MotorcycleHelmet)
+        let wearsNinjaMask = avatar.addition == .NinjaHood
+        let wearsHelmet = avatar.addition == .MotorcycleHelmet || avatar.addition == .AstronautHelmet
+        mouthImgView.isHidden = wearsNinjaMask || avatar.addition == .MotorcycleHelmet
         noseImgView.isHidden = wearsNinjaMask
         facialHairImgView.isHidden = wearsNinjaMask || wearsHelmet
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         let bodyImage = isBot ? avatar.skin.image()
             : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
         let dressedBody = bodyImageForClothing(bodyImageWithHair(bodyImage, isBot: isBot))
-        bodyImgView.image = bodyImageForHeadwear(dressedBody, isBot: isBot, wearsHood: wearsHood)
+        bodyImgView.image = bodyImageForHeadwear(dressedBody, isBot: isBot)
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
@@ -116,20 +117,23 @@ public class EditAvatarView : UIView {
             // Enlarge around the lens/eye center (160, 110), retaining the 8-point drop.
             glassesView.transform = glassesTransform.translatedBy(x: -11.2, y: 11.6).scaledBy(x: 1.4, y: 1.4)
         }
+        let additionColors = Avatar.Part.Addition.colors()
+        let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
         let hairColors = Avatar.Part.Hair.colors()
         if avatar.hairColorIdx >= hairColors.count {
             avatar.hairColorIdx = 0
         }
-        hairView.image = avatar.hair.image(color: hairColors[avatar.hairColorIdx])
-        if !isBot && avatar.hair.followsCheekShape {
+        hairView.image = wearsHeadwear ? avatar.addition.headwearImage(color: additionColor)
+            : avatar.hair.image(color: hairColors[avatar.hairColorIdx])
+        if !isBot && !wearsHeadwear && avatar.hair.followsCheekShape {
             hairView.image = AvatarBodyShape.fittedHair(avatar.hair, bodyType: avatar.bodyType)
         }
-        hairView.tintColor = hairColors[avatar.hairColorIdx]
-        var hairScale = avatar.hair.appearanceScale
-        var hairScaleY = avatar.hair.appearanceScaleY
+        hairView.tintColor = wearsHeadwear ? additionColor : hairColors[avatar.hairColorIdx]
+        var hairScale = wearsHeadwear ? avatar.addition.headwearScale : avatar.hair.appearanceScale
+        var hairScaleY = wearsHeadwear ? avatar.addition.headwearScaleY : avatar.hair.appearanceScaleY
         // Fit only the headwear around its brim/eye anchor; body and face stay the same size.
         let headwearFit: CGFloat
-        switch avatar.hair {
+        switch avatar.addition {
         case .WitchHat:
             headwearFit = min(1, 106 / (105 * hairScaleY),
                 262 / (216 * hairScale * avatar.bodyType.scaleX))
@@ -139,12 +143,14 @@ public class EditAvatarView : UIView {
         }
         hairScale *= headwearFit
         hairScaleY *= headwearFit
-        let hairWidthScale = isBot ? 1 : avatar.hair.widthScale(for: avatar.bodyType)
-        let hairStyle = avatar.hair.style
-        let hairOffsetX: CGFloat = hairStyle?.offsetX ?? (avatar.hair == .Beret ? -4 : 0)
-        let hairOffsetY = (1 - hairScaleY) * (avatar.hair.scaleAnchorY - 140) + (hairStyle?.offsetY ?? 0)
+        let hairWidthScale = isBot ? 1 : (wearsHeadwear
+            ? avatar.addition.headwearWidthScale(for: avatar.bodyType) : avatar.hair.widthScale(for: avatar.bodyType))
+        let hairStyle = wearsHeadwear ? nil : avatar.hair.style
+        let hairOffsetX: CGFloat = hairStyle?.offsetX ?? (avatar.addition == .Beret ? -4 : 0)
+        let hairAnchorY = wearsHeadwear ? avatar.addition.headwearAnchorY : avatar.hair.scaleAnchorY
+        let hairOffsetY = (1 - hairScaleY) * (hairAnchorY - 140) + (hairStyle?.offsetY ?? 0)
         // Raise the ponytail by 5% of the 280-point avatar canvas.
-        let hairLift: CGFloat = avatar.hair == .HighPonytail ? 14 : 0
+        let hairLift: CGFloat = !wearsHeadwear && avatar.hair == .HighPonytail ? 14 : 0
         let hairTransform = bodyTransform.translatedBy(x: hairOffsetX, y: hairOffsetY - hairLift)
             .scaledBy(x: hairScale, y: hairScaleY)
         hairView.transform = hairTransform.scaledBy(x: hairWidthScale, y: 1)
@@ -158,7 +164,7 @@ public class EditAvatarView : UIView {
         }
         let needsHairBacking = hairStyle != nil || avatar.hair == .HighPonytail
             || (avatar.hair == .LongWavy && (avatar.bodyType == .broad || avatar.bodyType == .veryBroad))
-        if !isBot && needsHairBacking {
+        if !isBot && !wearsHeadwear && needsHairBacking {
             // Fill openings behind the skin when widening the front hair.
             if hairBackingView.superview == nil {
                 insertSubview(hairBackingView, belowSubview: bodyImgView)
@@ -209,12 +215,10 @@ public class EditAvatarView : UIView {
         }
         clothingImgView.image = avatar.clothing.image(color: clothingColors[avatar.clothingColorIdx], raisedHood: wearsHood)
         clothingImgView.tintColor = clothingColors[avatar.clothingColorIdx]
-        let additionColors = Avatar.Part.Addition.colors()
-        let additionColor = additionColors.indices.contains(avatar.additionColorIdx) ? additionColors[avatar.additionColorIdx] : additionColors[0]
         // Body hair belongs to the skin layer, beneath every garment.
-        additionImgView.image = avatar.addition == .BodyHair ? nil : avatar.addition.avatarImage(color: additionColor)
-        if avatar.addition == .Crown && avatar.hair != .None && avatar.hair != .Eyepatch {
-            // Leave bald heads at the base position; make room for hair or headwear.
+        additionImgView.image = (avatar.addition == .BodyHair || wearsHeadwear) ? nil : avatar.addition.avatarImage(color: additionColor)
+        if avatar.addition == .Crown && avatar.hair != .None {
+            // Leave bald heads at the base position; make room for hair.
             additionImgView.transform = bodyTransform.translatedBy(x: 0, y: -8)
         }
         let facialHairColors = Avatar.Part.FacialHair.colors()
@@ -244,8 +248,18 @@ public class EditAvatarView : UIView {
             clothingLogoImgView.transform = CGAffineTransform(translationX: 36 * avatar.bodyType.scaleX, y: 0)
         }
         
+        // The witch hat brim covers glasses; other selections restore the normal hair layer.
+        if avatar.addition == .WitchHat {
+            insertSubview(hairView, aboveSubview: glassesView)
+        } else {
+            insertSubview(hairView, aboveSubview: clothingLogoImgView)
+        }
         switch avatar.addition {
-        case .None, .BodyHair:
+        case .None, .BodyHair, .Hat, .Turban, .Hijab,
+             .WinterHat1, .WinterHat2, .WinterHat3, .WinterHat4,
+             .CowboyHat, .BaseballCap, .ChefHat, .VikingHelmet, .BucketHat, .Beret, .BackwardCap,
+             .PoliceCap, .ConstructionHelmet, .PilotCap, .MotorcycleHelmet,
+             .AstronautHelmet, .NinjaHood, .WitchHat:
             break
         case .Laptop:
             insertSubview(additionImgView, aboveSubview: glassesView)
@@ -253,7 +267,7 @@ public class EditAvatarView : UIView {
             insertSubview(additionImgView, aboveSubview: clothingImgView)
         case .Freckles, .Old, .Makeup:
             insertSubview(additionImgView, aboveSubview: bodyImgView)
-        case .Hairband, .Crown, .KungFuHeadband:
+        case .Hairband, .Crown, .KungFuHeadband, .Eyepatch:
             insertSubview(additionImgView, aboveSubview: hairView)
         case .Bandana, .Hood:
             // Facial hair lies over the fabric at the jaw and neck.
@@ -265,8 +279,8 @@ public class EditAvatarView : UIView {
         }
     }
 
-    private func bodyImageForHeadwear(_ image: UIImage?, isBot: Bool, wearsHood: Bool) -> UIImage? {
-        guard let image, !isBot, !wearsHood, avatar.hair == .WitchHat else { return image }
+    private func bodyImageForHeadwear(_ image: UIImage?, isBot: Bool) -> UIImage? {
+        guard let image, !isBot, avatar.addition == .WitchHat else { return image }
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
         return UIGraphicsImageRenderer(size: image.size, format: format).image { renderer in

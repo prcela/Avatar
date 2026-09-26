@@ -17,6 +17,8 @@ public struct AvatarHexID: Equatable, Hashable {
 
     /// High-word bit 30 is clothing bit 5; the existing clothing extension stays at bit 8.
     private static let clothingExtensionOffset = 30
+    /// High-word bit 44 is accessory bit 5, after the glasses-color field.
+    private static let additionExtensionOffset = 44
 
     public init(legacyID: Int64) {
         high = 0
@@ -39,10 +41,14 @@ public struct AvatarHexID: Equatable, Hashable {
         get {
             let mask = (UInt64(1) << field.width) - 1
             let value = Int((low >> field.offset) & mask) | (Int((high >> field.rawValue) & 1) << field.width)
-            return field == .clothing ? value | (Int((high >> Self.clothingExtensionOffset) & 1) << 5) : value
+            switch field {
+            case .clothing: return value | (Int((high >> Self.clothingExtensionOffset) & 1) << 5)
+            case .addition: return value | (Int((high >> Self.additionExtensionOffset) & 1) << 5)
+            default: return value
+            }
         }
         set {
-            let extraWidth = field == .clothing ? 2 : 1
+            let extraWidth = field == .clothing || field == .addition ? 2 : 1
             precondition(newValue >= 0 && newValue < (1 << (field.width + extraWidth)))
             let mask = (UInt64(1) << field.width) - 1
             low = (low & ~(mask << field.offset)) | ((UInt64(newValue) & mask) << field.offset)
@@ -51,6 +57,9 @@ public struct AvatarHexID: Equatable, Hashable {
             if field == .clothing {
                 let clothingMask = UInt64(1) << Self.clothingExtensionOffset
                 high = (high & ~clothingMask) | (UInt64((newValue >> 5) & 1) << Self.clothingExtensionOffset)
+            } else if field == .addition {
+                let additionMask = UInt64(1) << Self.additionExtensionOffset
+                high = (high & ~additionMask) | (UInt64((newValue >> 5) & 1) << Self.additionExtensionOffset)
             }
         }
     }
