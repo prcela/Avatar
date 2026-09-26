@@ -234,12 +234,4 @@ A Kotlin implementation is also used in Yamb on Android. For details, contact us
 
 ## Licensing
 
-The code is licensed under the [Mozilla Public License 2.0](LICENSE), with
-**Rika Omega Rika** as the copyright holder for the project's own code.
-You can use it in commercial, closed-source applications. When distributing
-it, make the MPL-covered source, including modifications, available to
-recipients under the MPL and explain where they can obtain it.
-
-**Bundled artwork is excluded from this code license.** Its original license
-and redistribution permissions still need verification, including for artwork
-used in exported avatars. See [LICENSING.md](LICENSING.md) for scope and status.
+See [LICENSING.md](LICENSING.md) for scope and status.
