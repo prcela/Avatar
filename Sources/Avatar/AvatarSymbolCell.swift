@@ -14,6 +14,7 @@ class AvatarSymbolCell: UICollectionViewCell {
     @IBOutlet weak var img: UIImageView!
     @IBOutlet weak var imageBottomConstraint: NSLayoutConstraint!
     private let caption = UILabel()
+    var imageRequest = UUID()
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -43,6 +44,7 @@ class AvatarSymbolCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        imageRequest = UUID()
         img.image = nil
         setCaption(nil)
         contentView.layer.borderWidth = 0

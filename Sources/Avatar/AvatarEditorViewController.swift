@@ -25,6 +25,7 @@ public class AvatarEditorViewController: UIViewController {
     private var rememberedParts: [Avatar.Part] = [.Skin, .Eyes, .Hair, .Clothing]
 
     private let preview = UIImageView()
+    private var previewRequest = UUID()
     private let groupControl = UISegmentedControl()
     private let partScrollView = UIScrollView()
     private let partStack = UIStackView()
@@ -439,7 +440,12 @@ public class AvatarEditorViewController: UIViewController {
     }
 
     private func updatePreview() {
-        preview.image = AvatarCache.fetchImage(avatarId: avatar.legacyAvatarId, avatarHexId: avatar.compressHex(), small: false)
+        let request = UUID()
+        previewRequest = request
+        AvatarCache.loadImage(avatarId: avatar.legacyAvatarId, avatarHexId: avatar.compressHex(), small: false) { [weak self] image in
+            guard let self, self.previewRequest == request else { return }
+            self.preview.image = image
+        }
     }
 
     private func updateJerseyNumberMenu() {
@@ -523,9 +529,8 @@ extension AvatarEditorViewController: UICollectionViewDataSource, UICollectionVi
             let type = bodyTypes[indexPath.item]
             let copy = Avatar.decompress(value: avatar.legacyAvatarId, hexId: avatar.compressHex())
             copy.bodyType = type
-            let image = AvatarCache.fetchImage(avatarId: copy.legacyAvatarId, avatarHexId: copy.compressHex(), small: false)
             let title = bodyTypeTitle(type)
-            cell.configure(image: image, caption: title, color: nil, label: title)
+            cell.configureAvatar(copy, caption: title)
         } else {
             let symbol = selectedPart.symbols()[indexPath.item]
             let image = (symbol as? Avatar.Glasses)?.image(colorIndex: avatar.glassesColorIdx) ?? symbol.image()

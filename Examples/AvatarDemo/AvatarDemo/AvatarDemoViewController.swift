@@ -234,8 +234,17 @@ final class AvatarDemoViewController: UIViewController {
 
     @objc private func savePNG() {
         view.endEditing(true)
-        // Export the package-rendered image, without the demo's preview background.
-        guard let png = avatarView.image?.pngData() else {
+        let hexId = avatar.compressHex()
+        Task { @MainActor [weak self] in
+            let image = await AvatarCache.image(avatarId: 0, avatarHexId: hexId, small: false)
+            guard let self, self.view.window != nil, self.presentedViewController == nil else { return }
+            self.exportPNG(image, hexId: hexId)
+        }
+    }
+
+    private func exportPNG(_ image: UIImage, hexId: String) {
+        // Wait for the selected avatar, even if its preview is still loading.
+        guard let png = image.pngData() else {
             showError("demo.exportError")
             return
         }
@@ -244,7 +253,7 @@ final class AvatarDemoViewController: UIViewController {
         exportDirectory = directory
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            let file = directory.appendingPathComponent("avatar-\(avatar.compressHex()).png")
+            let file = directory.appendingPathComponent("avatar-\(hexId).png")
             try png.write(to: file, options: .atomic)
             let picker = UIDocumentPickerViewController(forExporting: [file], asCopy: true)
             picker.delegate = self

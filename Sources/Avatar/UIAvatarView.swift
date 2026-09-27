@@ -16,20 +16,28 @@ public class UIAvatarView: UIImageView {
     public static var enableBots = false
     public var avatarId: Int64? = nil {
         didSet {
-            if oldValue != avatarId {
+            if oldValue != avatarId && !settingAvatar {
                 update()
             }
         }
     }
     public var avatarHexId = "" {
-        didSet { if oldValue != avatarHexId { update() } }
+        didSet { if oldValue != avatarHexId && !settingAvatar { update() } }
     }
 
+    private var settingAvatar = false
+    private var imageRequest = UUID()
+
     public func setAvatar(avatarId: Int64? = nil, avatarHexId: String = "") {
+        settingAvatar = true
         self.avatarHexId = avatarHexId
         self.avatarId = avatarId
+        settingAvatar = false
+        update()
     }
-    public var small = false
+    public var small = false {
+        didSet { if oldValue != small { update() } }
+    }
     
     public override func awakeFromNib() {
         super.awakeFromNib()
@@ -50,8 +58,14 @@ public class UIAvatarView: UIImageView {
     }
     
     fileprivate func update() {
+        let request = UUID()
+        imageRequest = request
         if let avatarId = avatarId ?? AvatarHexID(avatarHexId)?.legacyID, !Self.hideAll {
-            image = AvatarCache.fetchImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small)
+            image = AvatarCache.cachedImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small)
+            AvatarCache.loadImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small) { [weak self] image in
+                guard let self, self.imageRequest == request, !Self.hideAll else { return }
+                self.image = image
+            }
         } else {
             image = nil
         }

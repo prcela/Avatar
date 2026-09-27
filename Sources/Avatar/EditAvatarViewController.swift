@@ -266,11 +266,15 @@ public class EditAvatarViewController: UIViewController {
         }
     }
 
-    private func bodyTypePreview(_ type: Avatar.BodyType) -> UIImage? {
+    private func configureBodyTypePreview(_ type: Avatar.BodyType, cell: AvatarSymbolCell) {
         // Preview a copy so browsing the options never changes the selected avatar.
         let preview = Avatar.decompress(value: avatar.compress(), hexId: avatar.compressHex())
         preview.bodyType = type
-        return AvatarCache.fetchImage(avatarId: preview.compress(), avatarHexId: preview.compressHex(), small: false)
+        let request = cell.imageRequest
+        AvatarCache.loadImage(avatarId: preview.compress(), avatarHexId: preview.compressHex(), small: false) { [weak cell] image in
+            guard let cell, cell.imageRequest == request else { return }
+            cell.img.image = image
+        }
     }
     
     @IBAction func cancel(_ sender: Any) {
@@ -291,9 +295,11 @@ extension EditAvatarViewController: UICollectionViewDataSource {
         switch collectionView {
         case symbolsCollectionView:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath) as! AvatarSymbolCell
+            cell.imageRequest = UUID()
+            cell.img.image = nil
             if part == .Skin {
                 let type = bodyTypes[indexPath.row]
-                cell.img.image = bodyTypePreview(type)
+                configureBodyTypePreview(type, cell: cell)
                 cell.setCaption(bodyTypeTitle(type))
             } else {
                 let symbol = part.symbols()[indexPath.row]

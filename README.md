@@ -107,17 +107,19 @@ Here, `avatarView` is a `UIAvatarView`. **Reset proportions** resets only the se
 Render an avatar from its saved ID without adding a view to your layout:
 
 ```swift
-let image = AvatarCache.fetchImage(
+let image = await AvatarCache.image(
     avatarId: 0,
     avatarHexId: "00000000325e00000c8849616c39285a",
     small: false
 )
-let pngData = image?.pngData()
+let pngData = image.pngData()
 ```
 
 The [demo app](Examples/AvatarDemo/README.md) shows how to save the PNG with the Files export picker.
 
-Use the editor, views, and image cache on the main thread. The cache keys images by the normalized full hex ID. Call `AvatarCache.didReceiveMemoryWarning()` to clear cached images when needed. Set `small = true` **before** assigning a `UIAvatarView` ID only when a 30 x 30 cached thumbnail is sufficient; the SwiftUI view and image cache also accept `small: true`.
+The views load images asynchronously. Cache bookkeeping and UI updates use the main actor; image composition runs on a serial background queue without creating UIKit views. Use `await AvatarCache.image(...)` from an async context, or `AvatarCache.loadImage(..., completion:)` on the main actor for a callback (also delivered on the main actor). `cachedImage(...)` only looks up an existing image and returns `nil` on a miss. The old synchronous `fetchImage` API has been removed.
+
+Requests for the same normalized ID, bot setting, display scale, and appearance share one render, including requests for both sizes. The cache has a 32 MB cost limit. Call `AvatarCache.didReceiveMemoryWarning()` to clear it; already-running requests still deliver their images without repopulating the cleared cache. Use `small: true` for a 30 x 30 thumbnail. Changing `UIAvatarView.small` reloads its image automatically.
 
 ## Avatar IDs and persistence
 

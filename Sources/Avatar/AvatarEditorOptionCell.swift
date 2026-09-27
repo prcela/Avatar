@@ -7,6 +7,7 @@ final class AvatarEditorOptionCell: UICollectionViewCell {
     private let caption = UILabel()
     private let swatch = UIView()
     private let checkmark = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
+    private var imageRequest = UUID()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -59,6 +60,7 @@ final class AvatarEditorOptionCell: UICollectionViewCell {
     }
 
     func configure(image: UIImage?, caption text: String?, color: UIColor?, label: String) {
+        imageRequest = UUID()
         img.image = image
         img.isHidden = color != nil
         caption.text = text
@@ -68,6 +70,15 @@ final class AvatarEditorOptionCell: UICollectionViewCell {
         contentView.backgroundColor = color == nil ? .secondarySystemBackground : .clear
         accessibilityLabel = label
         updateSelection()
+    }
+
+    func configureAvatar(_ avatar: Avatar, caption: String) {
+        configure(image: nil, caption: caption, color: nil, label: caption)
+        let request = imageRequest
+        AvatarCache.loadImage(avatarId: avatar.legacyAvatarId, avatarHexId: avatar.compressHex(), small: false) { [weak self] image in
+            guard let self, self.imageRequest == request else { return }
+            self.img.image = image
+        }
     }
 
     override var isSelected: Bool {
@@ -88,6 +99,7 @@ final class AvatarEditorOptionCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        imageRequest = UUID()
         img.image = nil
         caption.text = nil
         swatch.backgroundColor = nil

@@ -63,8 +63,8 @@ public class EditAvatarView : UIView {
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         let bodyImage = isBot ? avatar.skin.image()
             : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
-        let dressedBody = bodyImageForClothing(bodyImageWithHair(bodyImage, isBot: isBot))
-        bodyImgView.image = bodyImageForHeadwear(dressedBody, isBot: isBot)
+        let dressedBody = avatar.bodyImageForClothing(avatar.bodyImageWithHair(bodyImage, isBot: isBot))
+        bodyImgView.image = avatar.bodyImageForHeadwear(dressedBody, isBot: isBot)
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
         mouthImgView.image = avatar.mouth.image()
@@ -76,7 +76,7 @@ public class EditAvatarView : UIView {
             .scaledBy(x: noseScale, y: noseScale)
         if avatar.eyeSpacing == .normal && avatar.eyeSize == .normal {
             eyePairView.isHidden = true
-            eyesImgView.image = positionedPair(avatar.eyes.image())
+            eyesImgView.image = avatar.positionedPair(avatar.eyes.image())
         } else {
             if eyePairView.superview == nil {
                 eyesImgView.addSubview(eyePairView)
@@ -95,7 +95,7 @@ public class EditAvatarView : UIView {
         if avatar.eyebrow == .UnibrowNatural || avatar.eyeSpacing == .normal {
             browPairView.isHidden = true
             eyesbrowImgView.image = avatar.eyebrow == .UnibrowNatural
-                ? avatar.eyebrow.image() : positionedPair(avatar.eyebrow.image())
+                ? avatar.eyebrow.image() : avatar.positionedPair(avatar.eyebrow.image())
         } else {
             if browPairView.superview == nil {
                 eyesbrowImgView.addSubview(browPairView)
@@ -279,79 +279,7 @@ public class EditAvatarView : UIView {
         }
     }
 
-    private func bodyImageForHeadwear(_ image: UIImage?, isBot: Bool) -> UIImage? {
-        guard let image, !isBot, avatar.addition == .WitchHat else { return image }
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = image.scale
-        return UIGraphicsImageRenderer(size: image.size, format: format).image { renderer in
-            // The hat covers the scalp above avatar y=100; retain the face and ears below it.
-            let top = image.size.height * 64 / 244
-            renderer.cgContext.clip(to: CGRect(x: 0, y: top,
-                width: image.size.width, height: image.size.height - top))
-            image.draw(at: .zero)
-        }.withRenderingMode(image.renderingMode)
-    }
 
-    private func bodyImageWithHair(_ image: UIImage?, isBot: Bool) -> UIImage? {
-        guard avatar.addition == .BodyHair, !isBot,
-              let image, let hair = Avatar.Addition.BodyHair.image() else { return image }
-        let colors = Avatar.Part.Hair.colors()
-        let color = colors[colors.indices.contains(avatar.hairColorIdx) ? avatar.hairColorIdx : 0]
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = image.scale
-        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
-            image.draw(at: .zero)
-            // Body-local y=166 is avatar y=202, safely below the face and neck.
-            // Source-atop keeps the original skin alpha, including shoulder edges.
-            let frame = CGRect(x: 0, y: image.size.height * 166 / 244,
-                               width: image.size.width, height: image.size.height * 78 / 244)
-            hair.withTintColor(color, renderingMode: .alwaysOriginal)
-                .draw(in: frame, blendMode: .sourceAtop, alpha: 1)
-        }.withRenderingMode(.alwaysOriginal)
-    }
-
-    private func bodyImageForClothing(_ image: UIImage?) -> UIImage? {
-        guard let image else { return nil }
-        guard let torsoWidth = avatar.clothing.visibleTorsoWidth else { return image }
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = image.scale
-        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
-            // Keep the head and neckline, hiding skin outside the garment's shoulders.
-            let scaleX = image.size.width / 200
-            let scaleY = image.size.height / 244
-            let visibleSkin = UIBezierPath(rect: CGRect(x: 0, y: 0, width: image.size.width, height: 160 * scaleY))
-            visibleSkin.append(UIBezierPath(rect: CGRect(x: (200 - torsoWidth) / 2 * scaleX, y: 160 * scaleY, width: torsoWidth * scaleX, height: 84 * scaleY)))
-            if let armsStartY = avatar.clothing.visibleArmsStartY {
-                // Restore skin below short cuffs while keeping it hidden outside the shoulders.
-                visibleSkin.append(UIBezierPath(rect: CGRect(x: 0, y: armsStartY * scaleY,
-                    width: image.size.width, height: (244 - armsStartY) * scaleY)))
-            }
-            visibleSkin.addClip()
-            image.draw(at: .zero)
-        }.withRenderingMode(image.renderingMode)
-    }
-
-    private func positionedPair(_ image: UIImage?) -> UIImage? {
-        guard let image, avatar.bodyType != .normal else { return image }
-        // Move each eye/brow by 3 or 6 points on the 264-point avatar canvas.
-        // Only the spacing changes; each half keeps its original size and height.
-        let offset = (avatar.bodyType.scaleX - 1) * 20 * image.size.width / 112
-        let halfWidth = image.size.width / 2
-        let format = UIGraphicsImageRendererFormat.default()
-        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-        return renderer.image { context in
-            for side in 0...1 {
-                let shift = side == 0 ? -offset : offset
-                let clip = CGRect(x: CGFloat(side) * halfWidth + shift, y: 0,
-                                  width: halfWidth, height: image.size.height)
-                context.cgContext.saveGState()
-                context.cgContext.clip(to: clip)
-                image.draw(at: CGPoint(x: shift, y: 0))
-                context.cgContext.restoreGState()
-            }
-        }
-    }
-    
 }
 
 /// Clip the source pair before transforming each half. Large eyes, including tears
