@@ -61,7 +61,11 @@ public class UIAvatarView: UIImageView {
         let request = UUID()
         imageRequest = request
         if let avatarId = avatarId ?? AvatarHexID(avatarHexId)?.legacyID, !Self.hideAll {
-            image = AvatarCache.cachedImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small)
+            if let cached = AvatarCache.cachedImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small) {
+                image = cached
+                return
+            }
+            image = nil
             AvatarCache.loadImage(avatarId: avatarId, avatarHexId: avatarHexId, small: small) { [weak self] image in
                 guard let self, self.imageRequest == request, !Self.hideAll else { return }
                 self.image = image

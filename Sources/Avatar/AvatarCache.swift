@@ -95,7 +95,8 @@ public class AvatarCache {
     }
 
     static func image(for key: Key, small: Bool) async -> UIImage {
-        await withCheckedContinuation { continuation in
+        if let image = cachedImage(for: key, small: small) { return image }
+        return await withCheckedContinuation { continuation in
             loadImage(for: key, small: small) { continuation.resume(returning: $0) }
         }
     }
