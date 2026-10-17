@@ -945,6 +945,7 @@ public class Avatar {
         case AstronautHelmet
         case NinjaHood
         case WitchHat
+        case KnightHelmet = 48
 
         func image() -> UIImage? {
             switch self {
@@ -962,6 +963,8 @@ public class Avatar {
                 return UIImage(named: "NinjaHood", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
             case .WitchHat:
                 return UIImage(named: "WitchHat", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
+            case .KnightHelmet:
+                return UIImage(named: "KnightHelmet", in: .module, compatibleWith: .current)?.withRenderingMode(.alwaysOriginal)
             case .Eyepatch:
                 return UIImage(named: "Eyepatch", in: .module, compatibleWith: .current)
             case .Hat:
@@ -1053,7 +1056,7 @@ public class Avatar {
             case .Hat, .Turban, .Hijab, .WinterHat1, .WinterHat2, .WinterHat3, .WinterHat4,
                  .CowboyHat, .BaseballCap, .ChefHat, .VikingHelmet, .BucketHat, .Beret, .BackwardCap,
                  .PoliceCap, .ConstructionHelmet, .PilotCap, .MotorcycleHelmet,
-                 .AstronautHelmet, .NinjaHood, .WitchHat:
+                 .AstronautHelmet, .NinjaHood, .WitchHat, .KnightHelmet:
                 return true
             default: return false
             }
@@ -1799,7 +1802,7 @@ protocol AvatarSymbol: Any {
 }
 
 public extension UIImage {
-    public func avatarTinted(_ color: UIColor) -> UIImage {
+    func avatarTinted(_ color: UIColor) -> UIImage {
         let bounds = CGRect(origin: .zero, size: size)
         let format = UIGraphicsImageRendererFormat()
         format.scale = scale

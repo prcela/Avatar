@@ -103,13 +103,13 @@ struct AvatarRenderer {
         let isBot = avatar.skin == .Bot && enableBots
         let wearsHood = avatar.addition == .Hood
         let wearsHeadwear = avatar.addition.isHeadwear
-        let wearsNinjaMask = avatar.addition == .NinjaHood
+        let wearsFaceMask = avatar.addition == .NinjaHood || avatar.addition == .KnightHelmet
         let wearsHelmet = avatar.addition == .MotorcycleHelmet || avatar.addition == .AstronautHelmet
         hair.hidden = wearsHood
         backing.hidden = wearsHood
-        mouth.hidden = wearsNinjaMask || avatar.addition == .MotorcycleHelmet
-        nose.hidden = wearsNinjaMask
-        beard.hidden = wearsNinjaMask || wearsHelmet
+        mouth.hidden = wearsFaceMask || avatar.addition == .MotorcycleHelmet
+        nose.hidden = wearsFaceMask
+        beard.hidden = wearsFaceMask || wearsHelmet
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         // Read the captured bot setting, never UIAvatarView from the render queue.
         let bodyImage = isBot ? UIImage(named: "Bot", in: .module, compatibleWith: .current)
@@ -118,6 +118,8 @@ struct AvatarRenderer {
         body.image = avatar.bodyImageForHeadwear(dressedBody, isBot: isBot)
         body.tintColor = skinColors[skinIndex]
         neck.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: .current)
+        // The bot sprite already contains its mechanical neck and shading.
+        neck.hidden = isBot
         mouth.image = avatar.mouth.image()
         mouth.transform = CGAffineTransform(scaleX: avatar.mouthWidth.scale, y: 1)
         nose.image = AvatarNoseStyle.image(for: avatar.nose, skinColorIndex: skinIndex)
@@ -232,13 +234,14 @@ struct AvatarRenderer {
                 layers.insert(layer, at: index + (above ? 1 : 0))
             }
         }
-        place(hair, relativeTo: avatar.addition == .WitchHat ? glasses : logo, above: true)
+        let coversGlasses = avatar.addition == .WitchHat || avatar.addition == .KnightHelmet
+        place(hair, relativeTo: coversGlasses ? glasses : logo, above: true)
         switch avatar.addition {
         case .None, .BodyHair, .Hat, .Turban, .Hijab,
              .WinterHat1, .WinterHat2, .WinterHat3, .WinterHat4,
              .CowboyHat, .BaseballCap, .ChefHat, .VikingHelmet, .BucketHat, .Beret, .BackwardCap,
              .PoliceCap, .ConstructionHelmet, .PilotCap, .MotorcycleHelmet,
-             .AstronautHelmet, .NinjaHood, .WitchHat:
+             .AstronautHelmet, .NinjaHood, .WitchHat, .KnightHelmet:
             break
         case .Laptop, .AddHearts, .Headphones, .CheekBandage, .EyebrowScar, .EyebrowPiercing:
             place(addition, relativeTo: glasses, above: true)

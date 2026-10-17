@@ -40,6 +40,7 @@ final class AvatarCostumeTests: XCTestCase {
         view.layoutIfNeeded()
         for (addition, hidesMouth, hidesNose, hidesBeard) in [
             (Avatar.Addition.NinjaHood, true, true, true),
+            (.KnightHelmet, true, true, true),
             (.PoliceCap, false, false, false),
             (.MotorcycleHelmet, true, false, true),
             (.AstronautHelmet, false, false, true),

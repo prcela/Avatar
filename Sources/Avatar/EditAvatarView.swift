@@ -54,12 +54,12 @@ public class EditAvatarView : UIView {
         let wearsHeadwear = avatar.addition.isHeadwear
         hairView.isHidden = wearsHood
         hairBackingView.isHidden = wearsHood
-        // Keep selected facial features saved while costume fabric covers them.
-        let wearsNinjaMask = avatar.addition == .NinjaHood
+        // Keep selected facial features saved while a mask or helmet covers them.
+        let wearsFaceMask = avatar.addition == .NinjaHood || avatar.addition == .KnightHelmet
         let wearsHelmet = avatar.addition == .MotorcycleHelmet || avatar.addition == .AstronautHelmet
-        mouthImgView.isHidden = wearsNinjaMask || avatar.addition == .MotorcycleHelmet
-        noseImgView.isHidden = wearsNinjaMask
-        facialHairImgView.isHidden = wearsNinjaMask || wearsHelmet
+        mouthImgView.isHidden = wearsFaceMask || avatar.addition == .MotorcycleHelmet
+        noseImgView.isHidden = wearsFaceMask
+        facialHairImgView.isHidden = wearsFaceMask || wearsHelmet
         let bodyImages = isBot ? nil : AvatarBodyShape.images(for: avatar.bodyType)
         let bodyImage = isBot ? avatar.skin.image()
             : AvatarBodyShape.shadedBody(for: avatar.bodyType, skinColorIndex: avatar.skinColorIdx)
@@ -67,6 +67,8 @@ public class EditAvatarView : UIView {
         bodyImgView.image = avatar.bodyImageForHeadwear(dressedBody, isBot: isBot)
         bodyImgView.tintColor = skinColors[avatar.skinColorIdx]
         neckShadowImgView.image = bodyImages?.shadow ?? UIImage(named: "Neck Shadow", in: .module, compatibleWith: nil)
+        // The bot sprite already contains its mechanical neck and shading.
+        neckShadowImgView.isHidden = isBot
         mouthImgView.image = avatar.mouth.image()
         mouthImgView.transform = CGAffineTransform(scaleX: avatar.mouthWidth.scale, y: 1)
         noseImgView.image = AvatarNoseStyle.image(for: avatar.nose, skinColorIndex: avatar.skinColorIdx)
@@ -248,8 +250,8 @@ public class EditAvatarView : UIView {
             clothingLogoImgView.transform = CGAffineTransform(translationX: 36 * avatar.bodyType.scaleX, y: 0)
         }
         
-        // The witch hat brim covers glasses; other selections restore the normal hair layer.
-        if avatar.addition == .WitchHat {
+        // The witch hat brim and knight visor cover glasses; restore normal layering when removed.
+        if avatar.addition == .WitchHat || avatar.addition == .KnightHelmet {
             insertSubview(hairView, aboveSubview: glassesView)
         } else {
             insertSubview(hairView, aboveSubview: clothingLogoImgView)
@@ -259,7 +261,7 @@ public class EditAvatarView : UIView {
              .WinterHat1, .WinterHat2, .WinterHat3, .WinterHat4,
              .CowboyHat, .BaseballCap, .ChefHat, .VikingHelmet, .BucketHat, .Beret, .BackwardCap,
              .PoliceCap, .ConstructionHelmet, .PilotCap, .MotorcycleHelmet,
-             .AstronautHelmet, .NinjaHood, .WitchHat:
+             .AstronautHelmet, .NinjaHood, .WitchHat, .KnightHelmet:
             break
         case .Laptop:
             insertSubview(additionImgView, aboveSubview: glassesView)
